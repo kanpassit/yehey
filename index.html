@@ -532,10 +532,15 @@ async function init() {
   if (urlEl) urlEl.value = sbCfg.url;
   if (keyEl) keyEl.value = sbCfg.key;
 
-  // Load questions and check auth in parallel
+  // Load questions and check auth in parallel (with timeout on auth call)
+  const authPromise = Promise.race([
+    sbClient.auth.getSession().catch(() => ({ data: { session: null } })),
+    new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 2000))
+  ]);
+
   const [, sessionResult] = await Promise.all([
     loadQuestions(),
-    sbClient.auth.getSession().catch(() => ({ data: { session: null } }))
+    authPromise
   ]);
 
   if (sessionResult.data?.session) {
@@ -1336,7 +1341,4 @@ function closeModeModal(e) {
     document.getElementById('mode-overlay').classList.remove('open');
 }
 
-let _confirmCallback = null;
-function showConfirm({ icon, title, body, okLabel, onOk }) {
-  document.getElementById('confirm-icon').textContent  = icon || '⚠️';
-  document.getEleme
+let _c
