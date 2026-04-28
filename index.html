@@ -729,6 +729,11 @@ async function signOut() {
 // SUBJECTS VIEW
 // ═══════════════════════════════════════════════════════
 function renderSubjectsView() {
+  // Guard: ensure currentUser is initialized
+  if (!currentUser) {
+    currentUser = { id: 'guest', email: 'guest' };
+  }
+
   const pill = document.getElementById('user-pill');
   if (currentUser.id === 'guest') {
     pill.textContent = 'Guest Mode';
@@ -1334,37 +1339,4 @@ function closeModeModal(e) {
 let _confirmCallback = null;
 function showConfirm({ icon, title, body, okLabel, onOk }) {
   document.getElementById('confirm-icon').textContent  = icon || '⚠️';
-  document.getElementById('confirm-title').textContent = title;
-  document.getElementById('confirm-body').innerHTML    = body;
-  document.getElementById('confirm-ok').textContent   = okLabel || 'Confirm';
-  _confirmCallback = onOk;
-  document.getElementById('confirm-ok').onclick = () => { closeConfirm(); if (_confirmCallback) _confirmCallback(); };
-  document.getElementById('confirm-overlay').classList.add('open');
-}
-function closeConfirm() {
-  document.getElementById('confirm-overlay').classList.remove('open');
-  _confirmCallback = null;
-}
-
-// ═══════════════════════════════════════════════════════
-// UTILITIES
-// ═══════════════════════════════════════════════════════
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2600);
-}
-
-init();
-</script>
-</body>
-</html>
+  document.getEleme
