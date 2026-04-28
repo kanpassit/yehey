@@ -516,38 +516,56 @@ let authMode = 'signin';
 // INIT
 // ═══════════════════════════════════════════════════════
 async function init() {
-  const SUPABASE_URL = 'https://kcycuabxhowpdprrulyn.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtjeWN1YWJ4aG93cGRwcnJ1bHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMjg4OTQsImV4cCI6MjA5MjkwNDg5NH0.69f-JBkd8dAalymT7p4of-nihweiJcKeffUZxv7-T2c';
-  const sbCfg = { url: SUPABASE_URL, key: SUPABASE_KEY };
-  localStorage.setItem('studyapp_supabase', JSON.stringify(sbCfg));
+  try {
+    const SUPABASE_URL = 'https://kcycuabxhowpdprrulyn.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtjeWN1YWJ4aG93cGRwcnJ1bHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMjg4OTQsImV4cCI6MjA5MjkwNDg5NH0.69f-JBkd8dAalymT7p4of-nihweiJcKeffUZxv7-T2c';
+    const sbCfg = { url: SUPABASE_URL, key: SUPABASE_KEY };
+    localStorage.setItem('studyapp_supabase', JSON.stringify(sbCfg));
 
-  // Show loading screen while we fetch questions + auth state
-  showView('v-loading');
+    // Show loading screen while we fetch questions + auth state
+    showView('v-loading');
 
-  initSupabase(sbCfg.url, sbCfg.key);
+    initSupabase(sbCfg.url, sbCfg.key);
 
-  // Pre-fill setup form fields
-  const urlEl = document.getElementById('sb-url');
-  const keyEl = document.getElementById('sb-key');
-  if (urlEl) urlEl.value = sbCfg.url;
-  if (keyEl) keyEl.value = sbCfg.key;
+    // Pre-fill setup form fields
+    const urlEl = document.getElementById('sb-url');
+    const keyEl = document.getElementById('sb-key');
+    if (urlEl) urlEl.value = sbCfg.url;
+    if (keyEl) keyEl.value = sbCfg.key;
 
-  // Load questions and check auth in parallel (with timeout on auth call)
-  const authPromise = Promise.race([
-    sbClient.auth.getSession().catch(() => ({ data: { session: null } })),
-    new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 2000))
-  ]);
+    // Load questions with timeout (max 5 seconds)
+    const loadQuestionsPromise = Promise.race([
+      loadQuestions(),
+      new Promise(resolve => setTimeout(() => { console.warn('[QB] loadQuestions timeout'); resolve(false); }, 5000))
+    ]);
 
-  const [, sessionResult] = await Promise.all([
-    loadQuestions(),
-    authPromise
-  ]);
+    // Check auth with timeout (max 2 seconds)
+    const authPromise = Promise.race([
+      sbClient ? sbClient.auth.getSession().catch(e => { console.warn('[AUTH] getSession error:', e); return { data: { session: null } }; }) : Promise.resolve({ data: { session: null } }),
+      new Promise(resolve => setTimeout(() => { console.warn('[AUTH] getSession timeout'); resolve({ data: { session: null } }); }, 2000))
+    ]);
 
-  if (sessionResult.data?.session) {
-    currentUser = { id: sessionResult.data.session.user.id, email: sessionResult.data.session.user.email };
-    showView('v-subjects');
-    renderSubjectsView();
-  } else {
+    // Wait for both to complete
+    const [qLoaded, sessionResult] = await Promise.all([
+      loadQuestionsPromise,
+      authPromise
+    ]);
+
+    console.log('[INIT] Questions loaded:', qLoaded, 'Session result:', sessionResult);
+
+    // Determine next view based on session
+    if (sessionResult?.data?.session) {
+      currentUser = { id: sessionResult.data.session.user.id, email: sessionResult.data.session.user.email };
+      console.log('[INIT] Authenticated user:', currentUser.email);
+      showView('v-subjects');
+      renderSubjectsView();
+    } else {
+      console.log('[INIT] No session, showing auth view');
+      showView('v-auth');
+    }
+  } catch (err) {
+    console.error('[INIT] Error during initialization:', err);
+    // Fallback: show auth view
     showView('v-auth');
   }
 }
@@ -573,10 +591,23 @@ async function loadQuestions() {
       console.log('[QB] Loaded from cache:', Object.entries(QB).map(([k,v])=>`${k}:${v.length}`).join(', '));
       return true;
     }
-  } catch(e) {}
+  } catch(e) {
+    console.warn('[QB] Cache parse error:', e);
+  }
 
-  // 2. Fetch from Supabase questions table
-  if (!sbClient) return false;
+  // 2. Fallback: ensure QB has all subjects even if cache/Supabase fails
+  // This prevents "Cannot read property 'length' of undefined" errors
+  if (!QB['ab900']) QB['ab900'] = [];
+  if (!QB['lvn']) QB['lvn'] = [];
+  if (!QB['shrm']) QB['shrm'] = [];
+  if (!QB['shrm-scp']) QB['shrm-scp'] = [];
+
+  // 3. Try Supabase fetch only if client exists
+  if (!sbClient) {
+    console.warn('[QB] sbClient not initialized, using empty question banks');
+    return false;
+  }
+
   try {
     const { data, error } = await sbClient
       .from('questions')
@@ -608,7 +639,9 @@ async function loadQuestions() {
     // Cache for next load
     try {
       localStorage.setItem(QB_CACHE_KEY, JSON.stringify({ ts: Date.now(), data: QB }));
-    } catch(e) {}
+    } catch(e) {
+      console.warn('[QB] Cache save error:', e);
+    }
 
     console.log('[QB] Loaded from Supabase:', Object.entries(QB).map(([k,v])=>`${k}:${v.length}`).join(', '));
     return true;
@@ -748,8 +781,13 @@ function renderSubjectsView() {
 
   const grid = document.getElementById('subjects-grid');
   grid.innerHTML = Object.values(SUBJECTS).map(s => {
+    // Ensure QB[s.key] exists and is an array
+    if (!QB[s.key]) {
+      QB[s.key] = [];
+    }
+
     const subAnswers = getLocalAnswers(s.key);
-    const total = QB[s.key].length;
+    const total = QB[s.key].length || 0;
     const answered = Object.keys(subAnswers).length;
     const correct  = Object.values(subAnswers).filter(a => a.lastResult === 'correct').length;
     const acc = answered ? Math.round(correct / answered * 100) : 0;
@@ -1341,4 +1379,40 @@ function closeModeModal(e) {
     document.getElementById('mode-overlay').classList.remove('open');
 }
 
-let _c
+let _confirmCallback = null;
+function showConfirm({ icon, title, body, okLabel, onOk }) {
+  document.getElementById('confirm-icon').textContent  = icon || '⚠️';
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-body').innerHTML    = body;
+  document.getElementById('confirm-ok').textContent   = okLabel || 'Confirm';
+  _confirmCallback = onOk;
+  document.getElementById('confirm-ok').onclick = () => { closeConfirm(); if (_confirmCallback) _confirmCallback(); };
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm() {
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _confirmCallback = null;
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+init();
+</script>
+</body>
+</html>
