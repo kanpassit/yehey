@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>KanPassIt — AI-Powered Exam Prep</title>
 <meta name="description" content="KanPassIt — AI-powered exam prep for AB-900 (Microsoft 365 Copilot), LVN NCLEX-PN, and SHRM-CP certifications. Adaptive quizzes, domain performance tracking, and AI study analysis.">
 <meta name="keywords" content="exam prep, AB-900, NCLEX, SHRM-CP, quiz, certification, study app, AI tutor">
 <meta property="og:title" content="KanPassIt — AI-Powered Exam Prep">
@@ -10,7 +11,6 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://kanpassit.com">
 <link rel="canonical" href="https://kanpassit.com">
-<title>KanPassIt — AI-Powered Exam Prep</title>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6787955359497496" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -42,6 +42,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 a.la{color:#5aadff;text-decoration:none}
 .skip-link{font-size:12px;color:var(--text2);text-align:center;margin-top:12px;cursor:pointer}
 .skip-link span{color:#5aadff}
+.landing-tagline{font-size:13px;color:var(--text2);text-align:center;margin-bottom:20px;max-width:300px;line-height:1.6}
+.feature-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px}
+.feature-pill{font-size:11px;font-weight:700;color:#5aadff;background:rgba(0,120,212,0.12);border:1px solid rgba(0,120,212,0.25);border-radius:20px;padding:5px 12px;letter-spacing:.3px}
+.auth-card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px}
 .subjects-header{padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between}
 .subjects-title{font-size:20px;font-weight:900}
 .user-pill{font-size:12px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer}
@@ -57,7 +61,7 @@ a.la{color:#5aadff;text-decoration:none}
 .ss-item{background:var(--surface2);border-radius:8px;padding:8px;text-align:center}
 .ss-num{font-size:18px;font-weight:800;background:linear-gradient(125deg,#0078d4,#6264a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .ss-lbl{font-size:9px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-#v-app{padding-bottom:72px}
+#v-app{padding-bottom:72px}#v-subjects{padding-bottom:72px}
 .header{padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:50;border-bottom:1px solid var(--border)}
 .app-logo{font-size:16px;font-weight:800;background:linear-gradient(125deg,#0078d4,#6264a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .header-right{display:flex;gap:8px;align-items:center}
@@ -159,6 +163,7 @@ a.la{color:#5aadff;text-decoration:none}
 .toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 17px;font-size:13px;opacity:0;transition:all .28s;z-index:300;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--pass);display:inline-block}
+.sync-dot.offline{background:var(--warn)}
 .legal-footer{text-align:center;padding:20px 20px 28px;font-size:11px;color:var(--text2)}
 .legal-footer a{color:var(--text2);text-decoration:none;border-bottom:1px solid var(--border)}
 .legal-footer a:hover{color:var(--text)}
@@ -173,6 +178,7 @@ a.la{color:#5aadff;text-decoration:none}
 </head>
 <body>
 <div class="toast" id="toast"></div>
+
 <div class="cookie-banner" id="cookie-banner">
   <div class="cookie-text">We use cookies to improve your experience and show relevant ads. By continuing, you agree to our <a href="/privacy.html" target="_blank">Privacy Policy</a>.</div>
   <div class="cookie-btns">
@@ -184,7 +190,13 @@ a.la{color:#5aadff;text-decoration:none}
 <div class="view active" id="v-setup">
   <div class="center-wrap" style="justify-content:flex-start;padding-top:40px;overflow-y:auto">
     <div class="logo-big">KanPassIt</div>
-    <div class="logo-sub">Multi-subject AI quiz prep · One-time setup</div>
+    <div class="logo-sub">AI-Powered Exam Prep</div>
+    <p class="landing-tagline">Ace your certification exam with adaptive quizzes and AI-powered study analysis.</p>
+    <div class="feature-pills">
+      <span class="feature-pill">✦ AI Study Analysis</span>
+      <span class="feature-pill">📊 Domain Tracking</span>
+      <span class="feature-pill">🎯 Weak Area Drills</span>
+    </div>
     <div class="card">
       <div class="card-title">🔧 Connect Supabase (Optional)</div>
       <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Enables real accounts &amp; cross-device sync. Skip to use local-only mode.</p>
@@ -221,8 +233,15 @@ CREATE POLICY "Users manage own progress"
 <div class="view" id="v-auth">
   <div class="center-wrap">
     <div class="logo-big">KanPassIt</div>
-    <div class="logo-sub" id="auth-subtitle">Sign in to your account</div>
+    <div class="logo-sub">AI-Powered Exam Prep</div>
+    <p class="landing-tagline">Ace your certification exam with adaptive quizzes and AI-powered study analysis.</p>
+    <div class="feature-pills">
+      <span class="feature-pill">✦ AI Study Analysis</span>
+      <span class="feature-pill">📊 Domain Tracking</span>
+      <span class="feature-pill">🎯 Weak Area Drills</span>
+    </div>
     <div class="card" style="width:100%">
+      <div class="auth-card-title" id="auth-subtitle">Sign in to your account</div>
       <div id="auth-err" class="err-msg"></div>
       <div id="auth-ok" class="ok-msg"></div>
       <div class="field-lbl">Email</div>
@@ -296,7 +315,7 @@ CREATE POLICY "Users manage own progress"
   </div>
   <div class="page" id="page-settings">
     <div class="settings-body">
-      <div class="sec-title mt">Progress</div>
+      <div class="sec-title">Progress</div>
       <div class="s-row" onclick="doReset()"><span class="s-row-lbl">Reset This Subject's Progress</span><span class="s-row-val">↺</span></div>
       <div class="s-row" onclick="backToSubjects()"><span class="s-row-lbl">Switch Subject</span><span class="s-row-val">→</span></div>
       <div class="sec-title mt">Account</div>
@@ -309,24 +328,22 @@ CREATE POLICY "Users manage own progress"
       <div id="exam-info-rows"></div>
     </div>
   </div>
-  
 </div>
 
 <nav class="nav" id="global-nav" style="display:none">
-    <button class="nav-btn active" id="nav-home" onclick="showPage('home')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
-    </button>
-    <button class="nav-btn" id="nav-quiz" onclick="openModeModal()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3" stroke-linecap="round"/></svg>Practice
-    </button>
-    <button class="nav-btn" id="nav-analysis" onclick="showPage('analysis')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Analysis
-    </button>
-    <button class="nav-btn" id="nav-settings" onclick="showPage('settings')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
-    </button>
-  </nav>
-
+  <button class="nav-btn active" id="nav-home" onclick="showPage('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
+  </button>
+  <button class="nav-btn" id="nav-quiz" onclick="openModeModal()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3" stroke-linecap="round"/></svg>Practice
+  </button>
+  <button class="nav-btn" id="nav-analysis" onclick="showPage('analysis')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Analysis
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="showPage('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+  </button>
+</nav>
 
 <div class="overlay" id="mode-overlay" onclick="closeModeModal(event)">
   <div class="modal">
@@ -564,7 +581,7 @@ function init() {
   // Load persisted settings
   const cfg = JSON.parse(localStorage.getItem('studyapp_config') || '{}');
 
-  // Hardcoded Supabase credentials  no setup wizard needed
+  // Hardcoded Supabase credentials — no setup wizard needed
   const SUPABASE_URL = 'https://kcycuabxhowpdprrulyn.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtjeWN1YWJ4aG93cGRwcnJ1bHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMjg4OTQsImV4cCI6MjA5MjkwNDg5NH0.69f-JBkd8dAalymT7p4of-nihweiJcKeffUZxv7-T2c';
   const sbCfg = { url: SUPABASE_URL, key: SUPABASE_KEY };
@@ -1227,7 +1244,6 @@ Write directly to the student in second person. Be specific and practical.`;
 // SETTINGS
 // ═══════════════════════════════════════════════════════
 
-
 function doReset() {
   if (!confirm(`Reset all progress for ${SUBJECTS[currentSubject].name}? This cannot be undone.`)) return;
   answers = {}; streak = 0; lastDate = null;
@@ -1248,6 +1264,7 @@ function showView(id) {
   const showNav = (id === 'v-subjects' || id === 'v-app');
   nav.style.display = showNav ? 'flex' : 'none';
   if (id === 'v-subjects') {
+    // On subjects screen: dim non-home nav buttons since no subject is loaded
     document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.style.opacity = '0.4'; b.style.pointerEvents = 'none'; });
     const homeBtn = document.getElementById('nav-home');
     if (homeBtn) { homeBtn.style.opacity = '1'; homeBtn.style.pointerEvents = 'auto'; homeBtn.classList.add('active'); homeBtn.onclick = null; }
