@@ -405,7 +405,6 @@ CREATE POLICY "Users manage own progress"
 </div>
 
 <script>
-<script>
 // ═══════════════════════════════════════════════════════
 // QUESTION BANKS — loaded from Supabase at runtime
 // ═══════════════════════════════════════════════════════
@@ -1263,7 +1262,7 @@ function doReset() {
       resetProgressRemote();
       renderHome();
       showPage('home');
-      toast('Progress reset ↺');
+      toast('Progress reset ↚');
     }
   });
 }
@@ -1344,4 +1343,7 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2600);
 }
 
-// ══�
+init();
+</script>
+</body>
+</html>
