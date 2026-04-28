@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>StudyApp — Multi-Subject Quiz</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0d0d1a;--surface:#16162a;--surface2:#1e1e38;--accent:#0078d4;--accent2:#6264a7;--text:#f0f0f5;--text2:#8888aa;--border:#252540;--pass:#2ecc71;--warn:#f39c12;--fail:#e05c5c;--radius:16px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;overflow-x:hidden}
+.view{display:none;min-height:100vh}.view.active{display:block}
+.center-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px}
+.logo-big{font-size:28px;font-weight:900;background:linear-gradient(125deg,#0078d4,#6264a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.logo-sub{font-size:14px;color:var(--text2);margin-bottom:32px;text-align:center}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;width:100%;margin-bottom:14px}
+.card-title{font-size:15px;font-weight:800;margin-bottom:14px}
+.field-lbl{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px}
+.field{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-size:14px;font-family:inherit;margin-bottom:12px}
+.field:focus{outline:none;border-color:var(--accent)}
+.field-mono{font-family:monospace;font-size:12px}
+.btn-p{width:100%;padding:14px;border-radius:12px;background:linear-gradient(125deg,#0078d4,#6264a7);color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn-p:hover{opacity:.88}.btn-p:disabled{opacity:.45;cursor:not-allowed}
+.btn-s{width:100%;padding:12px;border-radius:12px;background:transparent;border:1px solid var(--border);color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;margin-top:9px}
+.btn-s:hover{border-color:var(--accent);color:var(--text)}
+.auth-toggle{font-size:13px;color:var(--text2);text-align:center;margin-top:14px;cursor:pointer}
+.auth-toggle span{color:#5aadff}
+.err-msg{font-size:13px;color:var(--fail);margin-bottom:10px;min-height:18px}
+.ok-msg{font-size:13px;color:var(--pass);margin-bottom:10px;min-height:18px}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--accent);font-size:11px;font-weight:800;margin-right:7px;flex-shrink:0}
+.step-row{display:flex;align-items:flex-start;font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px}
+.sql-block{background:#0a0a14;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:monospace;font-size:10px;color:#7a9fbf;white-space:pre;overflow-x:auto;margin:10px 0;line-height:1.5}
+a.la{color:#5aadff;text-decoration:none}
+.skip-link{font-size:12px;color:var(--text2);text-align:center;margin-top:12px;cursor:pointer}
+.skip-link span{color:#5aadff}
+.subjects-header{padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.subjects-title{font-size:20px;font-weight:900}
+.user-pill{font-size:12px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer}
+.subjects-grid{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+.subject-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:border-color .15s;position:relative;overflow:hidden}
+.subject-card:hover{border-color:var(--accent)}
+.subject-card-accent{position:absolute;top:0;left:0;right:0;height:3px}
+.subject-card-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.subject-icon{font-size:28px}
+.subject-name{font-size:16px;font-weight:800}
+.subject-desc{font-size:12px;color:var(--text2);margin-top:2px}
+.subject-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.ss-item{background:var(--surface2);border-radius:8px;padding:8px;text-align:center}
+.ss-num{font-size:18px;font-weight:800;background:linear-gradient(125deg,#0078d4,#6264a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ss-lbl{font-size:9px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+#v-app{padding-bottom:72px}
+.header{padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:50;border-bottom:1px solid var(--border)}
+.app-logo{font-size:16px;font-weight:800;background:linear-gradient(125deg,#0078d4,#6264a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-right{display:flex;gap:8px;align-items:center}
+.streak-pill{background:linear-gradient(125deg,#f39c12,#e74c3c);color:#fff;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
+.back-btn{font-size:13px;color:var(--text2);background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer}
+.page{display:none;padding-bottom:80px}.page.active{display:block}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;padding:10px 4px 8px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text2);font-size:10px;font-weight:600;transition:color .15s}
+.nav-btn.active{color:var(--accent)}.nav-btn svg{width:20px;height:20px}
+.home-body{padding:18px 20px 0}
+.gauge-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:14px}
+.gauge-wrap{position:relative;width:160px;margin:0 auto 10px}.gauge-wrap svg{width:100%}
+.gauge-center{position:absolute;top:55%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.gauge-pct{font-size:30px;font-weight:800}
+.gauge-lbl{font-size:10px;color:var(--text2);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.gauge-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.gauge-sub{font-size:12px;color:var(--text2)}
+.pass-line-note{font-size:11px;color:var(--text2);margin-top:8px}
+.pass-line-note span{color:var(--pass);font-weight:600}
+.quick-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:14px}
+.qs-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 10px;text-align:center}
+.qs-num{font-size:22px;font-weight:800;background:linear-gradient(125deg,#0078d4,#6264a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.qs-lbl{font-size:10px;color:var(--text2);margin-top:2px;font-weight:600}
+.section-lbl{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin:16px 0 10px}
+.domain-grid{display:flex;flex-direction:column;gap:9px}
+.domain-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s}
+.domain-card:hover{border-color:var(--accent)}
+.domain-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.domain-info{flex:1}.domain-name{font-size:13px;font-weight:700}
+.domain-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.domain-bar-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px}
+.domain-bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.domain-score-lbl{font-size:11px;color:var(--text2);text-align:right;width:40px}
+.quiz-header{padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.quiz-prog-wrap{flex:1}
+.quiz-prog-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:5px}
+.quiz-prog-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.quiz-prog-fill{height:100%;background:linear-gradient(90deg,#0078d4,#6264a7);border-radius:2px;transition:width .4s}
+.quit-btn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:12px;padding:5px 10px;cursor:pointer}
+.quit-btn:hover{border-color:var(--fail);color:var(--fail)}
+.q-body{padding:0 20px}
+.q-meta{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.q-cat{font-size:11px;padding:3px 9px;border-radius:10px;background:rgba(0,120,212,.15);color:#5aadff;font-weight:600}
+.q-num{font-size:11px;color:var(--text2)}
+.q-text{font-size:16px;font-weight:650;line-height:1.5;margin-bottom:20px}
+.options{display:flex;flex-direction:column;gap:10px}
+.option{padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;transition:all .17s;display:flex;align-items:flex-start;gap:12px;text-align:left}
+.option:hover:not(.locked){border-color:var(--accent);background:rgba(0,120,212,.07)}
+.option.correct{border-color:var(--pass);background:rgba(46,204,113,.1)}
+.option.wrong{border-color:var(--fail);background:rgba(224,92,92,.1)}
+.option.locked{cursor:default}
+.option.reveal-correct{border-color:var(--pass);background:rgba(46,204,113,.08)}
+.opt-letter{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;transition:all .15s;background:var(--surface2)}
+.option.correct .opt-letter,.option.reveal-correct .opt-letter{background:var(--pass);border-color:var(--pass);color:#fff}
+.option.wrong .opt-letter{background:var(--fail);border-color:var(--fail);color:#fff}
+.opt-text{font-size:14px;line-height:1.45;padding-top:3px}
+.feedback{margin-top:16px;padding:14px;border-radius:12px;font-size:13px;line-height:1.65;display:none}
+.feedback.correct-fb{background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3)}
+.feedback.wrong-fb{background:rgba(224,92,92,.08);border:1px solid rgba(224,92,92,.25)}
+.feedback-head{font-size:13px;font-weight:700;margin-bottom:6px}
+.correct-head{color:var(--pass)}.wrong-head{color:var(--fail)}
+.feedback-body{color:var(--text2)}
+.next-wrap{padding:14px 20px 0}
+.btn-next{width:100%;padding:14px;border-radius:12px;background:linear-gradient(125deg,#0078d4,#6264a7);color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;display:none}
+.session-done{padding:32px 20px;text-align:center}
+.done-emoji{font-size:56px;margin-bottom:14px}
+.done-h{font-size:22px;font-weight:800;margin-bottom:8px}
+.done-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px}
+.done-breakdown{text-align:left;background:var(--surface);border-radius:12px;padding:16px;margin-bottom:20px}
+.done-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.done-row:last-child{border-bottom:none}
+.done-row-score{font-weight:700}
+.score-good{color:var(--pass)}.score-mid{color:var(--warn)}.score-bad{color:var(--fail)}
+.analysis-body{padding:18px 20px 0}
+.analysis-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.analysis-card-title{font-size:14px;font-weight:700;margin-bottom:8px}
+.analysis-card-body{font-size:13px;color:var(--text2);line-height:1.7}
+.btn-ai-analyze{width:100%;padding:13px;border-radius:12px;border:1px solid rgba(98,100,167,.4);background:rgba(98,100,167,.1);color:#a0a4e0;font-size:14px;font-weight:700;cursor:pointer;transition:all .17s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
+.btn-ai-analyze:hover{background:rgba(98,100,167,.2);color:#c0c4f0}
+.ai-result{background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:10px;padding:14px;font-size:13px;line-height:1.75;color:var(--text2)}
+.spinner{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--accent);animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.settings-body{padding:18px 20px}
+.sec-title{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.sec-note{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px}
+.sec-note a{color:#5aadff;text-decoration:none}
+.s-row{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px 15px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.s-row:hover{border-color:var(--accent)}
+.s-row-lbl{font-size:14px}.s-row-val{font-size:13px;color:var(--text2)}
+.mt{margin-top:22px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;display:none;align-items:flex-end}
+.overlay.open{display:flex}
+.modal{width:100%;max-width:480px;margin:0 auto;background:var(--surface);border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom))}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:16px}
+.mode-btn{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);text-align:left;cursor:pointer;margin-bottom:9px;transition:border-color .15s}
+.mode-btn:hover{border-color:var(--accent)}
+.mode-btn-title{font-size:14px;font-weight:700}.mode-btn-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.modal-cancel{width:100%;padding:12px;border-radius:12px;background:transparent;border:1px solid var(--border);color:var(--text2);font-size:14px;cursor:pointer;margin-top:4px}
+.toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 17px;font-size:13px;opacity:0;transition:all .28s;z-index:300;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--pass);display:inline-block}
+.sync-dot.offline{background:var(--warn)}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<div class="view active" id="v-setup">
+  <div class="center-wrap" style="justify-content:flex-start;padding-top:40px;overflow-y:auto">
+    <div class="logo-big">📚 StudyApp</div>
+    <div class="logo-sub">Multi-subject AI quiz prep · One-time setup</div>
+    <div class="card">
+      <div class="card-title">🔧 Connect Supabase (Optional)</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Enables real accounts &amp; cross-device sync. Skip to use local-only mode.</p>
+      <div class="step-row"><span class="step-num">1</span>Create a free project at <a class="la" href="https://supabase.com" target="_blank">supabase.com</a></div>
+      <div class="step-row"><span class="step-num">2</span>Run this SQL in your project's SQL Editor:</div>
+      <div class="sql-block">CREATE TABLE IF NOT EXISTS public.user_progress (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  subject text NOT NULL,
+  question_id integer NOT NULL,
+  last_result text NOT NULL,
+  attempts integer DEFAULT 1 NOT NULL,
+  wrong_count integer DEFAULT 0 NOT NULL,
+  updated_at timestamptz DEFAULT now() NOT NULL,
+  UNIQUE(user_id, subject, question_id)
+);
+ALTER TABLE public.user_progress ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own progress"
+  ON public.user_progress FOR ALL
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);</div>
+      <div class="step-row"><span class="step-num">3</span>Paste your Project URL and anon key below (Project Settings → API)</div>
+      <div class="field-lbl">Supabase Project URL</div>
+      <input id="sb-url" class="field field-mono" placeholder="https://xxxx.supabase.co" autocomplete="off"/>
+      <div class="field-lbl">Supabase Anon Key</div>
+      <input id="sb-key" class="field field-mono" placeholder="eyJhbGciOi…" autocomplete="off"/>
+      <div id="setup-err" class="err-msg"></div>
+      <button class="btn-p" onclick="saveSetup()">Save &amp; Continue →</button>
+    </div>
+    <div class="skip-link" onclick="skipSetup()">Skip — use <span>local-only mode</span> (no accounts)</div>
+  </div>
+</div>
+
+<div class="view" id="v-auth">
+  <div class="center-wrap">
+    <div class="logo-big">📚 StudyApp</div>
+    <div class="logo-sub" id="auth-subtitle">Sign in to your account</div>
+    <div class="card" style="width:100%">
+      <div id="auth-err" class="err-msg"></div>
+      <div id="auth-ok" class="ok-msg"></div>
+      <div class="field-lbl">Email</div>
+      <input id="auth-email" class="field" type="email" placeholder="you@example.com" autocomplete="email"/>
+      <div class="field-lbl">Password</div>
+      <input id="auth-pass" class="field" type="password" placeholder="••••••••" autocomplete="current-password"/>
+      <button id="auth-btn" class="btn-p" onclick="submitAuth()">Sign In</button>
+    </div>
+    <div class="auth-toggle" onclick="toggleAuthMode()">Don't have an account? <span>Sign up</span></div>
+    <div class="skip-link" style="margin-top:12px" onclick="guestMode()">Continue as <span>guest</span> (local only)</div>
+  </div>
+</div>
+
+<div class="view" id="v-subjects">
+  <div class="subjects-header">
+    <div class="subjects-title">Choose Subject</div>
+    <div class="user-pill" id="user-pill" onclick="signOut()">Sign Out</div>
+  </div>
+  <div class="subjects-grid" id="subjects-grid"></div>
+</div>
+
+<div class="view" id="v-app">
+  <div class="header">
+    <button class="back-btn" onclick="backToSubjects()">← Subjects</button>
+    <div class="app-logo" id="app-subject-logo">Study</div>
+    <div class="header-right">
+      <div class="streak-pill">🔥 <span id="streak-val">0</span></div>
+      <div class="sync-dot offline" id="sync-dot"></div>
+    </div>
+  </div>
+  <div class="page active" id="page-home">
+    <div class="home-body">
+      <div class="gauge-card">
+        <div class="gauge-title">Pass Likelihood</div>
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 20 90 A 60 60 0 0 1 140 90" fill="none" stroke="#252540" stroke-width="12" stroke-linecap="round"/>
+            <path id="gauge-arc" d="M 20 90 A 60 60 0 0 1 140 90" fill="none" stroke="#252540" stroke-width="12" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+          </svg>
+          <div class="gauge-center">
+            <div class="gauge-pct" id="gauge-pct-text">—</div>
+            <div class="gauge-lbl">Likelihood</div>
+          </div>
+        </div>
+        <div class="gauge-sub" id="gauge-sub">Answer more questions to see your estimate</div>
+        <div class="pass-line-note">Passing threshold ≈ <span id="pass-threshold-lbl">700/1000</span></div>
+      </div>
+      <div class="quick-stats">
+        <div class="qs-card"><div class="qs-num" id="qs-answered">0</div><div class="qs-lbl">Answered</div></div>
+        <div class="qs-card"><div class="qs-num" id="qs-correct">—</div><div class="qs-lbl">Accuracy</div></div>
+        <div class="qs-card"><div class="qs-num" id="qs-weak">0</div><div class="qs-lbl">Weak Areas</div></div>
+      </div>
+      <div class="section-lbl">Domain Performance</div>
+      <div class="domain-grid" id="domain-grid"></div>
+      <div style="margin-top:18px">
+        <button class="btn-p" onclick="openModeModal()">▶ Start Practice</button>
+        <button class="btn-s" id="weak-btn" onclick="startQuiz('weak')" style="display:none">🎯 Focus Weak Areas</button>
+      </div>
+    </div>
+  </div>
+  <div class="page" id="page-quiz"><div id="quiz-content"></div></div>
+  <div class="page" id="page-analysis">
+    <div class="analysis-body">
+      <button class="btn-ai-analyze" id="analyze-btn" onclick="runAnalysis()">✦ Analyze Weak Areas with Claude</button>
+      <div id="ai-analysis-output"></div>
+      <div class="section-lbl" style="margin-top:8px">Wrong Answer Log</div>
+      <div id="wrong-log"></div>
+    </div>
+  </div>
+  <div class="page" id="page-settings">
+    <div class="settings-body">
+      <div class="sec-title">Claude API Key</div>
+      <p class="sec-note">Required for AI analysis. Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+      <input type="password" id="api-key-input" class="field field-mono" placeholder="sk-ant-api03-…"/>
+      <button class="btn-p" style="margin-top:0" onclick="saveApiKey()">Save Key</button>
+      <div class="sec-title mt">Progress</div>
+      <div class="s-row" onclick="doReset()"><span class="s-row-lbl">Reset This Subject's Progress</span><span class="s-row-val">↺</span></div>
+      <div class="s-row" onclick="backToSubjects()"><span class="s-row-lbl">Switch Subject</span><span class="s-row-val">→</span></div>
+      <div class="sec-title mt">Account</div>
+      <div class="s-row" onclick="signOut()"><span class="s-row-lbl">Sign Out</span><span class="s-row-val">→</span></div>
+      <div class="sec-title mt">Exam Info</div>
+      <div id="exam-info-rows"></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn active" id="nav-home" onclick="showPage('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
+    </button>
+    <button class="nav-btn" id="nav-quiz" onclick="openModeModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3" stroke-linecap="round"/></svg>Practice
+    </button>
+    <button class="nav-btn" id="nav-analysis" onclick="showPage('analysis')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Analysis
+    </button>
+    <button class="nav-btn" id="nav-settings" onclick="showPage('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+    </button>
+  </nav>
+</div>
+
+<div class="overlay" id="mode-overlay" onclick="closeModeModal(event)">
+  <div class="modal">
+    <div class="modal-title">Choose Practice Mode</div>
+    <button class="mode-btn" onclick="startQuiz('all');closeModeModal()">
+      <div class="mode-btn-title">📋 Full Exam Simulation</div>
+      <div class="mode-btn-sub" id="modal-full-sub">All questions in random order</div>
+    </button>
+    <button class="mode-btn" onclick="startQuiz('quick');closeModeModal()">
+      <div class="mode-btn-title">⚡ Quick Session (10 Random)</div>
+      <div class="mode-btn-sub">10 questions — great for a study break</div>
+    </button>
+    <button class="mode-btn" id="modal-weak-btn" onclick="startQuiz('weak');closeModeModal()">
+      <div class="mode-btn-title">🎯 Weak Areas Only</div>
+      <div class="mode-btn-sub">Questions you've answered incorrectly</div>
+    </button>
+    <div style="margin-top:4px;margin-bottom:10px">
+      <div class="section-lbl" style="margin:0 0 8px">By Domain</div>
+      <div id="modal-domains" style="display:flex;flex-wrap:wrap;gap:7px"></div>
+    </div>
+    <button class="modal-cancel" onclick="closeModeModal()">Cancel</button>
+  </div>
+</div>
+<script>
+// ═══════════════════════════════════════════════════════
+// QUESTION BANKS
+// ═══════════════════════════════════════════════════════
+const QB = {
+
+'ab900': [
+  {id:1,cat:"M365 Core",q:"What is required to use Microsoft 365 Copilot?",opts:["A qualifying base M365 license (E3, E5, Business Standard, or Business Premium) PLUS the Microsoft 365 Copilot add-on license","Any Microsoft 365 license, including Personal and Family plans","A standalone Copilot license — no base M365 subscription is required","A Microsoft 365 E5 license automatically includes Copilot at no extra cost"],correct:0,exp:"Copilot requires TWO things: a qualifying base M365 plan AND the Copilot add-on (assigned per user). Personal and Family plans do NOT qualify. E5 qualifies as a base, but Copilot is still a separate add-on."},
+  {id:2,cat:"M365 Core",q:"Which service provides authentication, single sign-on, and conditional access for Microsoft 365 services including Copilot?",opts:["Microsoft Intune","Microsoft Purview","Microsoft Entra ID","Microsoft Defender for Cloud"],correct:2,exp:"Microsoft Entra ID (formerly Azure Active Directory) is the identity platform for M365. It handles authentication, MFA, SSO, and Conditional Access policies that control who can access Copilot and under what conditions."},
+  {id:3,cat:"M365 Core",q:"Which Microsoft 365 service hosts cloud-based email, shared calendars, and global address lists?",opts:["SharePoint in Microsoft 365","Microsoft Teams","OneDrive for Business","Exchange Online"],correct:3,exp:"Exchange Online is Microsoft's cloud email service. It replaces on-premises Exchange servers and is a core M365 workload. Copilot reads and summarizes emails through Exchange Online via Microsoft Graph."},
+  {id:4,cat:"M365 Core",q:"An administrator needs to manage users, assign licenses, and access all Microsoft 365 admin centers from one place. Which URL should they visit?",opts:["portal.azure.com","compliance.microsoft.com","admin.microsoft.com","copilot.cloud.microsoft"],correct:2,exp:"admin.microsoft.com is the Microsoft 365 Admin Center — the central hub for user management, license assignment, and navigation to specialized admin centers for Exchange, Teams, SharePoint, Purview, and Copilot."},
+  {id:5,cat:"M365 Core",q:"What does Microsoft Graph provide to Microsoft 365 Copilot?",opts:["A data visualization dashboard for admin reports","A unified API enabling Copilot to access organizational data (emails, files, meetings) while enforcing existing user permissions","A security scanning service for SharePoint documents","A graphing tool for creating org charts in Teams"],correct:1,exp:"Microsoft Graph is the gateway to all M365 data. Copilot queries it in real-time to retrieve emails, files, calendar events, and Teams messages — always respecting the signed-in user's existing permissions."},
+  {id:6,cat:"M365 Core",q:"A user wants their personal work files accessible from any device and available to Copilot. Which service stores these files?",opts:["SharePoint team sites","Exchange Online","OneDrive for Business","Microsoft Teams file tabs"],correct:2,exp:"OneDrive for Business is the per-user cloud storage included in M365. Copilot can access and reference OneDrive files when answering questions, respecting the file owner's sharing settings."},
+  {id:7,cat:"M365 Core",q:"What is a Microsoft 365 tenant?",opts:["A temporary workspace created for individual project collaborators","A dedicated, isolated instance of Microsoft 365 services for one organization","A shared cloud environment used by multiple organizations simultaneously","A licensing agreement between Microsoft and an individual user"],correct:1,exp:"A tenant is your organization's private, isolated slice of Microsoft 365 — its own users, data, configuration, and apps. Copilot interactions are bounded within the tenant and never cross into another organization's data."},
+  {id:8,cat:"M365 Core",q:"An organization has 2,000 users who need Microsoft 365 Copilot licenses. What is the most efficient assignment method?",opts:["Manually assign the license to each user in the Admin Center","Submit a support ticket to Microsoft for bulk assignment","Use group-based licensing in Microsoft Entra ID to assign the license to a security group","Ask each user to self-purchase the Copilot add-on"],correct:2,exp:"Group-based licensing in Entra ID is the scalable approach — add users to a security group and the license assignment happens automatically. This scales to thousands of users and handles joiners/leavers dynamically."},
+  {id:9,cat:"M365 Core",q:"Which service manages and secures the devices employees use to access Microsoft 365 and Copilot?",opts:["Microsoft Purview","Microsoft Entra ID","Microsoft Intune","Microsoft Defender XDR"],correct:2,exp:"Microsoft Intune (part of Microsoft Endpoint Manager) manages device compliance — ensuring devices are encrypted, patched, and compliant before accessing M365 resources. Intune compliance status can gate Copilot access via Conditional Access."},
+  {id:10,cat:"M365 Core",q:"Which platform provides Copilot adoption analytics and usage reports to administrators?",opts:["Microsoft Defender for Cloud Apps","Microsoft Viva Insights and the M365 Admin Center reports","Microsoft Purview Audit Premium","Microsoft Entra ID Sign-in logs"],correct:1,exp:"Copilot usage data (active users, features used, prompts sent) is available in the M365 Admin Center under Reports → Usage, and deeper insights are available through Viva Insights for admins to track ROI and adoption."},
+  {id:11,cat:"M365 Core",q:"Copilot is embedded in Microsoft Teams to help users with which tasks?",opts:["Managing Teams Admin Center policies on behalf of admins","Summarizing meetings, recapping missed chat messages, and assisting during live calls","Configuring DLP policies for Teams channels","Deploying agents to Teams users across the organization"],correct:1,exp:"Copilot in Teams surfaces in meetings (real-time notes, action items), in chat (summarize a thread you missed), and in the Teams compose box. It's one of the highest-adoption Copilot entry points for most organizations."},
+  {id:12,cat:"M365 Core",q:"An organization uses SharePoint team sites to store project files. How does this relate to Microsoft 365 Copilot?",opts:["SharePoint files cannot be accessed by Copilot due to security restrictions","SharePoint is one of Copilot's primary data sources — it indexes SharePoint content via Microsoft Graph to ground responses in organizational documents","Copilot only uses OneDrive files, not SharePoint sites","SharePoint must be replaced by Dataverse before Copilot can access documents"],correct:1,exp:"SharePoint is a primary knowledge source for Copilot. When a user asks Copilot to 'find the Q3 project proposal,' Copilot searches SharePoint (and other M365 sources) via Microsoft Graph, subject to the user's existing permissions."},
+  {id:13,cat:"M365 Core",q:"What does the Microsoft Purview compliance solution govern in relation to Microsoft 365?",opts:["Device management and endpoint security","Identity verification and multi-factor authentication policies","Data governance including information protection, DLP, eDiscovery, records management, and audit","Application deployment and update management for M365 apps"],correct:2,exp:"Microsoft Purview is the umbrella compliance platform covering everything data-governance related: sensitivity labels, DLP policies, retention, eDiscovery, communication compliance, insider risk, and audit logs — all of which apply to Copilot interactions."},
+  {id:14,cat:"M365 Core",q:"Which Microsoft 365 admin center is specifically designed to manage Copilot settings, configure web search access, and view Copilot adoption data?",opts:["admin.microsoft.com (M365 Admin Center) only","compliance.microsoft.com (Purview portal)","copilot.cloud.microsoft (Copilot admin center)","security.microsoft.com (Microsoft Defender portal)"],correct:2,exp:"copilot.cloud.microsoft is the dedicated Copilot admin center. While the M365 Admin Center also has Copilot settings under Settings → Copilot, the dedicated portal at copilot.cloud.microsoft is the primary Copilot management experience."},
+  {id:15,cat:"Data & Governance",q:"A company wants to prevent employees from sharing credit card numbers or SSNs via email or Copilot responses. Which Purview feature should be configured?",opts:["Sensitivity labels","Retention policies","Data Loss Prevention (DLP) policies","Information barriers"],correct:2,exp:"DLP policies detect and block specific sensitive information types (credit cards, SSNs, health records). They apply across Exchange, Teams, SharePoint, and Copilot outputs — if Copilot would include sensitive data in a response, DLP can block or warn."},
+  {id:16,cat:"Data & Governance",q:"A document labeled 'Highly Confidential' with encryption is in SharePoint. A user without access asks Copilot about its contents. What happens?",opts:["Copilot ignores sensitivity labels and reads all content by default","Copilot decrypts the document temporarily to provide a summary","Copilot respects existing permissions — the user cannot receive content from documents they are not authorized to access","Copilot asks the document owner for permission before responding"],correct:2,exp:"Copilot strictly respects M365 permissions and sensitivity labels. It acts on behalf of the signed-in user and can only surface content that user is already authorized to see. Sensitivity labels and SharePoint permissions are the source of truth."},
+  {id:17,cat:"Data & Governance",q:"An EU-based organization must ensure Microsoft 365 and Copilot interaction data is stored only in European data centers. What should be configured?",opts:["Conditional Access policies with geographic restrictions","DLP policies with EU-specific templates","Data residency commitments or Microsoft 365 Multi-Geo configuration","Sensitivity labels with geographic metadata"],correct:2,exp:"Data residency commitments and Multi-Geo allow organizations to specify where M365 data (including Copilot logs) is stored at rest. This is critical for GDPR compliance and data sovereignty requirements."},
+  {id:18,cat:"Data & Governance",q:"An investment bank must ensure its investment banking team and trading desk cannot communicate with each other in Teams, and Copilot must not surface content across these groups. Which feature handles this?",opts:["Sensitivity labels","Retention policies","Data Loss Prevention policies","Information barriers"],correct:3,exp:"Information barriers (IB) restrict communication between defined user segments for regulatory compliance (e.g., preventing insider trading conflicts). IB policies apply in Teams, SharePoint, and Copilot — Copilot won't surface content across IB-restricted boundaries."},
+  {id:19,cat:"Data & Governance",q:"How long does Microsoft Purview Audit Standard retain audit logs by default?",opts:["30 days","90 days","180 days","1 year"],correct:1,exp:"Audit Standard provides 90-day log retention for user and admin activity — including Copilot interactions. Audit Premium extends this to 1 year (or 10 years with add-on) and adds intelligent insights for security investigations."},
+  {id:20,cat:"Data & Governance",q:"A legal team needs to search all Teams messages, emails, and Copilot interaction logs related to a pending lawsuit and preserve them from deletion. Which Purview feature should they use?",opts:["Communication compliance","eDiscovery with legal hold","Insider risk management","Retention policies"],correct:1,exp:"eDiscovery allows legal and compliance teams to search across M365 services (Exchange, Teams, SharePoint, Copilot logs) and place content on legal hold to prevent deletion. This is the primary tool for responding to litigation or regulatory requests."},
+  {id:21,cat:"Data & Governance",q:"Does Microsoft use prompts and responses from Microsoft 365 Copilot to train its foundation AI models?",opts:["Yes — all prompts and responses are used","Yes — but only with explicit customer opt-in","No — Microsoft does not use customer tenant content to train foundation AI models","Only anonymized data is used, with no way to opt out"],correct:2,exp:"Microsoft's enterprise data protection commitments explicitly state that customer content (prompts, responses, documents) from M365 Copilot is not used to train foundation models. This is a key governance and privacy assurance for enterprise customers."},
+  {id:22,cat:"Data & Governance",q:"An employee is resigning and mass-downloading SharePoint files and emailing them externally. Which Purview feature is designed to detect this risky behavior?",opts:["eDiscovery","Communication compliance","Insider risk management","Information barriers"],correct:2,exp:"Insider risk management uses ML to detect potentially risky user behaviors like mass downloads, unusual data exfiltration, or sensitive file access patterns before resignation. It can also flag anomalous Copilot usage that suggests data aggregation risk."},
+  {id:23,cat:"Data & Governance",q:"An admin wants to ensure a Microsoft support engineer cannot access organizational content without explicit customer approval. Which feature provides this?",opts:["Conditional Access","Customer Lockbox","Privileged Identity Management","Sensitivity labels"],correct:1,exp:"Customer Lockbox requires organizations to explicitly approve any Microsoft engineer access to their content during support cases. All requests are logged in the audit trail, providing full accountability and customer control."},
+  {id:24,cat:"Data & Governance",q:"Copilot generates a document drawing content from a file labeled 'Confidential' and another labeled 'General'. What sensitivity label will the output carry?",opts:["General — the least restrictive label is applied","A new label created dynamically by Copilot","Confidential — Copilot applies the most restrictive label from the source content","No label — Copilot-generated content cannot inherit sensitivity labels"],correct:2,exp:"Copilot inherits the most restrictive sensitivity label from the source content it references. If a response draws from a 'Confidential' document, the output is treated as Confidential. This prevents label downgrade and maintains data protection."},
+  {id:25,cat:"Data & Governance",q:"An admin configures a policy to require MFA and a compliant device before any user can access Copilot. Which feature implements this?",opts:["Sensitivity labels in Microsoft Purview","Data Loss Prevention policies","Conditional Access in Microsoft Entra ID","Insider risk management policies"],correct:2,exp:"Conditional Access evaluates identity and device signals before granting access to resources. Policies can specifically target the Microsoft 365 Copilot app, requiring MFA, device compliance (Intune), or specific locations — making it the key security layer for Copilot access."},
+  {id:26,cat:"Data & Governance",q:"Which Purview feature monitors Teams messages and Copilot-generated communications for policy violations like discriminatory language or regulatory breaches?",opts:["Insider risk management","Audit Premium","Communication compliance","Information barriers"],correct:2,exp:"Communication compliance monitors communications for policy violations using ML classifiers. It can be configured to monitor Copilot prompts and responses — important for financial services firms and healthcare organizations with strict communication regulations."},
+  {id:27,cat:"Data & Governance",q:"What is the purpose of configuring retention policies for Copilot interaction logs?",opts:["To prevent Copilot from referencing documents older than a defined period","To define how long Copilot prompt and response logs are retained or deleted for legal and compliance purposes","To limit the size of documents Copilot can process in a session","To archive Copilot conversations automatically to a SharePoint library"],correct:1,exp:"Retention policies for Copilot interactions govern how long prompt/response logs are kept (for compliance) or deleted (for privacy). Organizations can configure Copilot interaction retention independently from email or file retention policies."},
+  {id:28,cat:"Data & Governance",q:"Which of Microsoft's six responsible AI principles specifically addresses ensuring AI systems work fairly across all demographics and user groups?",opts:["Accountability","Transparency","Fairness","Inclusiveness"],correct:2,exp:"Fairness ensures AI systems don't produce biased outputs that disadvantage certain groups. Know all six principles: Fairness, Reliability & Safety, Privacy & Security, Inclusiveness, Transparency, and Accountability."},
+  {id:29,cat:"Data & Governance",q:"Before a Copilot rollout, an admin is concerned that broadly shared SharePoint files could be surfaced to users who shouldn't see them. What should be done FIRST?",opts:["Disable Copilot for all users until SharePoint is rebuilt","Configure DLP policies to block all Copilot file access","Audit SharePoint permissions and apply sensitivity labels to reduce oversharing risk","Enable information barriers for all users as a precaution"],correct:2,exp:"Oversharing is the #1 governance concern before a Copilot rollout. Copilot surfaces content based on existing permissions — if files are over-permissioned, Copilot makes that content easily discoverable. Auditing permissions and applying sensitivity labels is the recommended first step."},
+  {id:30,cat:"Data & Governance",q:"What is Privileged Identity Management (PIM) in Microsoft Entra ID primarily used for?",opts:["Managing sensitivity labels for documents accessed by privileged users","Providing just-in-time, time-bound admin role activation to reduce permanent privilege exposure","Monitoring all admin interactions with Copilot for audit purposes","Restricting Copilot access exclusively to users with admin roles"],correct:1,exp:"PIM implements just-in-time privilege — admin roles are activated only when needed, for a limited time, often requiring approval. This reduces the blast radius if an admin account is compromised, and is a best practice for securing Copilot admin roles."},
+  {id:31,cat:"Data & Governance",q:"Which Microsoft Purview audit solution provides extended log retention beyond 90 days and intelligent insights for security investigations?",opts:["Audit Standard","Insider risk management","Audit Premium","Communication compliance"],correct:2,exp:"Audit Premium extends retention to 1 year (or longer with add-on) and uses AI-driven intelligent insights to identify critical events. It's recommended for organizations with regulatory requirements or active security investigations involving Copilot or M365 data."},
+  {id:32,cat:"Data & Governance",q:"Which responsible AI principle ensures users and stakeholders can understand how AI systems reach their outputs?",opts:["Fairness","Transparency","Reliability & Safety","Accountability"],correct:1,exp:"Transparency means AI systems should be understandable — users should know they're interacting with AI, and outputs should include citations so users can verify information. Copilot cites the sources it references in responses, directly implementing this principle."},
+  {id:33,cat:"Copilot",q:"An admin wants to prevent Microsoft 365 Copilot from incorporating public internet search results in its responses. Where is this setting configured?",opts:["Microsoft Entra Admin Center → Security → Authentication methods","Microsoft Purview → DLP policies → Copilot template","Microsoft 365 Admin Center or Copilot admin center — toggle off 'Web search for Copilot'","Teams Admin Center → Meeting policies → AI features"],correct:2,exp:"Web content access for Copilot is toggled in Settings → Copilot in the M365 Admin Center, or in copilot.cloud.microsoft. Disabling it limits Copilot to only organizational data, which some regulated industries require."},
+  {id:34,cat:"Copilot",q:"What is 'grounding' in Microsoft 365 Copilot?",opts:["The process of retraining the AI model on organizational-specific data","Connecting Copilot's LLM outputs to real, current organizational data from Microsoft Graph to produce relevant, accurate responses","A security process that restricts Copilot to verified file types only","The mechanism by which Copilot re-authenticates users before each response"],correct:1,exp:"Grounding is what makes Copilot useful vs. a generic chatbot. Instead of relying solely on LLM training data, Copilot retrieves your actual emails, files, and chats via Microsoft Graph to ground its responses in real organizational context."},
+  {id:35,cat:"Copilot",q:"Where should an admin go to view which M365 apps Copilot is being used in and how many prompts employees are sending?",opts:["Microsoft Entra Admin Center → Sign-in logs","Microsoft 365 Admin Center → Reports → Usage → Microsoft 365 Copilot","Microsoft Purview → Audit search","Copilot Studio → Analytics"],correct:1,exp:"Copilot usage reports are in the M365 Admin Center under Reports → Usage. They show active users, feature adoption by app (Outlook, Teams, Word, etc.), and prompt volume. Viva Insights provides deeper analytics for business decision-making."},
+  {id:36,cat:"Copilot",q:"What adoption strategy does Microsoft recommend as the FIRST step when rolling out Microsoft 365 Copilot?",opts:["Deploy to all licensed users simultaneously to maximize impact","Identify champion users in each department to drive organic adoption and share use cases","Require all users to complete mandatory certification before access","Begin deployment with C-suite executives only, then cascade down"],correct:1,exp:"Champion-led adoption is Microsoft's proven playbook for Copilot. Champions become internal experts and advocates in their departments, share real use cases, and create peer-to-peer learning — far more effective than top-down mandates."},
+  {id:37,cat:"Copilot",q:"How does Microsoft 365 Copilot access organizational data, and what ensures it only returns information the user is authorized to see?",opts:["Copilot has a master admin account that can access all organizational data, filtered by admin-configured rules","Copilot uses Microsoft Graph, which enforces the signed-in user's existing M365 permissions when retrieving data","Copilot creates a temporary cached copy of all accessible content at the start of each session","Copilot uses AI to predict which content the user should see based on their role"],correct:1,exp:"Microsoft Graph enforces permissions — Copilot can only access data the signed-in user is already authorized to see. No elevation of privilege occurs. This means Copilot is only as powerful as the user's existing access."},
+  {id:38,cat:"Copilot",q:"How does Microsoft Copilot for Security differ from Microsoft 365 Copilot?",opts:["They are identical products with different branding","M365 Copilot is for productivity in M365 apps; Copilot for Security is a separate product for SOC analysts using Defender and Sentinel signals — requiring a separate license","M365 Copilot includes all Copilot for Security features at no extra cost in E5 plans","Copilot for Security is an agent built inside Copilot Studio for IT administrators"],correct:1,exp:"These are two distinct products. M365 Copilot = productivity AI in Word/Excel/Teams/Outlook. Copilot for Security = SOC/analyst AI for threat hunting and incident response. They have separate licensing, separate data sources, and separate admin centers."},
+  {id:39,cat:"Copilot",q:"What is prompt governance for Microsoft 365 Copilot?",opts:["A training program that teaches users how to write effective prompts","Administrative and policy controls (DLP, communication compliance) that govern what Copilot can be asked and what it can return","A feature that auto-corrects poorly worded prompts before sending them to the AI model","A Microsoft certification for users who demonstrate Copilot proficiency"],correct:1,exp:"Prompt governance encompasses the admin controls — DLP policies (block sensitive data in Copilot outputs), communication compliance policies (monitor prompts/responses for violations) — that ensure Copilot is used within organizational and regulatory boundaries."},
+  {id:40,cat:"Copilot",q:"What is the purpose of prompt engineering training during a Copilot rollout?",opts:["To train the Copilot AI model on company-specific terminology","To help administrators configure prompt governance and DLP policies","To teach users how to write effective queries so Copilot returns accurate, relevant, and useful responses","To certify users before they are allowed to access Copilot features"],correct:2,exp:"Copilot's output quality is directly tied to the quality of the prompt. Prompt engineering training teaches users to provide context, specify desired format/length, and use natural language effectively — turning Copilot from a novelty into a productivity multiplier."},
+  {id:41,cat:"Copilot",q:"An organization suspects an employee is using Copilot to aggregate and export sensitive HR records. Which feature provides the audit trail to investigate this?",opts:["Sensitivity labels — review which labels were applied to exported files","Data residency logs from Microsoft's data center","Microsoft Purview Audit — search Copilot interaction logs for the user's activity","Conditional Access sign-in logs from Entra ID"],correct:2,exp:"Microsoft Purview Audit captures Copilot prompts and responses (the queries a user sent and what data Copilot returned). Audit Premium provides longer retention and intelligent insights, making it the right tool for investigating potential misuse."},
+  {id:42,cat:"Copilot",q:"What does the Copilot admin center at copilot.cloud.microsoft primarily allow administrators to do?",opts:["Build and deploy custom Copilot agents using a drag-and-drop interface","Manage Copilot settings (web search, pinned features), view usage analytics, and configure governance settings specific to Copilot","Create sensitivity labels and DLP policies for Copilot interactions","Manage user licenses and assign Copilot add-ons to individuals"],correct:1,exp:"The Copilot admin center (copilot.cloud.microsoft) is the dedicated interface for Copilot configuration — enabling/disabling features, web content access, and viewing Copilot adoption analytics. License management stays in the M365 Admin Center; agent building is in Copilot Studio."},
+  {id:43,cat:"Agents",q:"What is Microsoft Copilot Studio?",opts:["The admin portal for managing Microsoft 365 Copilot licenses and settings","A low-code platform for building, testing, and deploying custom AI agents that connect to specific data sources and can be deployed in Teams and other channels","A developer SDK for writing Python scripts that extend Copilot","A Microsoft product for creating PowerPoint presentations with AI assistance"],correct:1,exp:"Copilot Studio is the low-code/no-code platform for building custom agents. Business users can create agents that answer questions from SharePoint sites or databases, trigger Power Automate workflows, and deploy to Teams — no developer required for basic scenarios."},
+  {id:44,cat:"Agents",q:"What is the key difference between a declarative agent and a custom engine agent?",opts:["Declarative agents can only be deployed to Teams; custom engine agents can be deployed to any channel","Declarative agents extend M365 Copilot with a custom persona and knowledge sources, using Copilot's LLM; custom engine agents use their own AI model for more complex scenarios","Declarative agents require professional developers; custom engine agents are fully no-code","Custom engine agents are free; declarative agents require a premium Copilot Studio license"],correct:1,exp:"Declarative agents are the simpler option — they inherit M365 Copilot's infrastructure and just add focused instructions and knowledge sources. Custom engine agents are for complex scenarios requiring custom AI models and orchestration, and are built by developers."},
+  {id:45,cat:"Agents",q:"After building and testing a custom agent in Copilot Studio, what step is required before it can be deployed organization-wide in Microsoft Teams?",opts:["Publish the agent to the public Microsoft App Store","Email the agent package to all employees for manual sideloading","A Teams administrator must approve the agent in the Teams Admin Center","Submit the agent to Microsoft for independent certification"],correct:2,exp:"Enterprise app governance requires Teams admin approval for org-wide agent deployments. This appears in Teams Admin Center → Manage Apps, where the admin can approve, block, or configure the agent for deployment to specific user groups."},
+  {id:46,cat:"Agents",q:"An agent in Copilot Studio is connected to a confidential SharePoint site. A user who does NOT have access asks the agent a question about its contents. What does the agent do?",opts:["The agent uses its admin service account credentials to access the site and answer","The agent cannot surface content the user is not authorized to see","The agent temporarily elevates the user's permissions to retrieve the requested information","The agent asks the user to log in with elevated credentials before proceeding"],correct:1,exp:"This is a critical security principle: agents operate under the signed-in user's permissions. No privilege elevation occurs. The agent cannot surface content from a SharePoint site the user doesn't have access to — the same M365 security model applies."},
+  {id:47,cat:"Agents",q:"What makes an agent 'agentic' — able to take actions rather than just answer questions?",opts:["Configuring sensitivity labels to allow the agent write access to M365 data","Integrating the agent with Power Automate cloud flows to trigger automated workflows","Publishing the agent to the Teams Admin Center for org-wide deployment","Connecting the agent to Microsoft Graph for real-time data retrieval"],correct:1,exp:"Power Automate is the action engine for Copilot Studio agents. By connecting a cloud flow, the agent can create tickets in ServiceNow, send approval emails, update Dataverse records, or post Teams messages — transforming a Q&A bot into an automated workflow assistant."},
+  {id:48,cat:"Agents",q:"An admin wants to block a specific third-party agent from being used across the entire organization in Teams. Where should they go?",opts:["Microsoft Purview Compliance Portal → Communication compliance","Copilot Studio → Agent settings → Disable for tenant","Microsoft 365 Admin Center → Integrated Apps or Teams Admin Center → Manage Apps","Microsoft Entra Admin Center → Enterprise Applications → Disable sign-on"],correct:2,exp:"Agent governance for Teams deployment goes through the Teams Admin Center (Manage Apps) and the M365 Admin Center (Integrated Apps). Admins can allow, block, or restrict agents to specific user groups from these locations."},
+  {id:49,cat:"Agents",q:"What is a knowledge source in a Copilot Studio agent?",opts:["A training dataset used to fine-tune the agent's underlying AI model","A connected data repository — such as a SharePoint site, website, or Dataverse table — that the agent uses to generate grounded, accurate responses","A library of pre-written responses the agent selects from based on keyword matching","A Microsoft-provided database of general business and industry knowledge"],correct:1,exp:"Knowledge sources are what give agents their domain expertise. Instead of relying on general LLM knowledge, the agent retrieves content from connected sources (SharePoint, websites, files) to answer questions accurately. This is distinct from model training — the source data isn't used to train the model."},
+  {id:50,cat:"Agents",q:"An organization wants to control which employees are allowed to create agents in Copilot Studio. Where should an admin configure this?",opts:["Microsoft 365 Admin Center → Integrated Apps → Copilot Studio permissions","Teams Admin Center → App permission policies → Copilot Studio","Power Platform Admin Center → Tenant settings for Copilot Studio (enable/disable by security group)","Microsoft Purview → Insider risk policies → Agent creation monitoring"],correct:2,exp:"Copilot Studio is part of the Power Platform ecosystem. The Power Platform Admin Center (admin.powerplatform.microsoft.com) is where admins control tenant-level settings including who can create and publish agents — by environment, security group, or user role."}
+],
+
+'lvn': [
+  {id:1,cat:"Safe Care",q:"A nurse receives a verbal order from a physician over the phone. What is the FIRST action the nurse should take?",opts:["Administer the medication immediately while documenting later","Repeat the order back to the physician to confirm accuracy before documenting","Ask a second nurse to verify the order before proceeding","Refuse to accept verbal orders as they are not permitted"],correct:1,exp:"Read-back verification is the standard for verbal/telephone orders. The nurse must repeat the order back to the prescriber and receive confirmation before acting. This prevents transcription errors and is a Joint Commission requirement."},
+  {id:2,cat:"Safe Care",q:"Which nursing action demonstrates proper implementation of the 'rights' of medication administration?",opts:["Administering a medication prepared by a colleague to save time","Checking the patient's armband against the MAR and asking the patient to state their name and date of birth","Crushing all oral medications together for ease of administration","Delegating medication verification to unlicensed assistive personnel"],correct:1,exp:"The rights of medication administration (right patient, right drug, right dose, right route, right time, right documentation, right reason) require the nurse to verify patient identity using at least two identifiers — armband plus verbal confirmation."},
+  {id:3,cat:"Safe Care",q:"A patient refuses a prescribed medication. What is the appropriate nursing response?",opts:["Administer the medication anyway since it is prescribed","Crush the medication and hide it in food to ensure the patient receives it","Document the refusal, notify the provider, and respect the patient's right to refuse treatment","Restrain the patient and administer the medication"],correct:2,exp:"Competent adults have the legal and ethical right to refuse any treatment. The nurse must document the refusal, notify the prescriber, educate the patient about consequences, and chart the interaction. Administering medication without consent is assault and battery."},
+  {id:4,cat:"Safe Care",q:"Which action best demonstrates correct hand hygiene technique per CDC guidelines?",opts:["Using hand sanitizer for all situations including when hands are visibly soiled","Washing hands with soap and water for at least 20 seconds, or using alcohol-based sanitizer when hands are not visibly soiled","Wearing gloves eliminates the need for hand hygiene","Rinsing hands with water alone is sufficient for routine patient care"],correct:1,exp:"Hand hygiene is the single most effective infection prevention measure. Soap and water for 20 seconds is required when hands are visibly soiled or after C. diff exposure (spores resist alcohol). Alcohol-based sanitizer is acceptable otherwise."},
+  {id:5,cat:"Safe Care",q:"A nurse is preparing to delegate blood pressure monitoring to an unlicensed assistive personnel (UAP). Which patient would be INAPPROPRIATE to delegate this task to?",opts:["A 65-year-old stable post-surgical patient on day 2","A patient who had their blood pressure checked 1 hour ago and it was normal","A patient with a new order for IV vasopressors due to hemodynamic instability","A patient with hypertension who is stable and awaiting discharge"],correct:2,exp:"Delegation requires the '5 Rights of Delegation' — the task must be appropriate for delegation. A hemodynamically unstable patient receiving vasopressors requires ongoing nursing assessment, not just measurement. Unstable patients require RN/LVN direct assessment, not delegation."},
+  {id:6,cat:"Safe Care",q:"A client signs a consent form for surgery but later tells the nurse they want to change their mind. What should the nurse do?",opts:["Inform the client that signing the form is legally binding and they cannot withdraw consent","Notify the surgeon immediately and document the client's wishes","Continue with the surgical preparation since the consent is already signed","Convince the client to proceed since the surgery is medically necessary"],correct:1,exp:"Informed consent is an ongoing process, not a one-time signature. Patients have the right to withdraw consent at any time. The nurse must immediately notify the surgeon and the surgical team and document the patient's change of mind."},
+  {id:7,cat:"Safe Care",q:"Which Standard Precaution practice is required for ALL patient care, regardless of diagnosis?",opts:["Wearing a surgical mask for all patient interactions","Donning an N95 respirator before entering any patient room","Performing hand hygiene and using gloves when contact with blood or body fluids is anticipated","Placing all patients in private rooms to prevent transmission"],correct:2,exp:"Standard Precautions apply to all patients regardless of diagnosis, treating blood and all body fluids as potentially infectious. Hand hygiene plus gloves when contact with blood/body fluids is anticipated is the foundational practice."},
+  {id:8,cat:"Safe Care",q:"A nurse notes a discrepancy in the medication count at the beginning of a shift. What is the correct action?",opts:["Assume it was a counting error and proceed with the shift","Document the count as correct to avoid paperwork","Report the discrepancy to the charge nurse and pharmacy immediately, and complete an incident report","Ask a colleague to recount and proceed if they agree"],correct:2,exp:"Controlled substance discrepancies must be reported immediately per facility policy to the charge nurse and pharmacy. An incident report is required. Failure to report could imply diversion and is a license violation."},
+  {id:9,cat:"Physiological Care",q:"A nurse is caring for a post-operative patient who begins to show signs of hemorrhage. Which assessment finding is MOST indicative of early hemorrhage?",opts:["Systolic BP of 88 mmHg","Urine output of 10 mL/hour","Increasing heart rate (tachycardia) with restlessness and anxiety","Decreased respiratory rate"],correct:2,exp:"Tachycardia is the FIRST compensatory response to blood loss — the body increases heart rate to maintain cardiac output. Blood pressure drops LATER when compensation fails. Restlessness/anxiety from tissue hypoperfusion also appears early. Never wait for hypotension to suspect hemorrhage."},
+  {id:10,cat:"Physiological Care",q:"A patient with a hip fracture is placed in Buck's traction. Which nursing intervention is the PRIORITY?",opts:["Ensuring the weights are resting on the floor for patient comfort","Assessing skin integrity under the traction boot every 4 hours","Removing the traction device for bathing every shift","Positioning the patient in high Fowler's position"],correct:1,exp:"Buck's traction is a skin traction used temporarily before hip surgery. The weights must hang freely (never rest on the floor) to maintain pull. Skin integrity assessment is the priority nursing action — the traction boot can cause skin breakdown and pressure injuries."},
+  {id:11,cat:"Physiological Care",q:"A patient has a nasogastric tube (NGT) for feeding. Before initiating each feeding, which action should the nurse perform FIRST?",opts:["Aspirate gastric contents and check pH to verify placement","Flush the tube with 30 mL of water to clear any residue","Begin the feeding at the prescribed rate","Place the patient in supine position to prevent aspiration"],correct:0,exp:"Verifying NGT placement before EVERY feeding is mandatory. Aspiration of gastric contents with pH testing (pH ≤ 5.5 confirms gastric placement) and/or X-ray confirmation is required. Undetected tube displacement into the lung and feeding can be fatal."},
+  {id:12,cat:"Physiological Care",q:"A patient with a urinary catheter develops a fever of 38.8°C, suprapubic pain, and cloudy, foul-smelling urine. The nurse suspects catheter-associated urinary tract infection (CAUTI). What is the PRIORITY intervention?",opts:["Irrigate the catheter with normal saline to clear the cloudy urine","Notify the provider and anticipate an order to change or remove the catheter","Increase the patient's fluid intake to 3 liters per day","Apply a heating pad to the suprapubic area"],correct:1,exp:"The first priority for a suspected CAUTI is to notify the provider. The catheter should be removed as soon as it is no longer needed (or changed if still required) since the catheter is the source of infection. Urine culture should be obtained."},
+  {id:13,cat:"Physiological Care",q:"A nurse is caring for a patient with increased intracranial pressure (ICP). Which position should the nurse maintain?",opts:["Trendelenburg position (head down 15-30 degrees)","Head of bed elevated 30 degrees with neck in neutral alignment","Prone position to reduce posterior fossa pressure","Flat supine to maximize cerebral perfusion pressure"],correct:1,exp:"HOB 30 degrees with neutral neck alignment promotes venous drainage from the brain, reducing ICP. Trendelenburg and flat supine increase ICP by impeding venous return. Avoid extreme neck flexion or rotation which also increases ICP."},
+  {id:14,cat:"Physiological Care",q:"A patient receiving IV heparin has an activated partial thromboplastin time (aPTT) of 180 seconds (therapeutic range: 60-100 seconds). What is the priority nursing action?",opts:["Continue the infusion — this level is within range for deep vein thrombosis","Increase the infusion rate to maintain therapeutic anticoagulation","Stop the heparin infusion and notify the provider immediately","Administer protamine sulfate 1 mg per 100 units of heparin without a provider order"],correct:2,exp:"An aPTT of 180 seconds is supratherapeutic (3x the upper limit) indicating dangerous over-anticoagulation with high bleeding risk. STOP the infusion and notify the provider immediately. Protamine sulfate (heparin reversal) may be ordered but requires a physician order."},
+  {id:15,cat:"Physiological Care",q:"A patient with a new colostomy expresses disgust about the stoma and refuses to look at it. The nurse recognizes this as which stage in the adaptation process?",opts:["Denial","Anger","Bargaining","Acceptance"],correct:0,exp:"Refusing to look at the stoma and expressing disgust represents denial — the first stage of grief/adaptation (Kübler-Ross). The nurse should allow the patient time to adjust, provide emotional support, and gradually involve the patient in ostomy care when they are ready."},
+  {id:16,cat:"Physiological Care",q:"A patient returns from a thyroidectomy. Which assessment finding requires IMMEDIATE intervention?",opts:["Voice hoarseness","Serum calcium of 9.2 mg/dL","Positive Chvostek's sign (facial twitching when tapping the facial nerve)","Temperature of 37.2°C"],correct:2,exp:"A positive Chvostek's sign indicates hypocalcemia from inadvertent parathyroid removal or damage during thyroidectomy. Hypocalcemia can progress to laryngospasm and tetany, a life-threatening airway emergency. Trousseau's sign is another indicator. IV calcium gluconate must be immediately available."},
+  {id:17,cat:"Physiological Care",q:"Which instruction should the nurse include when teaching a patient with iron-deficiency anemia to take oral iron supplements?",opts:["Take iron with milk to reduce gastrointestinal side effects","Take iron on an empty stomach or with orange juice (Vitamin C) to enhance absorption","Take iron with calcium supplements for synergistic effect","Iron supplements can be taken at any time without regard for other foods or medications"],correct:1,exp:"Vitamin C (ascorbic acid) converts ferric iron to ferrous iron, dramatically enhancing GI absorption. Calcium, antacids, milk, and coffee all inhibit iron absorption. Iron should ideally be taken on an empty stomach, though GI upset may require taking it with a small amount of food."},
+  {id:18,cat:"Physiological Care",q:"A patient is being discharged with a prescription for warfarin. Which statement by the patient indicates a need for further teaching?",opts:["'I will get my INR checked regularly as scheduled'","'I will eat consistent amounts of leafy green vegetables rather than eliminating them'","'I can take ibuprofen for pain since it's over-the-counter and doesn't interact with warfarin'","'I will notify my dentist that I am taking warfarin before any procedures'"],correct:2,exp:"NSAIDs like ibuprofen potentiate warfarin's anticoagulant effect AND cause GI bleeding, creating dangerous compounded bleeding risk. Patients on warfarin must use acetaminophen for pain. Consistent (not eliminated) vitamin K intake is correct advice."},
+  {id:19,cat:"Physiological Care",q:"A patient reports cramping abdominal pain, abdominal distention, and hasn't had a bowel movement in 5 days. Bowel sounds are hypoactive. What is the priority nursing action?",opts:["Administer a Fleet enema immediately","Perform digital disimpaction","Assess the abdomen and notify the provider — suspect ileus or obstruction","Encourage the patient to ambulate to stimulate peristalsis"],correct:2,exp:"Hypoactive bowel sounds plus 5 days without BM plus distention could indicate paralytic ileus or mechanical obstruction — both require medical evaluation before any enemas or laxatives are given. Administering enemas to an obstruction can cause perforation."},
+  {id:20,cat:"Physiological Care",q:"A patient on continuous cardiac monitoring develops sudden onset of irregular rhythm with no discernible P waves and an irregular ventricular rate of 90-130 bpm. The nurse recognizes this as:",opts:["Normal sinus rhythm","Atrial fibrillation","Second-degree AV block (Mobitz Type II)","Ventricular fibrillation"],correct:1,exp:"Atrial fibrillation is characterized by irregularly irregular rhythm, absence of distinct P waves (replaced by fibrillatory baseline), and variable ventricular rate. It is the most common sustained cardiac arrhythmia. Key concern: thrombus formation and stroke risk from blood pooling in the atria."},
+  {id:21,cat:"Pharmacology",q:"A patient with type 2 diabetes is prescribed metformin. Which lab value should the nurse assess BEFORE administration and periodically thereafter?",opts:["Liver function tests (AST, ALT)","Serum creatinine and GFR (kidney function)","Serum potassium","Platelet count"],correct:1,exp:"Metformin is renally cleared, and if kidney function is impaired (GFR <30 mL/min), it accumulates and can cause life-threatening lactic acidosis. Baseline and periodic renal function assessment is mandatory. Metformin should be held before contrast dye procedures."},
+  {id:22,cat:"Pharmacology",q:"A patient is receiving morphine PCA (patient-controlled analgesia). Which assessment finding requires immediate nursing intervention?",opts:["Pain score of 4/10","Respiratory rate of 8 breaths per minute with pinpoint pupils","Mild nausea","Request for crackers because of hunger"],correct:1,exp:"Respiratory rate of 8 (bradypnea) with pinpoint pupils (miosis) are classic signs of opioid toxicity/overdose. This is a life-threatening emergency requiring immediate intervention: stop the PCA, apply O2, stimulate the patient, notify the provider, and prepare naloxone (Narcan) administration."},
+  {id:23,cat:"Pharmacology",q:"The nurse is teaching a patient about taking digoxin. Which instruction is MOST important?",opts:["Take the medication with an antacid to prevent GI upset","Take the medication only when you feel your heart beating irregularly","Count your pulse for one full minute before each dose; hold if less than 60 bpm and call your provider","Double the next dose if you miss one"],correct:2,exp:"Digoxin has a narrow therapeutic index. A pulse below 60 indicates the drug may be causing bradycardia and the dose should be held. Doubling doses risks toxicity. Never take with antacids — they reduce absorption. Hypokalemia potentiates digoxin toxicity."},
+  {id:24,cat:"Pharmacology",q:"A patient allergic to penicillin is prescribed amoxicillin-clavulanate (Augmentin). What should the nurse do?",opts:["Administer the medication since amoxicillin is different from penicillin","Hold the medication, notify the provider, and document the allergy — amoxicillin is a penicillin-class antibiotic","Ask the patient if they've had amoxicillin before without a reaction, then proceed if yes","Administer a test dose and observe for 30 minutes before giving the full dose"],correct:1,exp:"Amoxicillin IS a penicillin. Administering amoxicillin to a penicillin-allergic patient risks a potentially fatal allergic reaction. The nurse must hold the drug, notify the provider, and ensure the allergy is documented. The provider can prescribe a non-penicillin alternative."},
+  {id:25,cat:"Pharmacology",q:"Which electrolyte imbalance is a nurse MOST concerned about when administering furosemide (Lasix) to a patient also taking digoxin?",opts:["Hypernatremia","Hypokalemia","Hypercalcemia","Hyperphosphatemia"],correct:1,exp:"Furosemide is a loop diuretic that wastes potassium. Hypokalemia potentiates digoxin toxicity by increasing the drug's binding to cardiac cells — even at therapeutic digoxin levels, low potassium can cause fatal arrhythmias. Monitor potassium and supplement as ordered."},
+  {id:26,cat:"Psychosocial",q:"A patient diagnosed with terminal cancer tells the nurse, 'I've been praying and I believe God will cure me. I don't think I need chemotherapy.' How should the nurse respond?",opts:["Inform the patient that faith alone cannot cure cancer and insist on chemotherapy","Tell the patient their beliefs are foolish and could lead to faster death","Acknowledge the patient's faith and values, explore their understanding of the prognosis, and notify the provider","Schedule an appointment with the hospital chaplain without discussing the situation further"],correct:2,exp:"The nurse must respect the patient's autonomy, cultural/spiritual beliefs, and right to make their own healthcare decisions. The appropriate response is therapeutic communication — acknowledge beliefs, assess understanding, ensure informed consent is in place — and notify the provider. Judgment or coercion is inappropriate."},
+  {id:27,cat:"Psychosocial",q:"A nurse is caring for a patient in the anger stage of grief following a terminal diagnosis. The patient shouts, 'You don't care about any of us! You're all just waiting for me to die!' What is the BEST response?",opts:["Explain calmly that the healthcare team does care and leave the room to give the patient privacy","'It sounds like you're feeling very angry and frustrated right now. I'm here to listen.'","Document the outburst as combative behavior and request a psychiatric consult","Ask the patient's family to speak with the patient about their attitude"],correct:1,exp:"Therapeutic communication during the anger stage means acknowledging feelings without defensiveness or abandonment. Reflecting the patient's emotion validates their experience and maintains the therapeutic relationship. Leaving or dismissing the anger is non-therapeutic."},
+  {id:28,cat:"Psychosocial",q:"A patient who survived a myocardial infarction tells the nurse, 'I know I'm supposed to quit smoking, but I've been doing it for 30 years. It's who I am.' Using motivational interviewing principles, what is the best nursing response?",opts:["'You need to stop smoking or you will have another heart attack and die.'","'What do you think could be different in your life if you did decide to quit?'","'Many people quit cold turkey and it works fine. Just stop.'","'Smoking is your choice, so we won't discuss it further.'"],correct:1,exp:"Motivational interviewing (MI) uses open-ended questions to evoke the patient's own reasons for change. Asking 'what could be different' invites the patient to articulate their own values and motivations — far more effective than lecturing or threatening."},
+  {id:29,cat:"Psychosocial",q:"A patient discloses to the nurse that they are experiencing domestic violence at home. Which response BEST demonstrates therapeutic communication and appropriate nursing action?",opts:["Advise the patient to leave the abusive relationship immediately","Reassure the patient that the situation will improve on its own","Listen non-judgmentally, assess immediate safety, provide information about resources and hotlines, and document findings","Report the abuser to police without the patient's knowledge"],correct:2,exp:"The nurse's role in domestic violence situations is to provide a safe, non-judgmental space, assess immediate safety risk, provide resource information (hotlines, shelters), and document using objective language. Mandating specific actions can endanger the patient further."},
+  {id:30,cat:"Psychosocial",q:"A nurse is assigned to a patient from a cultural background unfamiliar to the nurse. To provide culturally competent care, what is the MOST important initial action?",opts:["Treat the patient exactly as the nurse would treat all other patients to avoid bias","Ask the patient about their health beliefs, practices, and preferences","Assign the care to a nurse from the same cultural background","Assume the patient shares the cultural practices typically associated with their ethnic group"],correct:1,exp:"Cultural competence begins with assessing the individual — not assuming all members of a culture share the same beliefs. Asking open-ended questions about health beliefs, dietary practices, traditional remedies, and language needs is the most important first step in culturally sensitive care."}
+],
+
+'shrm': [
+  {id:1,cat:"Employment Law",q:"Under the Age Discrimination in Employment Act (ADEA), which employees are protected from age-based discrimination?",opts:["All employees regardless of age","Employees aged 40 and older","Employees aged 65 and older","Only employees who have been with the company for 5 or more years"],correct:1,exp:"The ADEA protects workers 40 years of age and older from discrimination based on age in hiring, firing, pay, job assignments, promotions, layoffs, training, and any other term or condition of employment. Applies to employers with 20 or more employees."},
+  {id:2,cat:"Employment Law",q:"The Fair Labor Standards Act (FLSA) establishes which of the following?",opts:["Mandatory vacation accrual rates for all employees","Federal minimum wage, overtime pay (1.5x for hours over 40/week for non-exempt employees), and child labor standards","Required paid sick leave for all private-sector employees","Mandatory health insurance for companies with 50 or more employees"],correct:1,exp:"The FLSA sets the federal minimum wage, requires overtime pay of 1.5x the regular rate for non-exempt employees who work more than 40 hours in a workweek, and establishes child labor standards. It does NOT require paid vacation, sick leave, or holidays."},
+  {id:3,cat:"Employment Law",q:"A company is planning to lay off 200 workers at a single facility. Under the Worker Adjustment and Retraining Notification (WARN) Act, what is required?",opts:["No advance notice is legally required for layoffs","60 days advance written notice to affected workers, state dislocated worker units, and local government","30 days advance written notice to the state unemployment agency only","Severance pay equal to 2 weeks per year of service for each affected employee"],correct:1,exp:"The WARN Act requires employers with 100+ employees to provide 60 calendar days advance written notice before a plant closing or mass layoff (50+ employees at a single site). Notice must go to affected workers, state, and local officials. Violations result in back pay liability."},
+  {id:4,cat:"Employment Law",q:"Under the Americans with Disabilities Act (ADA), what is an employer required to provide to a qualified employee with a disability?",opts:["Any accommodation the employee requests, regardless of cost","Reasonable accommodation unless it creates an undue hardship for the employer","Full disability benefits equal to their current salary","Transfer to a different department without considering business needs"],correct:1,exp:"The ADA requires employers to provide reasonable accommodations to qualified individuals with disabilities unless doing so creates an undue hardship (significant difficulty or expense). The interactive process between employer and employee is required to identify effective accommodations."},
+  {id:5,cat:"Employment Law",q:"Under Title VII of the Civil Rights Act of 1964, which categories are protected from employment discrimination?",opts:["Race, color, sex, national origin, and religion","Race, color, sex, national origin, religion, age, and disability","Race, color, and national origin only","All forms of discrimination in the workplace including unfair treatment"],correct:0,exp:"Title VII prohibits employment discrimination based on race, color, religion, sex (including pregnancy, sexual orientation, and gender identity), and national origin. Age is covered by the ADEA, and disability by the ADA — separate statutes."},
+  {id:6,cat:"Employment Law",q:"Which of the following is an example of a bona fide occupational qualification (BFOQ) that can be used as a legal defense for what would otherwise be discriminatory hiring?",opts:["Requiring all customer-facing employees to speak English","Requiring female actors to play female roles in a theatrical production","Refusing to hire applicants over age 50 for all positions because 'young people are more productive'","Requiring all employees to be of a specific nationality for international assignments"],correct:1,exp:"A BFOQ is a characteristic that is genuinely necessary for the performance of a job. Requiring female actors for female roles is a classic example. BFOQs are narrowly construed — customer preference, productivity stereotypes, or general convenience do NOT qualify as BFOQs."},
+  {id:7,cat:"Employment Law",q:"An employer's selection process results in significantly fewer women being hired even though the process appears neutral on its face. This is an example of:",opts:["Disparate treatment","Disparate impact","Hostile work environment","Quid pro quo harassment"],correct:1,exp:"Disparate impact (also called adverse impact) occurs when a facially neutral employment practice disproportionately affects a protected class. The '4/5ths rule' (selection rate for a protected group is less than 80% of the highest group's rate) is used to measure it. No discriminatory intent is required."},
+  {id:8,cat:"Employment Law",q:"Under the Family and Medical Leave Act (FMLA), how many weeks of unpaid, job-protected leave is an eligible employee entitled to per year?",opts:["6 weeks","12 weeks (or up to 26 weeks for military caregiver leave)","8 weeks","Leave under FMLA is paid, not unpaid"],correct:1,exp:"FMLA provides eligible employees (12 months of employment, 1,250 hours worked) at covered employers (50+ employees) up to 12 weeks of unpaid, job-protected leave per year for qualifying reasons (birth, adoption, serious health condition). Military caregiver leave can extend to 26 weeks."},
+  {id:9,cat:"Employment Law",q:"An OSHA inspection finds that an employer willfully violated a safety standard, causing a worker's death. What is the maximum penalty per violation?",opts:["$15,625","$70,000","$156,259","$1,000,000"],correct:2,exp:"OSHA willful violations with a fatality carry criminal penalties up to $156,259 per violation (as of recent adjustments) plus possible imprisonment. Serious violations carry up to $15,625 per violation. Willful violations can also result in criminal prosecution with up to 6 months imprisonment for a first offense."},
+  {id:10,cat:"Employment Law",q:"A supervisor conditions a promotion on an employee's agreement to a sexual relationship. This is an example of:",opts:["Hostile work environment harassment","Disparate impact","Quid pro quo sexual harassment","Constructive discharge"],correct:2,exp:"Quid pro quo ('something for something') harassment occurs when a person in authority conditions an employment benefit (promotion, raise, continued employment) on an employee's submission to sexual advances. This is strict liability for the employer regardless of whether the employee acquiesces."},
+  {id:11,cat:"Employment Law",q:"An employer with 60 employees wants to conduct drug testing. Which statement about drug testing is correct?",opts:["Pre-employment drug testing is prohibited under the ADA","Random drug testing of safety-sensitive employees is generally permissible","Drug tests may only be conducted after a workplace accident","Employees may refuse drug tests without consequence in all circumstances"],correct:1,exp:"Pre-employment and random drug testing for safety-sensitive positions is generally permissible. The ADA does not protect current illegal drug users. While current illegal drug use is not a disability, employees in recovery are protected. Testing policies must be applied consistently."},
+  {id:12,cat:"People & Talent",q:"Which recruitment metric measures the quality and retention of new hires from different sourcing channels?",opts:["Time to fill","Cost per hire","Source of hire quality (quality of hire)","Offer acceptance rate"],correct:2,exp:"Quality of hire measures the value new employees bring, typically tracking performance ratings, time to productivity, and retention rates by sourcing channel. It's considered the most strategic recruitment metric because it correlates sourcing effectiveness to business outcomes."},
+  {id:13,cat:"People & Talent",q:"A structured interview uses which approach to ensure consistency and legal defensibility?",opts:["Asking different questions to each candidate based on their resume","Allowing interviewers to ask any questions they find interesting","Asking all candidates the same predetermined, job-related questions with a standardized scoring rubric","Focusing primarily on personality and cultural fit questions"],correct:2,exp:"Structured interviews require the same questions in the same order for all candidates, scored against a predetermined rubric based on job-related competencies. They significantly reduce bias (halo effect, confirmation bias) and are more legally defensible than unstructured interviews."},
+  {id:14,cat:"People & Talent",q:"The 360-degree feedback process differs from traditional performance reviews because:",opts:["It focuses solely on quantitative metrics and KPIs","It collects performance feedback from multiple sources: supervisors, peers, direct reports, and the employee themselves","It eliminates the manager's role in performance assessment","It is used only for executive-level employees"],correct:1,exp:"360-degree feedback (multi-rater feedback) provides a holistic view of employee performance from multiple perspectives, reducing single-rater bias. It's particularly valuable for assessing leadership competencies and interpersonal behaviors that aren't visible to a direct supervisor alone."},
+  {id:15,cat:"People & Talent",q:"Which compensation strategy sets pay at or above market median to attract and retain top talent, accepting higher labor costs?",opts:["Lag the market strategy","Lead the market strategy","Match the market strategy","Broad-banding strategy"],correct:1,exp:"A lead the market (pay above market) strategy compensates above the market median to attract top candidates and reduce turnover. It's used in competitive talent markets or for critical skills. The trade-off is higher payroll costs but potentially lower recruiting and turnover costs."},
+  {id:16,cat:"People & Talent",q:"An organization wants to identify employees with high potential for leadership roles and develop targeted development plans. This is best described as:",opts:["Performance appraisal","Succession planning with talent review","Workforce planning","Compensation benchmarking"],correct:1,exp:"Succession planning identifies and develops high-potential employees ('HiPos') for future leadership roles. Talent review processes typically use 9-box grids (performance vs. potential) to segment the workforce and create targeted development plans for successors."},
+  {id:17,cat:"People & Talent",q:"Which of the following is a characteristic of Generation Z employees in the workforce?",opts:["Strong preference for face-to-face communication over digital tools","No expectation of work-life flexibility since they are digital natives accustomed to working anywhere","Strong prioritization of purpose-driven work, feedback, job security, and mental health support","Primarily motivated by retirement benefits and long-term job tenure"],correct:2,exp:"Generation Z (born ~1997-2012) entered the workforce during a period of economic uncertainty. Research shows they value purpose, feedback, mental health support, job security, and flexibility. They are digital-first but also value in-person mentorship."},
+  {id:18,cat:"People & Talent",q:"What is the primary goal of an Employee Assistance Program (EAP)?",opts:["To monitor employee productivity and attendance","To provide confidential counseling and referral services for personal and work-related problems that may affect job performance","To manage workers' compensation claims","To administer employee benefits enrollment"],correct:1,exp:"EAPs provide confidential, short-term counseling, assessment, and referral services for employees dealing with mental health, substance abuse, financial, legal, family, or other personal issues. EAPs are confidential and at no cost to the employee — usage cannot be disclosed to the employer."},
+  {id:19,cat:"People & Talent",q:"Which learning and development method is MOST effective for developing complex decision-making skills in managers?",opts:["Online self-paced e-learning modules","Action learning (real projects with coaching and peer learning groups)","One-time classroom lecture on decision-making frameworks","Reading assigned business books"],correct:1,exp:"Action learning addresses real business challenges through a small group with a coach, combining project work with structured reflection. It's most effective for complex competencies like decision-making because participants immediately apply learning to authentic problems with real stakes."},
+  {id:20,cat:"People & Talent",q:"An employee claims they were forced to resign because the work environment was so intolerable that no reasonable person would continue. This is known as:",opts:["Voluntary resignation","Quid pro quo harassment","Constructive discharge","Wrongful termination"],correct:2,exp:"Constructive discharge occurs when an employer makes working conditions so intolerable (through discrimination, harassment, etc.) that a reasonable person in the employee's position would feel compelled to resign. Courts treat constructive discharge as involuntary termination for legal purposes."},
+  {id:21,cat:"People & Talent",q:"When calculating cost per hire, which formula is correct?",opts:["(Internal recruiting costs + External recruiting costs) ÷ Total number of hires","Annual salary of all new hires ÷ Total number of hires","Total HR department budget ÷ Total headcount","Recruiter salary × Number of positions filled"],correct:0,exp:"Cost per hire = (Total internal recruiting costs + Total external recruiting costs) / Total number of hires in a period. This metric helps organizations evaluate recruiting efficiency and benchmark against industry standards. SHRM/ANSI standard includes both internal and external costs."},
+  {id:22,cat:"HR Strategy",q:"The SHRM Competency Model's Business Acumen competency requires HR professionals to:",opts:["Focus exclusively on HR technical knowledge and compliance","Understand organizational operations, finances, and industry to create and execute HR strategy that drives business results","Manage the HR information system and ensure data accuracy","Maintain expertise only in compensation and benefits administration"],correct:1,exp:"Business Acumen — understanding the organization's strategy, operations, competitive environment, and financials — is a core SHRM leadership competency. It enables HR to align people strategies to business goals and demonstrate the strategic value of HR investments."},
+  {id:23,cat:"HR Strategy",q:"An organization is implementing a new HRIS (Human Resource Information System). What is the MOST important factor in ensuring successful adoption?",opts:["Selecting the most expensive system with the most features","Ensuring change management: stakeholder engagement, training, and communication throughout implementation","Implementing the system as quickly as possible to gain ROI","Having the IT department lead the entire implementation without HR involvement"],correct:1,exp:"Technology implementation fails primarily due to people, not technology. Change management — engaging stakeholders early, communicating the 'why,' training users adequately, and addressing resistance — is the most critical factor for HRIS adoption and long-term success."},
+  {id:24,cat:"HR Strategy",q:"An organization's HR metrics show high turnover in a key business unit. Using an evidence-based HR approach, what should HR do FIRST?",opts:["Immediately increase salaries in the affected unit","Launch a company-wide engagement survey","Conduct exit interviews, stay interviews, and data analysis to identify root causes before intervening","Implement a blanket retention bonus for all employees"],correct:2,exp:"Evidence-based HR requires diagnosing before prescribing. Root cause analysis (exit/stay interviews, engagement data, compensation benchmarking, manager effectiveness data) identifies whether the driver is compensation, management, career development, or culture — and informs targeted interventions."},
+  {id:25,cat:"HR Strategy",q:"What is an Employee Value Proposition (EVP)?",opts:["The monetary value of an employee's total compensation package","The unique set of benefits, culture, and opportunities an organization offers in exchange for the skills, capabilities, and experience employees bring","A legal document outlining employee rights and organizational expectations","A performance scorecard linking individual goals to company objectives"],correct:1,exp:"The EVP is the 'deal' between an organization and its employees — what employees receive (compensation, benefits, culture, development, purpose) in exchange for what they contribute. A compelling, differentiated EVP is the foundation of employer branding and talent attraction strategies."},
+  {id:26,cat:"HR Strategy",q:"Which HR metric directly measures the effectiveness of the onboarding process?",opts:["Time to fill","90-day voluntary turnover rate (new hire turnover)","Employee Net Promoter Score (eNPS)","Training hours per employee"],correct:1,exp:"90-day (or first-year) voluntary turnover is the most direct indicator of onboarding effectiveness. If new hires leave within 90 days, it suggests misalignment in hiring (job fit, culture fit), inadequate onboarding support, or unmet expectations during the candidate experience."},
+  {id:27,cat:"HR Operations",q:"An HR professional discovers that a manager has been documenting performance issues for an employee but has not shared the feedback directly with the employee. What should the HR professional advise?",opts:["Continue documenting quietly in case termination is needed later","The manager must provide direct, documented feedback to the employee so they have the opportunity to improve — this is required for progressive discipline to be legally defensible","File the documentation and terminate the employee based on the undisclosed record","Transfer the employee to another department to resolve the performance issue"],correct:1,exp:"Progressive discipline requires that employees be clearly informed of performance issues and given the opportunity to improve before termination. Documenting problems without disclosure undermines due process, creates legal exposure, and is fundamentally unfair. Employees must receive feedback and a reasonable opportunity to correct behavior."},
+  {id:28,cat:"HR Operations",q:"Under which circumstance should an HR professional break confidentiality when an employee discloses information during a private conversation?",opts:["When a manager requests information about the employee's personal situation","When the information is interesting and relevant to a team situation","When the employee discloses credible threats of harm to themselves or others, or reports illegal activity","Confidentiality should never be broken under any circumstances"],correct:2,exp:"HR professionals maintain confidentiality as a core ethical obligation, but this is not absolute. Credible threats of violence or harm (to self or others), illegal activity, and workplace safety violations override confidentiality obligations. Employees should be informed of these limits at the outset of sensitive conversations."},
+  {id:29,cat:"HR Operations",q:"What is the primary purpose of conducting an I-9 (Employment Eligibility Verification) form for new hires?",opts:["To verify the applicant's educational credentials and certifications","To confirm the employee's tax withholding preferences","To verify that the employee is authorized to work in the United States under the Immigration Reform and Control Act","To collect emergency contact information for safety purposes"],correct:2,exp:"The I-9 form, required under IRCA, verifies that every employee hired after November 6, 1986 is legally authorized to work in the United States. Employers must examine acceptable documents proving identity and work authorization within 3 business days of hire. Failure to maintain I-9s results in civil penalties."},
+  {id:30,cat:"HR Operations",q:"An organization wants to ensure pay equity across gender and race. Which approach provides the most rigorous analysis?",opts:["Comparing average salaries by department without controlling for other factors","Conducting a regression analysis controlling for legitimate pay factors (job level, experience, performance) to identify unexplained pay gaps","Ensuring all employees in the same job title receive identical pay","Asking managers to self-certify that they have not discriminated in pay decisions"],correct:1,exp:"A multiple regression analysis controls for legitimate differentiating factors (tenure, experience, performance, job level) and isolates unexplained variance attributable to protected characteristics. This is the standard methodology for proactive pay equity analysis and is used in OFCCP audits and litigation."}
+]
+
+};
+
+// ═══════════════════════════════════════════════════════
+// SUBJECT CONFIG
+// ═══════════════════════════════════════════════════════
+const SUBJECTS = {
+  'ab900': {
+    key: 'ab900',
+    name: 'AB-900',
+    fullName: 'Microsoft 365 Copilot & Agent Administration',
+    icon: '🏢',
+    color: '#0078d4',
+    passThreshold: '700/1000 scaled score',
+    examInfo: [
+      ['Exam','AB-900'],
+      ['Questions','50'],
+      ['Passing Score','700 / 1000'],
+      ['Domains','M365 Core (33%) · Data & Governance (37%) · Copilot (15%) · Agents (15%)']
+    ],
+    domains: [
+      {name:'M365 Core',        icon:'🏢', color:'#0078d4', weight:0.33},
+      {name:'Data & Governance',icon:'🔒', color:'#6264a7', weight:0.37},
+      {name:'Copilot',          icon:'✦',  color:'#2ecc71', weight:0.15},
+      {name:'Agents',           icon:'🤖', color:'#f39c12', weight:0.15}
+    ],
+    aiContext: 'Microsoft 365 Copilot and Agent Administration Fundamentals (AB-900). Exam domains: M365 Core Services (33%), Data Protection & Governance (37%), Copilot Administration (15%), Agent Administration (15%). Passing score: 700/1000.'
+  },
+  'lvn': {
+    key: 'lvn',
+    name: 'LVN NCLEX-PN',
+    fullName: 'NCLEX-PN Licensed Vocational Nurse',
+    icon: '🩺',
+    color: '#2ecc71',
+    passThreshold: 'Passing Standard (Next Generation NCLEX)',
+    examInfo: [
+      ['Exam','NCLEX-PN'],
+      ['Questions','30 (practice set)'],
+      ['Format','Next Generation NCLEX (NGN)'],
+      ['Domains','Safe Care (30%) · Physiological (45%) · Pharmacology (15%) · Psychosocial (10%)']
+    ],
+    domains: [
+      {name:'Safe Care',       icon:'🛡️', color:'#0078d4', weight:0.30},
+      {name:'Physiological Care',icon:'❤️', color:'#e74c3c', weight:0.45},
+      {name:'Pharmacology',    icon:'💊', color:'#9b59b6', weight:0.15},
+      {name:'Psychosocial',    icon:'🧠', color:'#2ecc71', weight:0.10}
+    ],
+    aiContext: 'NCLEX-PN (Licensed Vocational/Practical Nurse) licensure exam. Domains: Safe and Effective Care Environment (30%), Physiological Integrity (45%), Pharmacological Therapies (15%), Psychosocial Integrity (10%). Next Generation NCLEX format.'
+  },
+  'shrm': {
+    key: 'shrm',
+    name: 'SHRM-CP',
+    fullName: 'SHRM Certified Professional (HR)',
+    icon: '👥',
+    color: '#f39c12',
+    passThreshold: '200 scale score (passing varies by exam form)',
+    examInfo: [
+      ['Exam','SHRM-CP'],
+      ['Questions','30 (practice set)'],
+      ['Format','Knowledge + Situational Judgment Items'],
+      ['Domains','Employment Law (38%) · People & Talent (32%) · HR Strategy (18%) · HR Operations (12%)']
+    ],
+    domains: [
+      {name:'Employment Law',  icon:'⚖️', color:'#e74c3c', weight:0.38},
+      {name:'People & Talent', icon:'👥', color:'#f39c12', weight:0.32},
+      {name:'HR Strategy',     icon:'📈', color:'#0078d4', weight:0.18},
+      {name:'HR Operations',   icon:'⚙️', color:'#6264a7', weight:0.12}
+    ],
+    aiContext: 'SHRM Certified Professional (SHRM-CP) exam. Domains: Employment Law & Regulations (38%), People & Talent Management (32%), HR Strategy & Business Acumen (18%), HR Operations & Technology (12%).'
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// GLOBALS
+// ═══════════════════════════════════════════════════════
+let sbClient = null;
+let currentUser = null;   // { id, email } or { id:'guest', email:'guest' }
+let currentSubject = null;  // subject key string
+let answers = {};           // { qId: { attempts, wrongCount, lastResult } }
+let streak = 0, lastDate = null, apiKey = '';
+let session = { questions: [], idx: 0, score: 0, results: [] };
+let authMode = 'signin';
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+function init() {
+  // Load persisted settings
+  const cfg = JSON.parse(localStorage.getItem('studyapp_config') || '{}');
+  apiKey = cfg.apiKey || '';
+  if (document.getElementById('api-key-input')) {
+    document.getElementById('api-key-input').value = apiKey;
+  }
+
+  // Check if Supabase is already configured
+  const sbCfg = JSON.parse(localStorage.getItem('studyapp_supabase') || 'null');
+  if (sbCfg && sbCfg.url && sbCfg.key) {
+    initSupabase(sbCfg.url, sbCfg.key);
+    // Pre-fill setup form
+    const urlEl = document.getElementById('sb-url');
+    const keyEl = document.getElementById('sb-key');
+    if (urlEl) urlEl.value = sbCfg.url;
+    if (keyEl) keyEl.value = sbCfg.key;
+    // Check for existing session
+    sbClient.auth.getSession().then(({data}) => {
+      if (data.session) {
+        currentUser = { id: data.session.user.id, email: data.session.user.email };
+        showView('v-subjects');
+        renderSubjectsView();
+      } else {
+        showView('v-auth');
+      }
+    }).catch(() => showView('v-auth'));
+    return;
+  }
+
+  // Check if guest mode was previously used
+  if (localStorage.getItem('studyapp_guest') === '1') {
+    currentUser = { id: 'guest', email: 'guest' };
+    showView('v-subjects');
+    renderSubjectsView();
+    return;
+  }
+
+  showView('v-setup');
+}
+
+// ═══════════════════════════════════════════════════════
+// SUPABASE
+// ═══════════════════════════════════════════════════════
+function initSupabase(url, key) {
+  sbClient = supabase.createClient(url, key);
+}
+
+// ═══════════════════════════════════════════════════════
+// SETUP VIEW
+// ═══════════════════════════════════════════════════════
+function saveSetup() {
+  const url = document.getElementById('sb-url').value.trim();
+  const key = document.getElementById('sb-key').value.trim();
+  const errEl = document.getElementById('setup-err');
+  errEl.textContent = '';
+
+  if (!url.startsWith('https://') || !url.includes('.supabase.co')) {
+    errEl.textContent = 'Please enter a valid Supabase project URL (https://xxxx.supabase.co)';
+    return;
+  }
+  if (!key.startsWith('eyJ')) {
+    errEl.textContent = 'Please enter a valid Supabase anon key (starts with eyJ...)';
+    return;
+  }
+
+  localStorage.setItem('studyapp_supabase', JSON.stringify({ url, key }));
+  localStorage.removeItem('studyapp_guest');
+  initSupabase(url, key);
+  showView('v-auth');
+}
+
+function skipSetup() {
+  localStorage.removeItem('studyapp_supabase');
+  currentUser = { id: 'guest', email: 'guest' };
+  localStorage.setItem('studyapp_guest', '1');
+  showView('v-subjects');
+  renderSubjectsView();
+}
+
+// ═══════════════════════════════════════════════════════
+// AUTH VIEW
+// ═══════════════════════════════════════════════════════
+function toggleAuthMode() {
+  authMode = authMode === 'signin' ? 'signup' : 'signin';
+  const isSignup = authMode === 'signup';
+  document.getElementById('auth-subtitle').textContent = isSignup ? 'Create your account' : 'Sign in to your account';
+  document.getElementById('auth-btn').textContent = isSignup ? 'Create Account' : 'Sign In';
+  document.getElementById('auth-toggle').innerHTML = isSignup
+    ? 'Already have an account? <span>Sign in</span>'
+    : "Don't have an account? <span>Sign up</span>";
+  document.getElementById('auth-err').textContent = '';
+  document.getElementById('auth-ok').textContent = '';
+}
+
+async function submitAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-pass').value;
+  const errEl = document.getElementById('auth-err');
+  const okEl  = document.getElementById('auth-ok');
+  const btn   = document.getElementById('auth-btn');
+
+  errEl.textContent = '';
+  okEl.textContent  = '';
+
+  if (!email || !pass) { errEl.textContent = 'Please enter your email and password.'; return; }
+  if (!sbClient) { errEl.textContent = 'Supabase not configured. Use guest mode or set up Supabase first.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = authMode === 'signin' ? 'Signing in…' : 'Creating account…';
+
+  try {
+    let result;
+    if (authMode === 'signin') {
+      result = await sbClient.auth.signInWithPassword({ email, password: pass });
+    } else {
+      result = await sbClient.auth.signUp({ email, password: pass });
+    }
+
+    if (result.error) throw result.error;
+
+    if (authMode === 'signup' && result.data?.user && !result.data.session) {
+      okEl.textContent = 'Check your email to confirm your account, then sign in.';
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+      return;
+    }
+
+    currentUser = { id: result.data.user.id, email: result.data.user.email };
+    showView('v-subjects');
+    renderSubjectsView();
+  } catch (err) {
+    errEl.textContent = err.message || 'Authentication failed. Please try again.';
+  }
+
+  btn.disabled = false;
+  btn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+}
+
+function guestMode() {
+  currentUser = { id: 'guest', email: 'guest' };
+  localStorage.setItem('studyapp_guest', '1');
+  showView('v-subjects');
+  renderSubjectsView();
+}
+
+async function signOut() {
+  if (sbClient && currentUser.id !== 'guest') {
+    await sbClient.auth.signOut().catch(() => {});
+  }
+  currentUser = null;
+  currentSubject = null;
+  localStorage.removeItem('studyapp_guest');
+  // Keep supabase config but clear session
+  showView('v-auth');
+  document.getElementById('auth-err').textContent = '';
+  document.getElementById('auth-ok').textContent = '';
+}
+
+// ═══════════════════════════════════════════════════════
+// SUBJECTS VIEW
+// ═══════════════════════════════════════════════════════
+function renderSubjectsView() {
+  const pill = document.getElementById('user-pill');
+  if (currentUser.id === 'guest') {
+    pill.textContent = 'Guest Mode';
+  } else {
+    pill.textContent = currentUser.email.split('@')[0] + ' · Sign Out';
+  }
+
+  const grid = document.getElementById('subjects-grid');
+  grid.innerHTML = Object.values(SUBJECTS).map(s => {
+    const subAnswers = getLocalAnswers(s.key);
+    const total = QB[s.key].length;
+    const answered = Object.keys(subAnswers).length;
+    const correct  = Object.values(subAnswers).filter(a => a.lastResult === 'correct').length;
+    const acc = answered ? Math.round(correct / answered * 100) : 0;
+    const likelihood = calcLikelihood(s.key, subAnswers);
+    const likeStr = likelihood > 0 ? likelihood + '%' : '—';
+    const likeColor = likelihood >= 75 ? 'var(--pass)' : likelihood >= 55 ? 'var(--warn)' : likelihood > 0 ? 'var(--fail)' : 'var(--text2)';
+
+    return `<div class="subject-card" onclick="selectSubject('${s.key}')">
+      <div class="subject-card-accent" style="background:${s.color}"></div>
+      <div class="subject-card-row">
+        <div class="subject-icon">${s.icon}</div>
+        <div>
+          <div class="subject-name">${s.name}</div>
+          <div class="subject-desc">${s.fullName}</div>
+        </div>
+      </div>
+      <div class="subject-stats">
+        <div class="ss-item"><div class="ss-num">${answered}</div><div class="ss-lbl">Answered</div></div>
+        <div class="ss-item"><div class="ss-num">${answered ? acc + '%' : '—'}</div><div class="ss-lbl">Accuracy</div></div>
+        <div class="ss-item"><div class="ss-num" style="color:${likeColor};-webkit-text-fill-color:${likeColor}">${likeStr}</div><div class="ss-lbl">Pass %</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function selectSubject(key) {
+  currentSubject = key;
+  // Load progress
+  await loadProgress();
+  enterApp();
+}
+
+// ═══════════════════════════════════════════════════════
+// PROGRESS: LOCAL + SUPABASE SYNC
+// ═══════════════════════════════════════════════════════
+function localKey() {
+  return `studyapp_progress_${currentUser.id}_${currentSubject}`;
+}
+
+function getLocalAnswers(subjectKey) {
+  const uid = currentUser ? currentUser.id : 'guest';
+  const k = `studyapp_progress_${uid}_${subjectKey}`;
+  const d = JSON.parse(localStorage.getItem(k) || '{}');
+  return d.answers || {};
+}
+
+function saveLocal() {
+  const d = JSON.parse(localStorage.getItem(localKey()) || '{}');
+  d.answers   = answers;
+  d.streak    = streak;
+  d.lastDate  = lastDate;
+  localStorage.setItem(localKey(), JSON.stringify(d));
+
+  const cfg = JSON.parse(localStorage.getItem('studyapp_config') || '{}');
+  cfg.apiKey = apiKey;
+  localStorage.setItem('studyapp_config', JSON.stringify(cfg));
+}
+
+async function loadProgress() {
+  // Load from local first (instant)
+  const local = JSON.parse(localStorage.getItem(localKey()) || '{}');
+  answers  = local.answers  || {};
+  streak   = local.streak   || 0;
+  lastDate = local.lastDate || null;
+
+  // Then sync from Supabase
+  if (sbClient && currentUser.id !== 'guest') {
+    setSyncDot(false);
+    try {
+      const { data, error } = await sbClient
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .eq('subject', currentSubject);
+
+      if (!error && data) {
+        data.forEach(row => {
+          answers[row.question_id] = {
+            attempts:   row.attempts,
+            wrongCount: row.wrong_count,
+            lastResult: row.last_result
+          };
+        });
+        saveLocal();
+        setSyncDot(true);
+      }
+    } catch(e) { setSyncDot(false); }
+  } else {
+    setSyncDot(currentUser.id === 'guest');
+  }
+}
+
+async function syncAnswer(qId, result) {
+  if (!sbClient || currentUser.id === 'guest') return;
+  const a = answers[qId];
+  try {
+    await sbClient.from('user_progress').upsert({
+      user_id:     currentUser.id,
+      subject:     currentSubject,
+      question_id: qId,
+      last_result: a.lastResult,
+      attempts:    a.attempts,
+      wrong_count: a.wrongCount,
+      updated_at:  new Date().toISOString()
+    }, { onConflict: 'user_id,subject,question_id' });
+    setSyncDot(true);
+  } catch(e) { setSyncDot(false); }
+}
+
+async function resetProgressRemote() {
+  if (!sbClient || currentUser.id === 'guest') return;
+  try {
+    await sbClient.from('user_progress')
+      .delete()
+      .eq('user_id', currentUser.id)
+      .eq('subject', currentSubject);
+  } catch(e) {}
+}
+
+function setSyncDot(online) {
+  const dot = document.getElementById('sync-dot');
+  if (!dot) return;
+  dot.className = 'sync-dot' + (online ? '' : ' offline');
+  dot.title = online ? 'Synced to cloud' : 'Local only';
+}
+
+// ═══════════════════════════════════════════════════════
+// APP ENTRY
+// ═══════════════════════════════════════════════════════
+function enterApp() {
+  const sub = SUBJECTS[currentSubject];
+  document.getElementById('app-subject-logo').textContent = sub.name;
+  document.getElementById('streak-val').textContent = streak || 0;
+  document.getElementById('pass-threshold-lbl').textContent = sub.passThreshold;
+
+  // Load API key
+  apiKey = JSON.parse(localStorage.getItem('studyapp_config') || '{}').apiKey || '';
+  const apiEl = document.getElementById('api-key-input');
+  if (apiEl) apiEl.value = apiKey;
+
+  // Exam info rows in settings
+  const infoDiv = document.getElementById('exam-info-rows');
+  if (infoDiv) {
+    infoDiv.innerHTML = sub.examInfo.map(([l,v]) =>
+      `<div class="s-row" style="cursor:default"><span class="s-row-lbl">${l}</span><span class="s-row-val" style="text-align:right;max-width:60%">${v}</span></div>`
+    ).join('');
+  }
+
+  // Domain buttons in modal
+  const modalDomains = document.getElementById('modal-domains');
+  if (modalDomains) {
+    modalDomains.innerHTML = sub.domains.map(d => `
+      <button class="mode-btn" style="flex:1;min-width:120px;padding:10px 12px" onclick="startQuiz('domain','${d.name}');closeModeModal()">
+        <div class="mode-btn-title" style="font-size:13px">${d.icon} ${d.name}</div>
+        <div class="mode-btn-sub">${QB[currentSubject].filter(q=>q.cat===d.name).length} questions</div>
+      </button>`).join('');
+  }
+
+  const totalQ = QB[currentSubject].length;
+  document.getElementById('modal-full-sub').textContent = `All ${totalQ} questions in random order`;
+
+  showView('v-app');
+  showPage('home');
+  renderHome();
+}
+
+function backToSubjects() {
+  currentSubject = null;
+  showView('v-subjects');
+  renderSubjectsView();
+}
+
+// ═══════════════════════════════════════════════════════
+// PASS LIKELIHOOD
+// ═══════════════════════════════════════════════════════
+function calcLikelihood(subKey, ans) {
+  const sub = SUBJECTS[subKey];
+  const qs  = QB[subKey];
+  const totalAnswered = Object.keys(ans).length;
+  if (totalAnswered < 5) return 0;
+
+  let weightedScore = 0, totalWeight = 0;
+  sub.domains.forEach(d => {
+    const dqs     = qs.filter(q => q.cat === d.name);
+    const answered = dqs.filter(q => ans[q.id]);
+    if (!answered.length) return;
+    const correct = answered.filter(q => ans[q.id].lastResult === 'correct').length;
+    weightedScore += (correct / answered.length) * d.weight;
+    totalWeight   += d.weight;
+  });
+
+  const rawPct    = totalWeight > 0 ? (weightedScore / totalWeight) * 100 : 0;
+  const confidence = Math.min(1, totalAnswered / 30);
+  const blended   = 50 + (rawPct - 50) * confidence;
+  return Math.round(Math.max(2, Math.min(97, blended)));
+}
+
+// ═══════════════════════════════════════════════════════
+// HOME PAGE
+// ═══════════════════════════════════════════════════════
+function renderHome() {
+  renderGauge();
+  renderQuickStats();
+  renderDomains();
+  document.getElementById('streak-val').textContent = streak || 0;
+  const hasWeak = getWeakQs().length > 0;
+  document.getElementById('weak-btn').style.display = hasWeak ? 'block' : 'none';
+  document.getElementById('modal-weak-btn').style.display = hasWeak ? 'block' : 'none';
+}
+
+function renderGauge() {
+  const likelihood = calcLikelihood(currentSubject, answers);
+  if (!likelihood) {
+    document.getElementById('gauge-pct-text').textContent = '—';
+    document.getElementById('gauge-pct-text').style.fontSize = '20px';
+    document.getElementById('gauge-pct-text').style.color = 'var(--text)';
+    document.getElementById('gauge-sub').textContent = `Answer at least 5 questions to see your estimate`;
+    setGaugeArc(0, '#252540');
+    return;
+  }
+  const color = likelihood >= 75 ? '#2ecc71' : likelihood >= 55 ? '#f39c12' : '#e05c5c';
+  document.getElementById('gauge-pct-text').textContent = `${likelihood}%`;
+  document.getElementById('gauge-pct-text').style.fontSize = '30px';
+  document.getElementById('gauge-pct-text').style.color = color;
+  document.getElementById('gauge-sub').textContent =
+    likelihood >= 75 ? 'Looking strong — keep it up!' :
+    likelihood >= 55 ? 'Getting there — focus on weak areas' :
+    'More practice needed across key domains';
+  setGaugeArc(likelihood / 100, color);
+}
+
+function setGaugeArc(pct, color) {
+  const arc = document.getElementById('gauge-arc');
+  const total = 188.5;
+  arc.setAttribute('stroke', color);
+  arc.setAttribute('stroke-dashoffset', total * (1 - pct));
+}
+
+function renderQuickStats() {
+  const ans   = Object.keys(answers).length;
+  const cor   = Object.values(answers).filter(a => a.lastResult === 'correct').length;
+  const acc   = ans ? Math.round(cor / ans * 100) : 0;
+  const weak  = getWeakQs().length;
+  document.getElementById('qs-answered').textContent = ans;
+  document.getElementById('qs-correct').textContent  = ans ? `${acc}%` : '—';
+  document.getElementById('qs-weak').textContent     = weak;
+}
+
+function renderDomains() {
+  const sub = SUBJECTS[currentSubject];
+  const qs  = QB[currentSubject];
+  document.getElementById('domain-grid').innerHTML = sub.domains.map(d => {
+    const dqs     = qs.filter(q => q.cat === d.name);
+    const answered = dqs.filter(q => answers[q.id]);
+    const correct = answered.filter(q => answers[q.id].lastResult === 'correct').length;
+    const pct     = answered.length ? Math.round(correct / answered.length * 100) : 0;
+    const scoreColor = pct >= 70 ? 'var(--pass)' : pct >= 50 ? 'var(--warn)' : pct > 0 ? 'var(--fail)' : 'var(--text2)';
+    return `<div class="domain-card" onclick="startQuiz('domain','${d.name}');closeModeModal()">
+      <div class="domain-icon" style="background:${d.color}22">${d.icon}</div>
+      <div class="domain-info">
+        <div class="domain-name">${d.name}</div>
+        <div class="domain-sub">${answered.length}/${dqs.length} answered · ${Math.round(d.weight*100)}% of exam</div>
+        <div class="domain-bar-track"><div class="domain-bar-fill" style="width:${pct}%;background:${d.color}"></div></div>
+      </div>
+      <div class="domain-score-lbl" style="color:${scoreColor}">${answered.length ? pct+'%' : 'Start'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// QUIZ ENGINE
+// ═══════════════════════════════════════════════════════
+function getWeakQs() {
+  return QB[currentSubject].filter(q => answers[q.id]?.lastResult === 'wrong');
+}
+
+function startQuiz(mode, domainName) {
+  const qs = QB[currentSubject];
+  let pool = [];
+  if (mode === 'all')    pool = shuffle([...qs]);
+  if (mode === 'quick')  pool = shuffle([...qs]).slice(0, 10);
+  if (mode === 'weak')   pool = shuffle(getWeakQs());
+  if (mode === 'domain') pool = shuffle(qs.filter(q => q.cat === domainName));
+  if (!pool.length) { toast('No questions available for this mode'); return; }
+  session = { questions: pool, idx: 0, score: 0, results: [] };
+  showPage('quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q   = session.questions[session.idx];
+  const tot = session.questions.length;
+  const pct = Math.round((session.idx / tot) * 100);
+
+  document.getElementById('quiz-content').innerHTML = `
+    <div class="quiz-header">
+      <div class="quiz-prog-wrap">
+        <div class="quiz-prog-meta">
+          <span>Question ${session.idx+1} of ${tot}</span>
+          <span>${session.score} correct</span>
+        </div>
+        <div class="quiz-prog-track"><div class="quiz-prog-fill" style="width:${pct}%"></div></div>
+      </div>
+      <button class="quit-btn" onclick="quitQuiz()">Quit</button>
+    </div>
+    <div class="q-body">
+      <div class="q-meta">
+        <span class="q-cat">${q.cat}</span>
+        <span class="q-num">#${q.id}</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="options" id="options">
+        ${q.opts.map((o, i) => `
+          <div class="option" id="opt-${i}" onclick="selectAnswer(${i})">
+            <div class="opt-letter">${'ABCD'[i]}</div>
+            <div class="opt-text">${o}</div>
+          </div>`).join('')}
+      </div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+    <div class="next-wrap">
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()">
+        ${session.idx + 1 === tot ? 'See Results →' : 'Next Question →'}
+      </button>
+    </div>`;
+}
+
+function selectAnswer(chosen) {
+  document.querySelectorAll('.option').forEach(o => o.classList.add('locked'));
+  const q       = session.questions[session.idx];
+  const correct = chosen === q.correct;
+
+  document.getElementById(`opt-${chosen}`).classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) document.getElementById(`opt-${q.correct}`).classList.add('reveal-correct');
+
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'block';
+  fb.className = `feedback ${correct ? 'correct-fb' : 'wrong-fb'}`;
+  fb.innerHTML = `
+    <div class="feedback-head ${correct ? 'correct-head' : 'wrong-head'}">
+      ${correct ? '✓ Correct!' : '✗ Incorrect'}
+    </div>
+    <div class="feedback-body">${q.exp}</div>`;
+
+  const prev = answers[q.id] || { attempts: 0, wrongCount: 0 };
+  answers[q.id] = {
+    attempts:   prev.attempts + 1,
+    wrongCount: correct ? prev.wrongCount : prev.wrongCount + 1,
+    lastResult: correct ? 'correct' : 'wrong'
+  };
+  saveLocal();
+  syncAnswer(q.id, correct ? 'correct' : 'wrong');
+
+  if (correct) session.score++;
+  session.results.push({ id: q.id, cat: q.cat, correct });
+
+  // Streak
+  const today = new Date().toDateString();
+  if (lastDate !== today) {
+    if (lastDate) {
+      const last = new Date(lastDate);
+      const yest = new Date(); yest.setDate(yest.getDate() - 1);
+      streak = last.toDateString() === yest.toDateString() ? streak + 1 : 1;
+    } else { streak = 1; }
+    lastDate = today;
+    saveLocal();
+  }
+  document.getElementById('streak-val').textContent = streak;
+  document.getElementById('btn-next').style.display = 'block';
+}
+
+function nextQuestion() {
+  session.idx++;
+  session.idx >= session.questions.length ? showSessionResults() : renderQuestion();
+}
+
+function quitQuiz() {
+  if (confirm('Quit? Progress so far will be saved.')) {
+    showPage('home');
+    renderHome();
+  }
+}
+
+function showSessionResults() {
+  const tot = session.questions.length;
+  const sc  = session.score;
+  const pct = Math.round(sc / tot * 100);
+  const emoji = pct >= 80 ? '🎉' : pct >= 60 ? '💪' : '📚';
+  const title = pct >= 80 ? 'Excellent Work!' : pct >= 60 ? 'Good Progress!' : 'Keep Practicing!';
+
+  const sub = SUBJECTS[currentSubject];
+  const breakdown = sub.domains.map(d => {
+    const drs = session.results.filter(r => r.cat === d.name);
+    if (!drs.length) return '';
+    const correct = drs.filter(r => r.correct).length;
+    const dpct = Math.round(correct / drs.length * 100);
+    const cls  = dpct >= 70 ? 'score-good' : dpct >= 50 ? 'score-mid' : 'score-bad';
+    return `<div class="done-row">
+      <span>${d.icon} ${d.name}</span>
+      <span class="done-row-score ${cls}">${correct}/${drs.length} (${dpct}%)</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('quiz-content').innerHTML = `
+    <div class="session-done">
+      <div class="done-emoji">${emoji}</div>
+      <div class="done-h">${title}</div>
+      <div class="done-sub">You scored ${sc} / ${tot} (${pct}%) this session</div>
+      ${breakdown ? `<div class="done-breakdown">${breakdown}</div>` : ''}
+      <button class="btn-p" onclick="startQuiz('quick')">Practice Again</button>
+      <button class="btn-s" onclick="showPage('home');renderHome()">Back to Home</button>
+      <button class="btn-s" onclick="showPage('analysis');renderWrongLog()">View AI Analysis ✦</button>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// ANALYSIS PAGE
+// ═══════════════════════════════════════════════════════
+function renderWrongLog() {
+  const qs    = QB[currentSubject];
+  const wrong = qs.filter(q => answers[q.id]?.lastResult === 'wrong');
+  const log   = document.getElementById('wrong-log');
+  if (!wrong.length) {
+    log.innerHTML = '<div style="font-size:13px;color:var(--text2);padding:12px 0">No wrong answers yet — start a practice session!</div>';
+    return;
+  }
+  log.innerHTML = wrong.map(q => {
+    const a = answers[q.id];
+    return `<div class="analysis-card">
+      <div class="analysis-card-title">#${q.id} · <span style="color:var(--text2);font-size:11px;font-weight:500">${q.cat}</span></div>
+      <div class="analysis-card-body">${q.q}<br><br>
+        <strong style="color:var(--text)">Correct answer:</strong> ${q.opts[q.correct]}<br><br>
+        <span style="font-size:11px">Wrong ${a.wrongCount}× of ${a.attempts} attempt${a.attempts>1?'s':''}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function runAnalysis() {
+  if (!apiKey) { toast('Add your Claude API key in Settings first'); showPage('settings'); return; }
+  const qs    = QB[currentSubject];
+  const wrong = qs.filter(q => answers[q.id]?.lastResult === 'wrong');
+  if (wrong.length < 3) { toast('Answer a few more questions first'); return; }
+
+  const btn = document.getElementById('analyze-btn');
+  btn.innerHTML = '<div class="spinner"></div> Analyzing with Claude…';
+  btn.disabled  = true;
+
+  const sub = SUBJECTS[currentSubject];
+  const totalAnswered = Object.keys(answers).length;
+  const totalCorrect  = Object.values(answers).filter(a => a.lastResult === 'correct').length;
+  const domainSummary = sub.domains.map(d => {
+    const dqs = qs.filter(q => q.cat === d.name);
+    const ans = dqs.filter(q => answers[q.id]);
+    const cor = ans.filter(q => answers[q.id].lastResult === 'correct').length;
+    return `${d.name}: ${cor}/${ans.length} correct${ans.length ? ` (${Math.round(cor/ans.length*100)}%)` : ' (not started)'}`;
+  }).join('\n');
+  const wrongList = wrong.slice(0, 15).map(q => `- [${q.cat}] ${q.q}`).join('\n');
+
+  const prompt = `You are an expert ${sub.name} exam coach. A student is preparing for the ${sub.fullName} exam.
+Context: ${sub.aiContext}
+
+Student performance:
+Overall: ${totalCorrect}/${totalAnswered} correct (${totalAnswered ? Math.round(totalCorrect/totalAnswered*100) : 0}%)
+
+Domain breakdown:
+${domainSummary}
+
+Questions answered incorrectly (recent):
+${wrongList}
+
+Provide a focused, actionable study plan in 200-250 words. Include:
+1. Their 2-3 biggest weak areas based on the data
+2. Specific concepts to review for each weak area
+3. Which domain to prioritize given its exam weight
+4. One encouraging closing note
+
+Write directly to the student in second person. Be specific and practical.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 500,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message); }
+    const data = await res.json();
+    document.getElementById('ai-analysis-output').innerHTML =
+      `<div class="ai-result">${data.content[0].text.replace(/\n/g,'<br>')}</div><br>`;
+  } catch(err) {
+    document.getElementById('ai-analysis-output').innerHTML =
+      `<div class="ai-result" style="border-color:var(--fail);color:#ff8080">Error: ${err.message}</div>`;
+  }
+  btn.innerHTML = '✦ Refresh AI Analysis';
+  btn.disabled  = false;
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+function saveApiKey() {
+  const k = document.getElementById('api-key-input').value.trim();
+  if (k && !k.startsWith('sk-ant-')) { toast('Key should start with sk-ant-'); return; }
+  apiKey = k;
+  saveLocal();
+  toast(k ? 'API key saved ✓' : 'API key cleared');
+}
+
+function doReset() {
+  if (!confirm(`Reset all progress for ${SUBJECTS[currentSubject].name}? This cannot be undone.`)) return;
+  answers = {}; streak = 0; lastDate = null;
+  saveLocal();
+  resetProgressRemote();
+  renderHome();
+  showPage('home');
+  toast('Progress reset ↺');
+}
+
+// ═══════════════════════════════════════════════════════
+// NAV & VIEW MANAGEMENT
+// ═══════════════════════════════════════════════════════
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showPage(name) {
+  document.querySelectorAll('#v-app .page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const nb = document.getElementById('nav-' + name);
+  if (nb) nb.classList.add('active');
+  if (name === 'home')     renderHome();
+  if (name === 'analysis') renderWrongLog();
+}
+
+function openModeModal()  { document.getElementById('mode-overlay').classList.add('open'); }
+function closeModeModal(e) {
+  if (!e || e.target === document.getElementById('mode-overlay'))
+    document.getElementById('mode-overlay').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ═══════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
