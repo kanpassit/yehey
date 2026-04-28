@@ -3,7 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>KanPassIt  Multi-Subject Quiz</title>
+<meta name="description" content="KanPassIt — AI-powered exam prep for AB-900 (Microsoft 365 Copilot), LVN NCLEX-PN, and SHRM-CP certifications. Adaptive quizzes, domain performance tracking, and AI study analysis.">
+<meta name="keywords" content="exam prep, AB-900, NCLEX, SHRM-CP, quiz, certification, study app, AI tutor">
+<meta property="og:title" content="KanPassIt — AI-Powered Exam Prep">
+<meta property="og:description" content="Ace your certification exam with adaptive quizzes, AI-powered weak area analysis, and cross-device progress tracking.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kanpassit.com">
+<link rel="canonical" href="https://kanpassit.com">
+<title>KanPassIt — AI-Powered Exam Prep</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#0d0d1a;--surface:#16162a;--surface2:#1e1e38;--accent:#0078d4;--accent2:#6264a7;--text:#f0f0f5;--text2:#8888aa;--border:#252540;--pass:#2ecc71;--warn:#f39c12;--fail:#e05c5c;--radius:16px}
@@ -151,11 +158,27 @@ a.la{color:#5aadff;text-decoration:none}
 .toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 17px;font-size:13px;opacity:0;transition:all .28s;z-index:300;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--pass);display:inline-block}
-.sync-dot.offline{background:var(--warn)}
+.legal-footer{text-align:center;padding:20px 20px 28px;font-size:11px;color:var(--text2)}
+.legal-footer a{color:var(--text2);text-decoration:none;border-bottom:1px solid var(--border)}
+.legal-footer a:hover{color:var(--text)}
+.cookie-banner{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#1a1a2e;border-top:1px solid var(--border);padding:14px 20px calc(14px + env(safe-area-inset-bottom));z-index:500;display:none}
+.cookie-banner.show{display:block}
+.cookie-text{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:10px}
+.cookie-text a{color:#5aadff;text-decoration:none}
+.cookie-btns{display:flex;gap:8px}
+.cookie-accept{flex:1;padding:9px;border-radius:9px;background:var(--accent);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer}
+.cookie-decline{flex:1;padding:9px;border-radius:9px;background:transparent;border:1px solid var(--border);color:var(--text2);font-size:13px;cursor:pointer}
 </style>
 </head>
 <body>
 <div class="toast" id="toast"></div>
+<div class="cookie-banner" id="cookie-banner">
+  <div class="cookie-text">We use cookies to improve your experience and show relevant ads. By continuing, you agree to our <a href="/privacy.html" target="_blank">Privacy Policy</a>.</div>
+  <div class="cookie-btns">
+    <button class="cookie-accept" onclick="acceptCookies()">Accept</button>
+    <button class="cookie-decline" onclick="declineCookies()">Decline</button>
+  </div>
+</div>
 
 <div class="view active" id="v-setup">
   <div class="center-wrap" style="justify-content:flex-start;padding-top:40px;overflow-y:auto">
@@ -210,6 +233,7 @@ CREATE POLICY "Users manage own progress"
     <div class="auth-toggle" onclick="toggleAuthMode()">Don't have an account? <span>Sign up</span></div>
     <div class="skip-link" style="margin-top:12px" onclick="guestMode()">Continue as <span>guest</span> (local only)</div>
   </div>
+  <div class="legal-footer"><a href="/privacy.html" target="_blank">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms.html" target="_blank">Terms of Service</a></div>
 </div>
 
 <div class="view" id="v-subjects">
@@ -218,6 +242,7 @@ CREATE POLICY "Users manage own progress"
     <div class="user-pill" id="user-pill" onclick="signOut()">Sign Out</div>
   </div>
   <div class="subjects-grid" id="subjects-grid"></div>
+  <div class="legal-footer"><a href="/privacy.html" target="_blank">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms.html" target="_blank">Terms of Service</a></div>
 </div>
 
 <div class="view" id="v-app">
@@ -279,6 +304,10 @@ CREATE POLICY "Users manage own progress"
       <div class="s-row" onclick="backToSubjects()"><span class="s-row-lbl">Switch Subject</span><span class="s-row-val">→</span></div>
       <div class="sec-title mt">Account</div>
       <div class="s-row" onclick="signOut()"><span class="s-row-lbl">Sign Out</span><span class="s-row-val">→</span></div>
+      <div class="sec-title mt">Legal</div>
+      <div class="s-row" onclick="window.open('/privacy.html','_blank')"><span class="s-row-lbl">Privacy Policy</span><span class="s-row-val">↗</span></div>
+      <div class="s-row" onclick="window.open('/terms.html','_blank')"><span class="s-row-lbl">Terms of Service</span><span class="s-row-val">↗</span></div>
+      <div class="s-row" onclick="window.open('mailto:support@kanpassit.com')"><span class="s-row-lbl">Contact Support</span><span class="s-row-val">↗</span></div>
       <div class="sec-title mt">Exam Info</div>
       <div id="exam-info-rows"></div>
     </div>
@@ -1292,9 +1321,27 @@ function toast(msg) {
 }
 
 // ═══════════════════════════════════════════════════════
+// COOKIE CONSENT
+// ═══════════════════════════════════════════════════════
+function initCookieBanner() {
+  if (!localStorage.getItem('kpi-cookie-consent')) {
+    setTimeout(() => document.getElementById('cookie-banner').classList.add('show'), 800);
+  }
+}
+function acceptCookies() {
+  localStorage.setItem('kpi-cookie-consent', 'accepted');
+  document.getElementById('cookie-banner').classList.remove('show');
+}
+function declineCookies() {
+  localStorage.setItem('kpi-cookie-consent', 'declined');
+  document.getElementById('cookie-banner').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════
 // START
 // ═══════════════════════════════════════════════════════
 init();
+initCookieBanner();
 </script>
 </body>
 </html>
