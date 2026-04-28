@@ -295,10 +295,6 @@ CREATE POLICY "Users manage own progress"
   </div>
   <div class="page" id="page-settings">
     <div class="settings-body">
-      <div class="sec-title">Claude API Key</div>
-      <p class="sec-note">Required for AI analysis. Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
-      <input type="password" id="api-key-input" class="field field-mono" placeholder="sk-ant-api03-…"/>
-      <button class="btn-p" style="margin-top:0" onclick="saveApiKey()">Save Key</button>
       <div class="sec-title mt">Progress</div>
       <div class="s-row" onclick="doReset()"><span class="s-row-lbl">Reset This Subject's Progress</span><span class="s-row-val">↺</span></div>
       <div class="s-row" onclick="backToSubjects()"><span class="s-row-lbl">Switch Subject</span><span class="s-row-val">→</span></div>
@@ -556,7 +552,7 @@ let sbClient = null;
 let currentUser = null;   // { id, email } or { id:'guest', email:'guest' }
 let currentSubject = null;  // subject key string
 let answers = {};           // { qId: { attempts, wrongCount, lastResult } }
-let streak = 0, lastDate = null, apiKey = '';
+let streak = 0, lastDate = null;
 let session = { questions: [], idx: 0, score: 0, results: [] };
 let authMode = 'signin';
 
@@ -566,10 +562,6 @@ let authMode = 'signin';
 function init() {
   // Load persisted settings
   const cfg = JSON.parse(localStorage.getItem('studyapp_config') || '{}');
-  apiKey = cfg.apiKey || '';
-  if (document.getElementById('api-key-input')) {
-    document.getElementById('api-key-input').value = apiKey;
-  }
 
   // Hardcoded Supabase credentials  no setup wizard needed
   const SUPABASE_URL = 'https://kcycuabxhowpdprrulyn.supabase.co';
@@ -794,7 +786,6 @@ function saveLocal() {
   localStorage.setItem(localKey(), JSON.stringify(d));
 
   const cfg = JSON.parse(localStorage.getItem('studyapp_config') || '{}');
-  cfg.apiKey = apiKey;
   localStorage.setItem('studyapp_config', JSON.stringify(cfg));
 }
 
@@ -874,11 +865,6 @@ function enterApp() {
   document.getElementById('app-subject-logo').textContent = sub.name;
   document.getElementById('streak-val').textContent = streak || 0;
   document.getElementById('pass-threshold-lbl').textContent = sub.passThreshold;
-
-  // Load API key
-  apiKey = JSON.parse(localStorage.getItem('studyapp_config') || '{}').apiKey || '';
-  const apiEl = document.getElementById('api-key-input');
-  if (apiEl) apiEl.value = apiKey;
 
   // Exam info rows in settings
   const infoDiv = document.getElementById('exam-info-rows');
@@ -1179,7 +1165,6 @@ function renderWrongLog() {
 }
 
 async function runAnalysis() {
-  if (!apiKey) { toast('Add your Claude API key in Settings first'); showPage('settings'); return; }
   const qs    = QB[currentSubject];
   const wrong = qs.filter(q => answers[q.id]?.lastResult === 'wrong');
   if (wrong.length < 3) { toast('Answer a few more questions first'); return; }
@@ -1220,24 +1205,15 @@ Provide a focused, actionable study plan in 200-250 words. Include:
 Write directly to the student in second person. Be specific and practical.`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/analyze', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 500,
-        messages: [{ role: 'user', content: prompt }]
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
     });
-    if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message); }
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Analysis failed'); }
     const data = await res.json();
     document.getElementById('ai-analysis-output').innerHTML =
-      `<div class="ai-result">${data.content[0].text.replace(/\n/g,'<br>')}</div><br>`;
+      `<div class="ai-result">${data.content.replace(/\n/g,'<br>')}</div><br>`;
   } catch(err) {
     document.getElementById('ai-analysis-output').innerHTML =
       `<div class="ai-result" style="border-color:var(--fail);color:#ff8080">Error: ${err.message}</div>`;
@@ -1249,13 +1225,7 @@ Write directly to the student in second person. Be specific and practical.`;
 // ═══════════════════════════════════════════════════════
 // SETTINGS
 // ═══════════════════════════════════════════════════════
-function saveApiKey() {
-  const k = document.getElementById('api-key-input').value.trim();
-  if (k && !k.startsWith('sk-ant-')) { toast('Key should start with sk-ant-'); return; }
-  apiKey = k;
-  saveLocal();
-  toast(k ? 'API key saved ✓' : 'API key cleared');
-}
+
 
 function doReset() {
   if (!confirm(`Reset all progress for ${SUBJECTS[currentSubject].name}? This cannot be undone.`)) return;
