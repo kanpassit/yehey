@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>KanPassIt — AI-Powered Exam Prep</title>
-<meta name="description" content="KanPassIt — AI-powered exam prep for AB-900 (Microsoft 365 Copilot), LVN NCLEX-PN, and SHRM-CP certifications. Adaptive quizzes, domain performance tracking, and AI study analysis.">
-<meta name="keywords" content="exam prep, AB-900, NCLEX, SHRM-CP, quiz, certification, study app, AI tutor">
+<meta name="description" content="KanPassIt — AI-powered exam prep for AB-900 (Microsoft 365 Copilot), LVN NCLEX-PN, SHRM-CP, and SHRM-SCP certifications. Adaptive quizzes, domain performance tracking, and AI study analysis.">
+<meta name="keywords" content="exam prep, AB-900, NCLEX, SHRM-CP, SHRM-SCP, quiz, certification, study app, AI tutor">
 <meta property="og:title" content="KanPassIt — AI-Powered Exam Prep">
 <meta property="og:description" content="Ace your certification exam with adaptive quizzes, AI-powered weak area analysis, and cross-device progress tracking.">
 <meta property="og:type" content="website">
@@ -477,6 +477,27 @@ const SUBJECTS = {
       {name:'HR Operations',   icon:'⚙️', color:'#6264a7', weight:0.12}
     ],
     aiContext: 'SHRM Certified Professional (SHRM-CP) exam. Domains: Employment Law & Regulations (38%), People & Talent Management (32%), HR Strategy & Business Acumen (18%), HR Operations & Technology (12%).'
+  },
+  'shrm-scp': {
+    key: 'shrm-scp',
+    name: 'SHRM-SCP',
+    fullName: 'SHRM Senior Certified Professional',
+    icon: '👔',
+    color: '#6f42c1',
+    passThreshold: '200 scale score (passing varies by exam form)',
+    examInfo: [
+      ['Exam','SHRM-SCP'],
+      ['Questions','100 (practice set)'],
+      ['Format','Knowledge + Situational Judgment Items'],
+      ['Domains','Acuity (25%) · Strategic HR Mgmt (25%) · HR Expertise (25%) · Consultation (25%)']
+    ],
+    domains: [
+      {name:'Acuity',                    icon:'📊', color:'#6f42c1', weight:0.25},
+      {name:'Strategic HR Management',   icon:'🎯', color:'#0078d4', weight:0.25},
+      {name:'HR Expertise',              icon:'🔧', color:'#f39c12', weight:0.25},
+      {name:'Consultation & Business Acumen', icon:'💼', color:'#2ecc71', weight:0.25}
+    ],
+    aiContext: 'SHRM Senior Certified Professional (SHRM-SCP) exam. Domains: Acuity (25%), Strategic HR Management (25%), HR Expertise (25%), Consultation & Business Acumen (25%). Senior level certification requiring strategic thinking, business partnering, and advanced HR expertise.'
   }
 };
 
@@ -1262,7 +1283,7 @@ function doReset() {
       resetProgressRemote();
       renderHome();
       showPage('home');
-      toast('Progress reset ↚');
+      toast('Progress reset ↺');
     }
   });
 }
