@@ -694,12 +694,32 @@ function initSupabase(url, key) {
 const QB_CACHE_KEY = 'kanpassit_qb_v1';
 const QB_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
+// Shuffle answer options across all questions to eliminate AI positional bias
+// (AI-generated questions tend to place the correct answer in the same position)
+function _shuffleArr(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function applyOptionShuffle(qb) {
+  for (const slug in qb) {
+    qb[slug] = qb[slug].map(q => {
+      const correctText = q.opts[q.correct];
+      const opts = _shuffleArr([...q.opts]);
+      return { ...q, opts, correct: opts.indexOf(correctText) };
+    });
+  }
+}
+
 async function loadQuestions() {
   // 1. Try localStorage cache first
   try {
     const cached = JSON.parse(localStorage.getItem(QB_CACHE_KEY) || 'null');
     if (cached && Date.now() - cached.ts < QB_CACHE_TTL) {
       QB = cached.data;
+      applyOptionShuffle(QB);
       console.log('[QB] Loaded from cache:', Object.entries(QB).map(([k,v])=>`${k}:${v.length}`).join(', '));
       return true;
     }
@@ -748,12 +768,15 @@ async function loadQuestions() {
     }
     QB = grouped;
 
-    // Cache for next load
+    // Cache for next load (store original unshuffled data)
     try {
       localStorage.setItem(QB_CACHE_KEY, JSON.stringify({ ts: Date.now(), data: QB }));
     } catch(e) {
       console.warn('[QB] Cache save error:', e);
     }
+
+    // Shuffle answer options after caching so each session gets a fresh random order
+    applyOptionShuffle(QB);
 
     console.log('[QB] Loaded from Supabase:', Object.entries(QB).map(([k,v])=>`${k}:${v.length}`).join(', '));
     return true;
@@ -1987,21 +2010,4 @@ async function deleteAccount() {
   const confirmEmail = document.getElementById('delete-confirm-email').value.trim();
   const errEl = document.getElementById('delete-account-err');
   errEl.textContent = '';
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || confirmEmail !== user.email) { errEl.textContent = 'Email does not match'; return; }
-  try {
-    toast('Contact support to delete your account');
-  } catch (err) { errEl.textContent = err.message; }
-}
-
-function showModal(modalId) { document.getElementById(modalId).classList.add('open'); }
-function closeModal(modalId) { document.getElementById(modalId).classList.remove('open'); }
-function showPage(pageId) {
-  if (pageId === 'settings') loadAccountData();
-  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-  document.getElementById('page-' + pageId).classList.add('active');
-  if (pageId !== 'quiz') document.getElementById('global-nav').style.display = 'flex';
-}
-</script>
-</body>
-</html>
+  const { 
