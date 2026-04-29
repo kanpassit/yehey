@@ -1,5 +1,39 @@
 # KanPassIt — Implementation Summary
-**Last Updated: April 29, 2026 | Current Version: v2.3.0 | Status: LIVE ✅**
+**Last Updated: April 29, 2026 | Current Version: v2.3.1 | Status: LIVE ✅**
+
+---
+
+## v2.3.1 — Subject & Domain Fixes (April 29, 2026)
+
+### Loading Screen Freeze — Root Cause & Fix
+The app was stuck on "Loading questions…" on every load. Root cause: `index.html` was being truncated at ~101KB by the bash sandbox's Windows mount limit. The file ended mid-function inside `deleteAccount()` with no closing `</script>` or `</html>`. The browser hit a JS parse error, `init()` never ran, and the page stayed frozen on the loading view.
+
+Fix: Recovered the missing function tail from a prior working GitHub commit, appended it to restore the complete file, then deployed via native Windows PowerShell (which reads the full Windows filesystem without the mount limit).
+
+### CNA and RN Subjects Added
+Both had full question banks in Supabase (`cna`: 101 questions, `rn`: 97 questions) but were missing from the frontend `SUBJECTS` object. Added complete configs including domain names, weights, icons, exam info, and aiContext strings.
+
+### Domain Name Alignment
+Domain `name` values in the frontend `SUBJECTS[slug].domains` array must exactly match the `domain` column in Supabase — they're used as query filters. Six mismatches were found and fixed:
+
+| Subject | Fixed |
+|---------|-------|
+| AB-900 | `Admin Tasks` → split into `Agents` + `Copilot`; `Core M365` → `M365 Core` |
+| LVN | All 4 domains renamed to match DB: `Safe Care`, `Physiological Care`, `Pharmacology`, `Psychosocial` |
+
+### Live Question Bank
+| Subject | Questions | Domains |
+|---------|-----------|---------|
+| AB-900 | 100 | Data & Governance (37) · M365 Core (33) · Agents (15) · Copilot (15) |
+| CNA | 101 | Basic Nursing Skills (36) · Activities of Daily Living (29) · Role of the Nurse Aide (26) · Psychosocial Care Skills (10) |
+| LVN | 100 | Physiological Care (45) · Safe Care (30) · Pharmacology (15) · Psychosocial (10) |
+| RN | 97 | Physiological Integrity (50) · Safe & Effective Care (32) · Psychosocial Integrity (9) · Health Promotion (6) |
+| SHRM-CP | 100 | Employment Law (38) · People & Talent (32) · HR Strategy (18) · HR Operations (12) |
+| SHRM-SCP | 100 | Acuity (25) · Consultation & Business Acumen (25) · HR Expertise (25) · Strategic HR Management (25) |
+| **Total** | **598** | |
+
+### Architecture Note — Push Strategy
+The bash sandbox has a ~101KB read limit on files in the Windows filesystem mount. Any file larger than this **must be pushed via native Windows PowerShell** using `git push` or the GitHub Contents API with `[System.IO.File]::ReadAllBytes()`. Never use `subprocess.run(['cat', ...])` or Python `open()` to read files that may exceed this limit — both will return truncated content without error.
 
 ---
 
@@ -129,88 +163,4 @@ All tables have RLS — users can only access their own rows.
 ## v2.0.x — Settings, Exam Fidelity, Subjects (April 28, 2026)
 
 ### User Accounts (`user_accounts` table)
-Fields: `user_id`, `subscription_tier` (free/single/all_access), `subscription_status`, `subscription_renews_at`, `stripe_customer_id`, `stripe_subscription_id`, `billing_email`, `display_name`, `avatar_url`, `created_at`, `updated_at`
-
-### Settings Page Features
-- Change email (Supabase auth)
-- Change password
-- Sign out everywhere (global session termination)
-- Export quiz progress as JSON
-- Delete account (placeholder — needs Edge Function)
-- Subscription tier display (Stripe-ready)
-
-### Exam Fidelity
-Official question counts and domain weights applied to all subjects. Pass Likelihood gated until cumulative questions ≥ threshold (80–85% of exam length).
-
-### Subject Categories + Search
-Collapsible Tech / Healthcare / HR categories. Real-time search bar.
-
-### New Subjects Added
-- NCLEX CNA (60 questions)
-- NCLEX RN (145 questions)
-- SHRM-SCP (110 questions, 100 seeded via Supabase)
-
----
-
-## v1.x — Initial Launch (April 28, 2026)
-
-### Core Features
-- Single-file app (`index.html`)
-- Supabase auth + cross-device progress sync
-- Guest (local-only) mode
-- Multiple choice with instant feedback
-- Wrong Answer Log
-- AI Study Analysis via `/api/analyze.js` Vercel proxy
-- AB-900, LVN NCLEX-PN, SHRM-CP subjects
-
----
-
-## Current Status — What's Live
-
-| Feature | Status |
-|---------|--------|
-| Quiz engine (all modes) | ✅ Live |
-| Skip button | ✅ Live |
-| AI Study Analysis | ✅ Live |
-| AI Q Generation | ✅ Live (v2.2.0) |
-| Analytics dashboard | ✅ Live |
-| User accounts / settings | ✅ Live |
-| Pass Likelihood gauge | ✅ Live |
-| All 6 subjects | ✅ Live |
-| Stripe integration | ⏳ Schema ready, not wired |
-| AdSense / AdMob | ⏳ Pending hosted domain setup |
-| Per-question AI explanations | ⏳ DB table ready, needs UI |
-| Mobile app (Capacitor) | ⏳ Roadmap |
-
----
-
-## Testing Guide
-
-### Test AI Study Analysis
-1. Sign in and choose a subject
-2. Answer 3+ questions (get some wrong)
-3. Go to Analysis tab → tap "✦ Analyze with AI"
-4. Expect: 200–250 word study plan in ~5 seconds
-5. Check `api_logs` in Supabase for the logged attempt
-
-### Test AI Question Generation
-1. Sign in as `mark_quion@yahoo.com` (all_access tier)
-2. Answer some questions in a subject (get some wrong to create weak domains)
-3. Go to Analysis tab → tap "✦ Generate AI Practice Questions"
-4. Expect: 10 questions generated and displayed with "▶ Practice These Now"
-5. Tap "Practice These Now" — quiz launches with AI questions
-6. Check `usage_tracking` in Supabase: feature = 'q_generation' should have count = 1
-
-### Test Skip Button
-1. Start any practice session
-2. Click "Skip — return to later"
-3. Verify: question moves to end, session continues
-4. Check `question_skips` table in Supabase for the logged skip
-
-### Test Analytics Dashboard
-1. Answer 5+ questions in a session
-2. Go to Analysis tab
-3. Verify: Overall Progress card + domain breakdown cards visible above Wrong Answer Log
-
-### Test Tier Gating
-- Sign in as a free user → try Q generation → should see "Q generation is a premium featur
+Fields: `user_id`, `subscription_tier` (free/single/all_access), `subscription_status`, `subscription_renews_at`, `stripe_customer_id`, `stripe_subscription_id`, `billing_email`, `display_name`, `avatar_url`, `cre
