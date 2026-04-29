@@ -558,17 +558,61 @@ const SUBJECTS = {
       ['Exam','NCLEX-PN'],
       ['Questions','150'],
       ['Format','Next Generation NCLEX (NGN)'],
-      ['Domains','Coordinated Care (21%) · Safety & Infection (13%) · Health Promotion (9%) · Physiological (57%)']
+      ['Domains','Physiological Care (45%) · Safe Care (30%) · Pharmacology (15%) · Psychosocial (10%)']
     ],
     domains: [
-      {name:'Coordinated Care',                  icon:'🛡️', color:'#0078d4', weight:0.21},
-      {name:'Safety & Infection Control',       icon:'🔒', color:'#e74c3c', weight:0.13},
-      {name:'Health Promotion & Maintenance',   icon:'💚', color:'#2ecc71', weight:0.09},
-      {name:'Physiological Integrity',          icon:'❤️', color:'#9b59b6', weight:0.57}
+      {name:'Physiological Care', icon:'❤️', color:'#9b59b6', weight:0.45},
+      {name:'Safe Care',          icon:'🛡️', color:'#e74c3c', weight:0.30},
+      {name:'Pharmacology',       icon:'💊', color:'#2ecc71', weight:0.15},
+      {name:'Psychosocial',       icon:'🧠', color:'#0078d4', weight:0.10}
     ],
-    aiContext: 'NCLEX-PN (Licensed Vocational/Practical Nurse) licensure exam. Domains: Safe and Effective Care Environment (30%), Physiological Integrity (45%), Pharmacological Therapies (15%), Psychosocial Integrity (10%). Next Generation NCLEX format.'
+    aiContext: 'NCLEX-PN (Licensed Vocational/Practical Nurse) licensure exam. Domains: Physiological Care (45%), Safe Care (30%), Pharmacology (15%), Psychosocial (10%). Next Generation NCLEX format.'
   },
-  'shrm': {
+  'cna': {
+    key: 'cna',
+    name: 'NCLEX CNA',
+    fullName: 'Certified Nursing Assistant',
+    icon: '🏥',
+    color: '#1abc9c',
+    category: 'Healthcare',
+    passThreshold: 'State-determined passing score',
+    examInfo: [
+      ['Exam','CNA State Competency'],
+      ['Questions','60–70'],
+      ['Format','Written + Skills Demonstration'],
+      ['Domains','Basic Nursing Skills (36%) · Role of the Nurse Aide (26%) · Activities of Daily Living (29%) · Psychosocial Care Skills (10%)']
+    ],
+    domains: [
+      {name:'Basic Nursing Skills',       icon:'🩺', color:'#1abc9c', weight:0.36},
+      {name:'Role of the Nurse Aide',     icon:'👩‍⚕️', color:'#0078d4', weight:0.26},
+      {name:'Activities of Daily Living', icon:'🌅', color:'#f39c12', weight:0.29},
+      {name:'Psychosocial Care Skills',   icon:'🧠', color:'#9b59b6', weight:0.10}
+    ],
+    aiContext: 'CNA (Certified Nursing Assistant) state competency exam. Domains: Basic Nursing Skills (36%), Role of the Nurse Aide (26%), Activities of Daily Living (29%), Psychosocial Care Skills (10%).'
+  },
+  'rn': {
+    key: 'rn',
+    name: 'NCLEX RN',
+    fullName: 'NCLEX-RN Registered Nurse',
+    icon: '👩‍⚕️',
+    color: '#e74c3c',
+    category: 'Healthcare',
+    passThreshold: 'Passing Standard (Next Generation NCLEX)',
+    examInfo: [
+      ['Exam','NCLEX-RN'],
+      ['Questions','75–145'],
+      ['Format','Next Generation NCLEX (NGN) — CAT'],
+      ['Domains','Physiological Integrity (52%) · Safe & Effective Care (33%) · Psychosocial Integrity (9%) · Health Promotion (6%)']
+    ],
+    domains: [
+      {name:'Physiological Integrity', icon:'❤️', color:'#e74c3c', weight:0.52},
+      {name:'Safe & Effective Care',   icon:'🛡️', color:'#0078d4', weight:0.33},
+      {name:'Psychosocial Integrity',  icon:'🧠', color:'#9b59b6', weight:0.09},
+      {name:'Health Promotion',        icon:'💚', color:'#2ecc71', weight:0.06}
+    ],
+    aiContext: 'NCLEX-RN (Registered Nurse) licensure exam. Domains: Physiological Integrity (52%), Safe & Effective Care Environment (33%), Psychosocial Integrity (9%), Health Promotion & Maintenance (6%). Next Generation NCLEX CAT format.'
+  },
+'shrm': {
     key: 'shrm',
     name: 'SHRM-CP',
     fullName: 'SHRM Certified Professional (HR)',
@@ -1974,54 +2018,4 @@ async function changePassword() {
   try {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) throw error;
-    okEl.textContent = 'Password updated successfully';
-    setTimeout(() => closeModal('change-password-modal'), 2000);
-  } catch (err) { errEl.textContent = err.message; }
-}
-
-async function exportUserData() {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const { data: progress, error } = await supabase.from('user_progress').select('*').eq('user_id', user.id);
-    if (error) throw error;
-    const dataStr = JSON.stringify(progress, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `kanpassit-export-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    toast('Data exported');
-  } catch (err) { toast('Error: ' + err.message); }
-}
-
-async function signOutAllDevices() {
-  try {
-    await supabase.auth.signOut({ scope: 'global' });
-    toast('Signed out everywhere');
-    setTimeout(() => location.reload(), 1000);
-  } catch (err) { toast('Error: ' + err.message); }
-}
-
-async function deleteAccount() {
-  const confirmEmail = document.getElementById('delete-confirm-email').value.trim();
-  const errEl = document.getElementById('delete-account-err');
-  errEl.textContent = '';
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || confirmEmail !== user.email) { errEl.textContent = 'Email does not match'; return; }
-  try {
-    toast('Contact support to delete your account');
-  } catch (err) { errEl.textContent = err.message; }
-}
-
-function showModal(modalId) { document.getElementById(modalId).classList.add('open'); }
-function closeModal(modalId) { document.getElementById(modalId).classList.remove('open'); }
-function showPage(pageId) {
-  if (pageId === 'settings') loadAccountData();
-  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-  document.getElementById('page-' + pageId).classList.add('active');
-  if (pageId !== 'quiz') do
+    okEl.textContent = 'Password updated successful
