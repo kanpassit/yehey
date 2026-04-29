@@ -2018,4 +2018,58 @@ async function changePassword() {
   try {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) throw error;
-    okEl.textContent = 'Password updated successful
+    okEl.textContent = 'Password updated successfully';
+    setTimeout(() => closeModal('change-password-modal'), 2000);
+  } catch (err) { errEl.textContent = err.message; }
+}
+
+async function exportUserData() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data: progress, error } = await supabase.from('user_progress').select('*').eq('user_id', user.id);
+    if (error) throw error;
+    const dataStr = JSON.stringify(progress, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `kanpassit-export-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast('Data exported');
+  } catch (err) { toast('Error: ' + err.message); }
+}
+
+async function signOutAllDevices() {
+  try {
+    await supabase.auth.signOut({ scope: 'global' });
+    toast('Signed out everywhere');
+    setTimeout(() => location.reload(), 1000);
+  } catch (err) { toast('Error: ' + err.message); }
+}
+
+async function deleteAccount() {
+  const confirmEmail = document.getElementById('delete-confirm-email').value.trim();
+  const errEl = document.getElementById('delete-account-err');
+  errEl.textContent = '';
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || confirmEmail !== user.email) { errEl.textContent = 'Email does not match'; return; }
+  try {
+    toast('Contact support to delete your account');
+  } catch (err) { errEl.textContent = err.message; }
+}
+
+function showModal(modalId) { document.getElementById(modalId).classList.add('open'); }
+function closeModal(modalId) { document.getElementById(modalId).classList.remove('open'); }
+function showPage(pageId) {
+  if (pageId === 'settings') loadAccountData();
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  if (pageId !== 'quiz') document.getElementById('global-nav').style.display = 'flex';
+}
+</script>
+</body>
+</html>
