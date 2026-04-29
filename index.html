@@ -519,16 +519,6 @@ CREATE POLICY "Users manage own progress"
 let QB = {};
 let aiGeneratedQuestions = [];
 
-// Full-exam simulation question counts (matches official exam lengths)
-const SIM_COUNTS = {
-  'ab900':    60,
-  'lvn':     150,
-  'cna':      60,
-  'rn':      145,
-  'shrm':    110,
-  'shrm-scp':110
-};
-
 
 // ═══════════════════════════════════════════════════════
 // SUBJECT CONFIG
@@ -557,8 +547,8 @@ const SUBJECTS = {
   },
   'lvn': {
     key: 'lvn',
-    name: 'NCLEX-PN',
-    fullName: 'Licensed Vocational/Practical Nurse',
+    name: 'LVN NCLEX-PN',
+    fullName: 'NCLEX-PN Licensed Vocational Nurse',
     icon: '🩺',
     color: '#2ecc71',
     category: 'Healthcare',
@@ -576,50 +566,6 @@ const SUBJECTS = {
       {name:'Physiological Integrity',          icon:'❤️', color:'#9b59b6', weight:0.57}
     ],
     aiContext: 'NCLEX-PN (Licensed Vocational/Practical Nurse) licensure exam. Domains: Safe and Effective Care Environment (30%), Physiological Integrity (45%), Pharmacological Therapies (15%), Psychosocial Integrity (10%). Next Generation NCLEX format.'
-  },
-  'cna': {
-    key: 'cna',
-    name: 'NCLEX-CNA',
-    fullName: 'Certified Nursing Assistant',
-    icon: '🏥',
-    color: '#00b894',
-    category: 'Healthcare',
-    passThreshold: 'Passing Standard (70% or state equivalent)',
-    examInfo: [
-      ['Exam','CNA State Written Exam (NNAAP 2024)'],
-      ['Questions','60 scored (70 total w/ 10 pretest)'],
-      ['Format','Multiple Choice Written + Skills Evaluation'],
-      ['Domains','Activities of Daily Living (29%) · Basic Nursing Skills (35%) · Psychosocial Care (10%) · Role of Nurse Aide (26%)']
-    ],
-    domains: [
-      {name:'Activities of Daily Living',  icon:'🤲', color:'#00b894', weight:0.29},
-      {name:'Basic Nursing Skills',        icon:'🔒', color:'#e74c3c', weight:0.35},
-      {name:'Psychosocial Care Skills',    icon:'💙', color:'#6264a7', weight:0.10},
-      {name:'Role of the Nurse Aide',      icon:'📋', color:'#f39c12', weight:0.26}
-    ],
-    aiContext: 'Certified Nursing Assistant (CNA) State Written Exam — NNAAP 2024 content outline (Credentia/NCSBN). Domains: Activities of Daily Living & Self-Care (29%), Basic Nursing Skills — Infection Control, Safety, Technical Procedures, Data Collection (35%), Psychosocial Care Skills (10%), Role of the Nurse Aide — Communication, Client Rights, Legal & Ethical Behavior, Team Member (26%). Source: 2024 NNAAP Content Outline effective October 2024.'
-  },
-  'rn': {
-    key: 'rn',
-    name: 'NCLEX-RN',
-    fullName: 'Registered Nurse',
-    icon: '👩‍⚕️',
-    color: '#3498db',
-    category: 'Healthcare',
-    passThreshold: 'Passing Standard (Next Generation NCLEX)',
-    examInfo: [
-      ['Exam','NCLEX-RN'],
-      ['Questions','145'],
-      ['Format','Next Generation NCLEX (NGN) — Adaptive CAT'],
-      ['Domains','Safe & Effective Care (32%) · Physiological Integrity (51%) · Health Promotion (9%) · Psychosocial (9%)']
-    ],
-    domains: [
-      {name:'Safe & Effective Care',    icon:'🛡️', color:'#3498db', weight:0.32},
-      {name:'Physiological Integrity',  icon:'❤️', color:'#9b59b6', weight:0.51},
-      {name:'Health Promotion',         icon:'💚', color:'#2ecc71', weight:0.09},
-      {name:'Psychosocial Integrity',   icon:'🧠', color:'#f39c12', weight:0.09}
-    ],
-    aiContext: 'NCLEX-RN (Registered Nurse) licensure exam using Next Generation NCLEX (NGN) format. Client Needs: Safe and Effective Care Environment (32%), Physiological Integrity (51%), Health Promotion & Maintenance (9%), Psychosocial Integrity (9%). Higher complexity than NCLEX-PN; includes clinical judgment and clinical decision-making scenarios.'
   },
   'shrm': {
     key: 'shrm',
@@ -765,8 +711,6 @@ async function loadQuestions() {
   // This prevents "Cannot read property 'length' of undefined" errors
   if (!QB['ab900']) QB['ab900'] = [];
   if (!QB['lvn']) QB['lvn'] = [];
-  if (!QB['cna']) QB['cna'] = [];
-  if (!QB['rn']) QB['rn'] = [];
   if (!QB['shrm']) QB['shrm'] = [];
   if (!QB['shrm-scp']) QB['shrm-scp'] = [];
 
@@ -969,7 +913,7 @@ function renderCategorizedSubjects(subjects) {
   grid.innerHTML = categoryOrder
     .filter(cat => categories[cat])
     .map(cat => {
-      const subjectsInCat = categories[cat].sort((a, b) => a.name.localeCompare(b.name));
+      const subjectsInCat = categories[cat];
       const catId = `cat-${cat.toLowerCase().replace(/\s+/g, '-')}`;
 
       const subjectCards = subjectsInCat.map(s => {
@@ -1166,10 +1110,8 @@ function enterApp() {
       </button>`).join('');
   }
 
-  const totalQ  = QB[currentSubject].length;
-  const simCount = Math.min(SIM_COUNTS[currentSubject] || totalQ, totalQ);
-  document.getElementById('modal-full-sub').textContent =
-    `${simCount} questions · domain-weighted${simCount < (SIM_COUNTS[currentSubject] || simCount) ? ' (more unlock as bank grows)' : ''}`;
+  const totalQ = QB[currentSubject].length;
+  document.getElementById('modal-full-sub').textContent = `All ${totalQ} questions in random order`;
 
   showView('v-app');
   showPage('home');
@@ -1194,8 +1136,6 @@ function calcLikelihood(subKey, ans) {
   const thresholds = {
     'ab900': 50,
     'lvn': 125,
-    'cna': 50,
-    'rn': 120,
     'shrm': 90,
     'shrm-scp': 90
   };
@@ -1220,7 +1160,12 @@ function calcLikelihood(subKey, ans) {
   const rawPct = totalWeight > 0 ? (weightedScore / totalWeight) * 100 : 0;
 
   // Define max questions per subject (for confidence scaling)
-  const maxQuestions = SIM_COUNTS[subKey] || 100;
+  const maxQuestions = {
+    'ab900': 60,
+    'lvn': 150,
+    'shrm': 110,
+    'shrm-scp': 110
+  }[subKey] || 100;
 
   // Keep climbing after threshold; don't plateau
   const confidence = Math.min(1, Math.max(0.5, totalAnswered / maxQuestions));
@@ -1266,4 +1211,797 @@ function renderGauge() {
   }
 
   const likelihood = percentage;
-  const color = likelihood >= 75 ? '#2ecc71' : likelihood >= 55 ? '#f39c12' : '#
+  const color = likelihood >= 75 ? '#2ecc71' : likelihood >= 55 ? '#f39c12' : '#e05c5c';
+  document.getElementById('gauge-pct-text').textContent = `${likelihood}%`;
+  document.getElementById('gauge-pct-text').style.fontSize = '30px';
+  document.getElementById('gauge-pct-text').style.color = color;
+  document.getElementById('gauge-sub').textContent =
+    likelihood >= 75 ? '✓ Looking strong — keep it up!' :
+    likelihood >= 55 ? '⚠ Getting there — focus on weak areas' :
+    '→ More practice needed across key domains';
+  setGaugeArc(likelihood / 100, color);
+
+  // Check if we just crossed the threshold
+  if (answered === threshold) {
+    showMilestoneBadge(`🎉 Confidence unlocked! You've reached ${threshold} questions.`);
+  }
+}
+
+function setGaugeArc(pct, color) {
+  const arc = document.getElementById('gauge-arc');
+  const total = 188.5;
+  arc.setAttribute('stroke', color);
+  arc.setAttribute('stroke-dashoffset', total * (1 - pct));
+}
+
+function showMilestoneBadge(text) {
+  const badge = document.getElementById('milestone-badge');
+  const milestoneText = document.getElementById('milestone-text');
+  milestoneText.textContent = text;
+  badge.style.display = 'flex';
+  setTimeout(() => closeMilestone(), 5000);  // Auto-close after 5s
+}
+
+function closeMilestone() {
+  document.getElementById('milestone-badge').style.display = 'none';
+}
+
+function renderQuickStats() {
+  const ans   = Object.keys(answers).length;
+  const cor   = Object.values(answers).filter(a => a.lastResult === 'correct').length;
+  const acc   = ans ? Math.round(cor / ans * 100) : 0;
+  const weak  = getWeakQs().length;
+  document.getElementById('qs-answered').textContent = ans;
+  document.getElementById('qs-correct').textContent  = ans ? `${acc}%` : '—';
+  document.getElementById('qs-weak').textContent     = weak;
+}
+
+function renderDomains() {
+  const sub = SUBJECTS[currentSubject];
+  const qs  = QB[currentSubject];
+  document.getElementById('domain-grid').innerHTML = sub.domains.map(d => {
+    const dqs     = qs.filter(q => q.cat === d.name);
+    const answered = dqs.filter(q => answers[q.id]);
+    const correct = answered.filter(q => answers[q.id].lastResult === 'correct').length;
+    const pct     = answered.length ? Math.round(correct / answered.length * 100) : 0;
+    const scoreColor = pct >= 70 ? 'var(--pass)' : pct >= 50 ? 'var(--warn)' : pct > 0 ? 'var(--fail)' : 'var(--text2)';
+    return `<div class="domain-card" onclick="startQuiz('domain','${d.name}');closeModeModal()">
+      <div class="domain-icon" style="background:${d.color}22">${d.icon}</div>
+      <div class="domain-info">
+        <div class="domain-name">${d.name}</div>
+        <div class="domain-sub">${answered.length}/${dqs.length} answered · ${Math.round(d.weight*100)}% of exam</div>
+        <div class="domain-bar-track"><div class="domain-bar-fill" style="width:${pct}%;background:${d.color}"></div></div>
+      </div>
+      <div class="domain-score-lbl" style="color:${scoreColor}">${answered.length ? pct+'%' : 'Start'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// QUIZ ENGINE
+// ═══════════════════════════════════════════════════════
+function getWeakQs() {
+  return QB[currentSubject].filter(q => answers[q.id]?.lastResult === 'wrong');
+}
+
+function startQuiz(mode, domainName) {
+  const qs = QB[currentSubject];
+  let pool = [];
+  if (mode === 'all')    pool = shuffle([...qs]);
+  if (mode === 'quick')  pool = shuffle([...qs]).slice(0, 10);
+  if (mode === 'weak')   pool = shuffle(getWeakQs());
+  if (mode === 'domain') pool = shuffle(qs.filter(q => q.cat === domainName));
+  if (mode === 'ai')     pool = [...aiGeneratedQuestions];
+  if (!pool.length) { toast(mode === 'ai' ? 'No AI questions yet — generate some first' : 'No questions available for this mode'); return; }
+  session = { questions: pool, idx: 0, score: 0, results: [] };
+  showPage('quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q   = session.questions[session.idx];
+  const tot = session.questions.length;
+  const pct = Math.round((session.idx / tot) * 100);
+
+  document.getElementById('quiz-content').innerHTML = `
+    <div class="quiz-header">
+      <div class="quiz-prog-wrap">
+        <div class="quiz-prog-meta">
+          <span>Question ${session.idx+1} of ${tot}</span>
+          <span>${session.score} correct</span>
+        </div>
+        <div class="quiz-prog-track"><div class="quiz-prog-fill" style="width:${pct}%"></div></div>
+      </div>
+      <button class="quit-btn" onclick="quitQuiz()">Quit</button>
+    </div>
+    <div class="q-body">
+      <div class="q-meta">
+        <span class="q-cat">${q.cat}</span>
+        <span class="q-num">#${q.id}</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="options" id="options">
+        ${q.opts.map((o, i) => `
+          <div class="option" id="opt-${i}" onclick="selectAnswer(${i})">
+            <div class="opt-letter">${'ABCD'[i]}</div>
+            <div class="opt-text">${o}</div>
+          </div>`).join('')}
+        <div class="option" id="opt-${q.opts.length}" onclick="selectAnswer(${q.opts.length})" style="border-style:dashed;opacity:.75">
+          <div class="opt-letter" style="background:var(--surface2);color:var(--text2)">${'ABCDE'[q.opts.length]}</div>
+          <div class="opt-text" style="color:var(--text2);font-style:italic">I don't know</div>
+        </div>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      <a class="quiz-skip-link" id="skip-link" onclick="skipQuestion()">Skip — return to later</a>
+    </div>
+    <div class="next-wrap">
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()">
+        ${session.idx + 1 === tot ? 'See Results →' : 'Next Question →'}
+      </button>
+    </div>`;
+}
+
+function selectAnswer(chosen) {
+  document.querySelectorAll('.option').forEach(o => o.classList.add('locked'));
+  const skipLink = document.getElementById('skip-link');
+  if (skipLink) skipLink.style.display = 'none';
+  const q       = session.questions[session.idx];
+  const correct = chosen === q.correct; // "I don't know" (index = q.opts.length) is always wrong
+
+  document.getElementById(`opt-${chosen}`).classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) document.getElementById(`opt-${q.correct}`).classList.add('reveal-correct');
+
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'block';
+  fb.className = `feedback ${correct ? 'correct-fb' : 'wrong-fb'}`;
+  fb.innerHTML = `
+    <div class="feedback-head ${correct ? 'correct-head' : 'wrong-head'}">
+      ${correct ? '✓ Correct!' : '✗ Incorrect'}
+    </div>
+    <div class="feedback-body">${q.exp}</div>`;
+
+  const prev = answers[q.id] || { attempts: 0, wrongCount: 0 };
+  answers[q.id] = {
+    attempts:   prev.attempts + 1,
+    wrongCount: correct ? prev.wrongCount : prev.wrongCount + 1,
+    lastResult: correct ? 'correct' : 'wrong'
+  };
+  saveLocal();
+  syncAnswer(q.id, correct ? 'correct' : 'wrong');
+
+  if (correct) session.score++;
+  session.results.push({ id: q.id, cat: q.cat, correct });
+
+  // Streak
+  const today = new Date().toDateString();
+  if (lastDate !== today) {
+    if (lastDate) {
+      const last = new Date(lastDate);
+      const yest = new Date(); yest.setDate(yest.getDate() - 1);
+      streak = last.toDateString() === yest.toDateString() ? streak + 1 : 1;
+    } else { streak = 1; }
+    lastDate = today;
+    saveLocal();
+  }
+  document.getElementById('streak-val').textContent = streak;
+  document.getElementById('btn-next').style.display = 'block';
+}
+
+function nextQuestion() {
+  session.idx++;
+  session.idx >= session.questions.length ? showSessionResults() : renderQuestion();
+}
+
+function quitQuiz() {
+  showConfirm({
+    icon: '🚪',
+    title: 'Quit Session?',
+    body: 'Your progress so far will be saved.',
+    okLabel: 'Quit',
+    onOk: () => { showPage('home'); renderHome(); }
+  });
+}
+
+async function skipQuestion() {
+  const q = session.questions[session.idx];
+  const remaining = session.questions.length - session.idx;
+  if (remaining <= 1) { toast('No other questions to skip to'); return; }
+
+  // Mark question as skipped in database
+  if (currentUser && currentUser.id !== 'guest') {
+    try {
+      await sbClient.from('question_skips').upsert({
+        user_id: currentUser.id,
+        subject: currentSubject,
+        question_id: q.id,
+        skipped_at: new Date()
+      }, { onConflict: 'user_id,subject,question_id' });
+    } catch(err) {
+      console.warn('[SKIP] Database error:', err);
+    }
+  }
+
+  // Move current question to the end of the queue
+  const [skipped] = session.questions.splice(session.idx, 1);
+  session.questions.push(skipped);
+  // idx stays the same — it now points to the next question
+  renderQuestion();
+}
+
+function showSessionResults() {
+  const tot = session.questions.length;
+  const sc  = session.score;
+  const pct = Math.round(sc / tot * 100);
+  const emoji = pct >= 80 ? '🎉' : pct >= 60 ? '💪' : '📚';
+  const title = pct >= 80 ? 'Excellent Work!' : pct >= 60 ? 'Good Progress!' : 'Keep Practicing!';
+
+  const sub = SUBJECTS[currentSubject];
+  const breakdown = sub.domains.map(d => {
+    const drs = session.results.filter(r => r.cat === d.name);
+    if (!drs.length) return '';
+    const correct = drs.filter(r => r.correct).length;
+    const dpct = Math.round(correct / drs.length * 100);
+    const cls  = dpct >= 70 ? 'score-good' : dpct >= 50 ? 'score-mid' : 'score-bad';
+    return `<div class="done-row">
+      <span>${d.icon} ${d.name}</span>
+      <span class="done-row-score ${cls}">${correct}/${drs.length} (${dpct}%)</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('quiz-content').innerHTML = `
+    <div class="session-done">
+      <div class="done-emoji">${emoji}</div>
+      <div class="done-h">${title}</div>
+      <div class="done-sub">You scored ${sc} / ${tot} (${pct}%) this session</div>
+      ${breakdown ? `<div class="done-breakdown">${breakdown}</div>` : ''}
+      <button class="btn-p" onclick="startQuiz('quick')">Practice Again</button>
+      <button class="btn-s" onclick="showPage('home');renderHome()">Back to Home</button>
+      <button class="btn-s" onclick="showPage('analysis');renderWrongLog()">View AI Analysis ✦</button>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// ANALYSIS PAGE
+// ═══════════════════════════════════════════════════════
+function renderAnalysisPage() {
+  const analysisOutput = document.getElementById('ai-analysis-output');
+  // Render analytics dashboard
+  renderAnalyticsDashboard();
+  renderWrongLog();
+}
+
+function renderWrongLog() {
+  const qs    = QB[currentSubject];
+  const wrong = qs.filter(q => answers[q.id]?.lastResult === 'wrong');
+  const log   = document.getElementById('wrong-log');
+  const countBadge = document.getElementById('wrong-log-count');
+
+  // Update count badge
+  if (countBadge) {
+    countBadge.textContent = wrong.length ? `${wrong.length}` : '0';
+    countBadge.className = 'wrong-log-count' + (wrong.length ? ' has-items' : '');
+  }
+
+  if (!wrong.length) {
+    log.innerHTML = '<div style="font-size:13px;color:var(--text2);padding:12px 0">No wrong answers yet — start a practice session!</div>';
+    return;
+  }
+  log.innerHTML = wrong.map(q => {
+    const a = answers[q.id];
+    return `<div class="analysis-card">
+      <div class="analysis-card-title">#${q.id} · <span style="color:var(--text2);font-size:11px;font-weight:500">${q.cat}</span></div>
+      <div class="analysis-card-body">${q.q}<br><br>
+        <strong style="color:var(--text)">Correct answer:</strong> ${q.opts[q.correct]}<br><br>
+        <span style="font-size:11px">Wrong ${a.wrongCount}× of ${a.attempts} attempt${a.attempts>1?'s':''}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleWrongLog() {
+  const wrap    = document.getElementById('wrong-log-wrap');
+  const chevron = document.getElementById('wrong-log-chevron');
+  const isOpen  = wrap.classList.contains('open');
+  wrap.classList.toggle('open', !isOpen);
+  chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+async function runAnalysis() {
+  const qs    = QB[currentSubject];
+  const wrong = qs.filter(q => answers[q.id]?.lastResult === 'wrong');
+  if (wrong.length < 3) { toast('Answer a few more questions first'); return; }
+
+  const btn = document.getElementById('analyze-btn');
+  btn.innerHTML = '<div class="spinner"></div> Analyzing…';
+  btn.disabled  = true;
+
+  const sub = SUBJECTS[currentSubject];
+  const totalAnswered = Object.keys(answers).length;
+  const totalCorrect  = Object.values(answers).filter(a => a.lastResult === 'correct').length;
+  const domainSummary = sub.domains.map(d => {
+    const dqs = qs.filter(q => q.cat === d.name);
+    const ans = dqs.filter(q => answers[q.id]);
+    const cor = ans.filter(q => answers[q.id].lastResult === 'correct').length;
+    return `${d.name}: ${cor}/${ans.length} correct${ans.length ? ` (${Math.round(cor/ans.length*100)}%)` : ' (not started)'}`;
+  }).join('\n');
+  const wrongList = wrong.slice(0, 15).map(q => `- [${q.cat}] ${q.q}`).join('\n');
+
+  const prompt = `You are an expert ${sub.name} exam coach. A student is preparing for the ${sub.fullName} exam.
+Context: ${sub.aiContext}
+
+Student performance:
+Overall: ${totalCorrect}/${totalAnswered} correct (${totalAnswered ? Math.round(totalCorrect/totalAnswered*100) : 0}%)
+
+Domain breakdown:
+${domainSummary}
+
+Questions answered incorrectly (recent):
+${wrongList}
+
+Provide a focused, actionable study plan in 200-250 words. Include:
+1. Their 2-3 biggest weak areas based on the data
+2. Specific concepts to review for each weak area
+3. Which domain to prioritize given its exam weight
+4. One encouraging closing note
+
+Write directly to the student in second person. Be specific and practical.`;
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Analysis failed'); }
+    const data = await res.json();
+    document.getElementById('ai-analysis-output').innerHTML =
+      `<div class="ai-result">${data.content.replace(/\n/g,'<br>')}</div><br>`;
+  } catch(err) {
+    document.getElementById('ai-analysis-output').innerHTML =
+      `<div class="ai-result" style="border-color:var(--fail);color:#ff8080">Error: ${err.message}</div>`;
+  }
+  btn.innerHTML = '✦ Refresh AI Analysis';
+  btn.disabled  = false;
+}
+
+
+// ═══════════════════════════════════════════════════════
+// AI QUESTION GENERATION
+// ═══════════════════════════════════════════════════════
+async function generateQuestions() {
+  const sub = SUBJECTS[currentSubject];
+  const qs  = QB[currentSubject];
+  if (!qs) { toast('Load a subject first'); return; }
+
+  const tier   = await getUserTier();
+  const userId = currentUser?.id;
+
+  const quota = await checkQuotaQGeneration(userId, tier);
+  await logUsageAttempt(userId, 'q_generation', tier, quota.allowed);
+  if (!quota.allowed) { toast(quota.message); return; }
+
+  const btn = document.getElementById('generate-btn');
+  const out = document.getElementById('ai-gen-output');
+  btn.innerHTML = '<div class="spinner"></div> Generating…';
+  btn.disabled  = true;
+  out.innerHTML = '';
+
+  const weakDomains = sub.domains.filter(d => {
+    const dqs = qs.filter(q => q.cat === d.name);
+    const ans = dqs.filter(q => answers[q.id]);
+    if (!ans.length) return false;
+    const cor = ans.filter(q => answers[q.id].lastResult === 'correct').length;
+    return (cor / ans.length) < 0.70;
+  }).map(d => d.name);
+
+  const count   = (tier === 'all_access') ? 10 : 4;
+  const domains = sub.domains.map(d => d.name);
+  const targets = weakDomains.length ? weakDomains : domains.slice(0, 2);
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subjectName: sub.fullName,
+        aiContext:   sub.aiContext,
+        domains,
+        weakDomains: targets,
+        count
+      })
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Generation failed'); }
+    const questions = await res.json();
+    if (!Array.isArray(questions) || !questions.length) throw new Error('No questions returned');
+
+    aiGeneratedQuestions = questions;
+    await incrementUsage(userId, 'q_generation');
+
+    const aiBtn = document.getElementById('modal-ai-btn');
+    if (aiBtn) aiBtn.style.display = '';
+    const aiSub = document.getElementById('modal-ai-sub');
+    if (aiSub) aiSub.textContent = `${questions.length} questions targeting: ${targets.join(', ')}`;
+
+    out.innerHTML = `<div class="ai-result" style="border-color:rgba(0,120,212,.35)">
+      ✅ ${questions.length} AI questions ready — targeting: ${targets.join(', ')}<br><br>
+      <button class="btn-ai-analyze" onclick="startQuiz('ai')" style="border-color:rgba(0,120,212,.35);color:#60a8e0;background:rgba(0,120,212,.08)">▶ Practice These Now</button>
+    </div>`;
+  } catch(err) {
+    out.innerHTML = `<div class="ai-result" style="border-color:var(--fail);color:#ff8080">Error: ${err.message}</div>`;
+  }
+  btn.innerHTML = '✦ Generate AI Practice Questions';
+  btn.disabled  = false;
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+
+function doReset() {
+  const subName = SUBJECTS[currentSubject].name;
+  showConfirm({
+    icon: '🗑️',
+    title: 'Reset Progress?',
+    body: `All progress for <strong style="color:var(--text)">${subName}</strong> will be permanently deleted. This cannot be undone.`,
+    okLabel: 'Reset Everything',
+    onOk: () => {
+      answers = {}; streak = 0; lastDate = null;
+      saveLocal();
+      resetProgressRemote();
+      renderHome();
+      showPage('home');
+      toast('Progress reset ↺');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// NAV & VIEW MANAGEMENT
+// ═══════════════════════════════════════════════════════
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const nav = document.getElementById('global-nav');
+  const showNav = (id === 'v-subjects' || id === 'v-app');
+  nav.style.display = showNav ? 'flex' : 'none';
+  if (id === 'v-subjects') {
+    // On subjects screen: show only Settings, centered
+    document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.style.display = 'none'; });
+    const settingsBtn = document.getElementById('nav-settings');
+    if (settingsBtn) {
+      settingsBtn.style.display = 'flex';
+      settingsBtn.style.opacity = '1';
+      settingsBtn.style.pointerEvents = 'auto';
+      settingsBtn.onclick = () => { showView('v-app'); showPage('settings'); };
+    }
+  } else if (id === 'v-app') {
+    // Restore all nav buttons to full visibility
+    document.querySelectorAll('.nav-btn').forEach(b => { b.style.display = 'flex'; b.style.opacity = ''; b.style.pointerEvents = ''; });
+    document.getElementById('nav-home').onclick = () => showPage('home');
+    document.getElementById('nav-settings').onclick = () => showPage('settings');
+  }
+}
+
+function showPage(name) {
+  document.querySelectorAll('#v-app .page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const nb = document.getElementById('nav-' + name);
+  if (nb) nb.classList.add('active');
+  if (name === 'home')     renderHome();
+  if (name === 'analysis') renderAnalysisPage();
+}
+
+function openModeModal()  { document.getElementById('mode-overlay').classList.add('open'); }
+function closeModeModal(e) {
+  if (!e || e.target === document.getElementById('mode-overlay'))
+    document.getElementById('mode-overlay').classList.remove('open');
+}
+
+let _confirmCallback = null;
+function showConfirm({ icon, title, body, okLabel, onOk }) {
+  document.getElementById('confirm-icon').textContent  = icon || '⚠️';
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-body').innerHTML    = body;
+  document.getElementById('confirm-ok').textContent   = okLabel || 'Confirm';
+  _confirmCallback = onOk;
+  document.getElementById('confirm-ok').onclick = () => { closeConfirm(); if (_confirmCallback) _confirmCallback(); };
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm() {
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _confirmCallback = null;
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ═══════════════════════════════════════════════════════
+// HARD CAPS & USAGE TRACKING
+// ═══════════════════════════════════════════════════════
+async function getUserTier() {
+  if (!currentUser || currentUser.id === 'guest') return 'free';
+  try {
+    const { data } = await sbClient.from('user_accounts').select('subscription_tier').eq('user_id', currentUser.id).single();
+    return data?.subscription_tier || 'free';
+  } catch(err) {
+    console.warn('[TIER] Error fetching tier:', err);
+    return 'free';
+  }
+}
+
+async function checkQuotaStudyPlan(userId, tier) {
+  if (!userId || userId === 'guest') return { allowed: false, message: 'Sign in to use AI study plans' };
+
+  const thisMonth = new Date().toISOString().slice(0, 7) + '-01';
+  try {
+    const { data } = await sbClient
+      .from('usage_tracking')
+      .select('count')
+      .eq('user_id', userId)
+      .eq('feature', 'study_plan')
+      .eq('month', thisMonth)
+      .single();
+
+    const used = data?.count || 0;
+    const limit = tier === 'free' ? 1 : 1; // both get 1/month for now
+
+    if (used >= limit) {
+      return { allowed: false, message: `Study plan limit reached. Next plan available 2026-05-01.` };
+    }
+    return { allowed: true };
+  } catch(err) {
+    console.warn('[QUOTA] Error:', err);
+    return { allowed: true }; // Fail open
+  }
+}
+
+async function checkQuotaQGeneration(userId, tier) {
+  if (tier === 'free') return { allowed: false, message: 'Q generation is a premium feature. Upgrade to Single Subject.' };
+  if (!userId || userId === 'guest') return { allowed: false, message: 'Sign in to use Q generation' };
+
+  const today = new Date().toISOString().slice(0, 10);
+  const monday = new Date();
+  monday.setDate(monday.getDate() - monday.getDay());
+  const weekStart = monday.toISOString().slice(0, 10);
+
+  try {
+    const { data } = await sbClient
+      .from('usage_tracking')
+      .select('count')
+      .eq('user_id', userId)
+      .eq('feature', 'q_generation')
+      .gte('date', weekStart)
+      .single();
+
+    const used = data?.count || 0;
+    const limits = { single: 4, all_access: 12 };
+    const limit = limits[tier] || 0;
+
+    if (used >= limit) {
+      return { allowed: false, message: `Weekly Q limit (${limit}) reached. Resets Sunday.` };
+    }
+    return { allowed: true };
+  } catch(err) {
+    console.warn('[QUOTA] Q Gen error:', err);
+    return { allowed: true };
+  }
+}
+
+async function logUsageAttempt(userId, feature, tier, allowed) {
+  if (!userId || userId === 'guest') return;
+  try {
+    await sbClient.from('api_logs').insert({
+      user_id: userId,
+      feature,
+      tier,
+      allowed,
+      created_at: new Date()
+    });
+  } catch(err) {
+    console.warn('[API_LOG] Error:', err);
+  }
+}
+
+async function incrementUsage(userId, feature) {
+  if (!userId || userId === 'guest') return;
+  const today = new Date().toISOString().slice(0, 10);
+  const thisMonth = new Date().toISOString().slice(0, 7) + '-01';
+  try {
+    await sbClient.from('usage_tracking').upsert({
+      user_id: userId,
+      feature,
+      date: today,
+      month: thisMonth,
+      count: 1
+    }, { onConflict: feature === 'study_plan' ? 'user_id,feature,month' : 'user_id,feature,date' });
+  } catch(err) {
+    console.warn('[USAGE] Increment error:', err);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ANALYTICS DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderAnalyticsDashboard() {
+  const sub = SUBJECTS[currentSubject];
+  const totalAnswered = Object.keys(answers).length;
+  const totalCorrect = Object.values(answers).filter(a => a.lastResult === 'correct').length;
+  const accuracy = totalAnswered ? Math.round(totalCorrect / totalAnswered * 100) : 0;
+
+  const domainStats = sub.domains.map(d => {
+    const dqs = QB[currentSubject].filter(q => q.cat === d.name);
+    const answered = dqs.filter(q => answers[q.id]);
+    const correct = answered.filter(q => answers[q.id].lastResult === 'correct').length;
+    const pct = answered.length ? Math.round(correct / answered.length * 100) : 0;
+    const needed = Math.ceil(dqs.length * d.weight);
+    const progress = answered.length;
+
+    return {
+      name: d.name,
+      icon: d.icon,
+      correct,
+      answered: answered.length,
+      total: dqs.length,
+      pct,
+      needed,
+      progress
+    };
+  });
+
+  const html = `
+    <div class="analysis-card">
+      <div class="analysis-card-title">📊 Overall Progress</div>
+      <div class="analysis-card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">
+          <div>
+            <div style="font-size:28px;font-weight:800;color:var(--accent)">${totalAnswered}</div>
+            <div style="font-size:11px;color:var(--text2)">Questions Answered</div>
+          </div>
+          <div>
+            <div style="font-size:28px;font-weight:800;color:var(--pass)">${accuracy}%</div>
+            <div style="font-size:11px;color:var(--text2)">Overall Accuracy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-lbl" style="margin-top:16px">Domain Breakdown</div>
+    ${domainStats.map(d => `
+      <div class="analysis-card">
+        <div class="analysis-card-title">${d.icon} ${d.name}</div>
+        <div class="analysis-card-body">
+          <div style="font-size:13px;margin-bottom:8px">
+            <strong>${d.correct}/${d.answered}</strong> correct of <strong>${d.total}</strong> questions
+          </div>
+          <div class="domain-bar-track">
+            <div class="domain-bar-fill" style="width:${(d.answered/d.total)*100}%;background:var(--accent)"></div>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:6px">
+            ${d.answered >= d.total ? '✓ Complete' : `${d.total - d.answered} remaining`}
+            · ${d.answered ? d.pct + '% accuracy' : 'Not started'}
+          </div>
+        </div>
+      </div>
+    `).join('')}
+  `;
+
+  const analysisOutput = document.getElementById('ai-analysis-output');
+  if (analysisOutput) {
+    analysisOutput.innerHTML = html;
+  }
+}
+
+init();
+
+// Settings page functions
+async function loadAccountData() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    document.getElementById('email-display').textContent = user.email || 'Not set';
+    const { data: account } = await supabase.from('user_accounts').select('subscription_tier').eq('user_id', user.id).single();
+    if (account) {
+      const tierDisplay = account.subscription_tier === 'free' ? 'Free' : account.subscription_tier.charAt(0).toUpperCase() + account.subscription_tier.slice(1);
+      document.getElementById('plan-display').textContent = tierDisplay;
+    }
+  } catch (err) {
+    console.error('Error loading account data:', err);
+  }
+}
+
+async function changeEmail() {
+  const newEmail = document.getElementById('new-email-input').value.trim();
+  const errEl = document.getElementById('change-email-err');
+  const okEl = document.getElementById('change-email-ok');
+  errEl.textContent = ''; okEl.textContent = '';
+  if (!newEmail) { errEl.textContent = 'Please enter a new email'; return; }
+  try {
+    const { error } = await supabase.auth.updateUser({ email: newEmail });
+    if (error) throw error;
+    okEl.textContent = 'Verification link sent to ' + newEmail;
+    setTimeout(() => closeModal('change-email-modal'), 2000);
+  } catch (err) { errEl.textContent = err.message; }
+}
+
+async function changePassword() {
+  const newPassword = document.getElementById('new-password-input').value;
+  const confirmPassword = document.getElementById('confirm-password-input').value;
+  const errEl = document.getElementById('change-password-err');
+  const okEl = document.getElementById('change-password-ok');
+  errEl.textContent = ''; okEl.textContent = '';
+  if (newPassword !== confirmPassword) { errEl.textContent = 'Passwords do not match'; return; }
+  if (newPassword.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
+  try {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+    okEl.textContent = 'Password updated successfully';
+    setTimeout(() => closeModal('change-password-modal'), 2000);
+  } catch (err) { errEl.textContent = err.message; }
+}
+
+async function exportUserData() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data: progress, error } = await supabase.from('user_progress').select('*').eq('user_id', user.id);
+    if (error) throw error;
+    const dataStr = JSON.stringify(progress, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `kanpassit-export-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast('Data exported');
+  } catch (err) { toast('Error: ' + err.message); }
+}
+
+async function signOutAllDevices() {
+  try {
+    await supabase.auth.signOut({ scope: 'global' });
+    toast('Signed out everywhere');
+    setTimeout(() => location.reload(), 1000);
+  } catch (err) { toast('Error: ' + err.message); }
+}
+
+async function deleteAccount() {
+  const confirmEmail = document.getElementById('delete-confirm-email').value.trim();
+  const errEl = document.getElementById('delete-account-err');
+  errEl.textContent = '';
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || confirmEmail !== user.email) { errEl.textContent = 'Email does not match'; return; }
+  try {
+    toast('Contact support to delete your account');
+  } catch (err) { errEl.textContent = err.message; }
+}
+
+function showModal(modalId) { document.getElementById(modalId).classList.add('open'); }
+function closeModal(modalId) { document.getElementById(modalId).classList.remove('open'); }
+function showPage(pageId) {
+  if (pageId === 'settings') loadAccountData();
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  if (pageId !== 'quiz') document.getElementById('global-nav').style.display = 'flex';
+}
+</script>
+</body>
+</html>
