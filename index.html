@@ -536,12 +536,13 @@ const SUBJECTS = {
       ['Exam','AB-900'],
       ['Questions','60'],
       ['Passing Score','700 / 1000'],
-      ['Domains','Data & Governance (37.5%) · Admin Tasks (27.5%) · Core M365 (35%)']
+      ['Domains','Data & Governance (37.5%) · M365 Core (32.5%) · Copilot (15%) · Agents (15%)']
     ],
     domains: [
       {name:'Data & Governance',icon:'🔒', color:'#6264a7', weight:0.375},
-      {name:'Admin Tasks',      icon:'⚙️', color:'#f39c12', weight:0.275},
-      {name:'Core M365',        icon:'🏢', color:'#0078d4', weight:0.35}
+      {name:'M365 Core',        icon:'🏢', color:'#0078d4', weight:0.325},
+      {name:'Copilot',          icon:'🤖', color:'#7b68ee', weight:0.15},
+      {name:'Agents',           icon:'⚙️', color:'#f39c12', weight:0.15}
     ],
     aiContext: 'Microsoft 365 Copilot and Agent Administration Fundamentals (AB-900). Exam domains: M365 Core Services (33%), Data Protection & Governance (37%), Copilot Administration (15%), Agent Administration (15%). Passing score: 700/1000.'
   },
@@ -2023,8 +2024,4 @@ function showPage(pageId) {
   if (pageId === 'settings') loadAccountData();
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.getElementById('page-' + pageId).classList.add('active');
-  if (pageId !== 'quiz') document.getElementById('global-nav').style.display = 'flex';
-}
-</script>
-</body>
-</html>
+  if (pageId !== 'quiz') do
