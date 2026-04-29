@@ -1,7 +1,59 @@
 # KanPassIt — Changelog
 
 ## 🚀 Latest Deployment
-**v2.3.0 deployed to production** — April 29, 2026
+**v2.3.1 deployed to production** — April 29, 2026
+
+---
+
+## [2.3.1] — 2026-04-29 — Subject & Domain Fixes
+
+### 🐛 Bug Fixed: Loading Screen Freeze
+- Root cause: `index.html` JS was truncated mid-function (`deleteAccount()` cut off at `const {`), causing a browser parse error that silently prevented `init()` from running
+- Fix: Recovered missing function tail from prior working commit; pushed full 103,637-byte file via native Windows PowerShell (bypassing bash sandbox ~101KB mount limit)
+
+### ✦ CNA and RN Subjects Added to App
+Both subjects had questions in Supabase but were missing from the frontend subject registry entirely.
+
+**CNA — 101 questions**
+| Domain | Questions |
+|--------|-----------|
+| Basic Nursing Skills | 36 |
+| Activities of Daily Living | 29 |
+| Role of the Nurse Aide | 26 |
+| Psychosocial Care Skills | 10 |
+
+**RN (NCLEX-RN) — 97 questions**
+| Domain | Questions |
+|--------|-----------|
+| Physiological Integrity | 50 |
+| Safe & Effective Care | 32 |
+| Health Promotion | 6 |
+| Psychosocial Integrity | 9 |
+
+### 🐛 Bug Fixed: Domain Name Mismatches
+All domain `name` values in the frontend subject config must exactly match the `domain` column in Supabase for question filtering to work.
+
+| Subject | Old (broken) | New (matches DB) |
+|---------|-------------|-----------------|
+| AB-900 | Admin Tasks | Agents + Copilot (split into 2) |
+| AB-900 | Core M365 | M365 Core |
+| LVN | Coordinated Care | Physiological Care |
+| LVN | Safety & Infection Control | Safe Care |
+| LVN | Health Promotion & Maintenance | Pharmacology |
+| LVN | Physiological Integrity | Psychosocial |
+
+### 📊 Live Question Bank — All Subjects
+| Subject | Questions | Notes |
+|---------|-----------|-------|
+| AB-900 | 100 | Microsoft 365 Copilot & Agent Admin |
+| CNA | 101 | Certified Nursing Assistant |
+| LVN | 100 | NCLEX-PN Licensed Vocational Nurse |
+| RN | 97 | NCLEX-RN Registered Nurse |
+| SHRM-CP | 100 | SHRM Certified Professional |
+| SHRM-SCP | 100 | SHRM Senior Certified Professional |
+| **Total** | **598** | |
+
+---
 
 ---
 
@@ -31,40 +83,4 @@ All 6 subjects now balanced — no letter exceeds 38%.
 ### 🗄️ Database Migration (598 questions updated)
 - All 598 questions in Supabase patched via REST API using service role key
 - `options` array and `correct_index` updated for every row across all 6 subjects
-- Result: correct answers distributed ~25% each across A/B/C/D in live DB
-
-### 📄 Seed Files Rewritten
-The following seed files were rewritten with shuffled options so future re-seeds produce clean data:
-- `kanpassit_migration.sql` (ab900, lvn, shrm — 300 questions)
-- `questions_cna_rn_seed.sql` (cna, rn — 61 questions)
-- `questions_cna_rn_batch2.sql` (cna, rn — 138 questions)
-- `shrm-scp-final.sql` (shrm-scp — 100 questions)
-
-### 💡 Architecture Note
-The UI shuffle acts as a permanent safety net — even if new questions are added with AI-generated positional bias, users will not notice it. The DB fix ensures the data is clean at rest.
-
----
-
-## [2.2.0] — 2026-04-29 — AI Question Generation (Frontend + API)
-
-### ✦ AI Question Generation — Now Fully Wired
-- **New API endpoint:** `/api/generate.js` — Vercel serverless function that calls Claude to generate exam-realistic MCQ questions as JSON
-- **New frontend function:** `generateQuestions()` — checks quota, identifies weak domains, calls `/api/generate`, stores result
-- **New UI button:** "✦ Generate AI Practice Questions" on the Analysis page (below AI Analyze)
-- **New practice mode:** "🤖 AI-Generated Questions" in the Practice modal (appears after questions are generated)
-- **Tier limits enforced:** Free = blocked, Single = 4 questions/week, All Access = 10 questions/week
-- **Weak area targeting:** Automatically focuses generation on domains where accuracy < 70%
-- **Usage logged:** All generation attempts (allowed + blocked) written to `api_logs` and `usage_tracking`
-- **One-click practice:** "▶ Practice These Now" button appears in-line after generation completes
-
----
-
-## [2.1.0] — 2026-04-29 — Hard Caps & Analytics Release — ✅ LIVE ON VERCEL
-**v2.1.0 deployed to production** — April 29, 2026, 05:30 AM PST
-- **Live URL**: https://yehey-8q6rplw6-kanpassits-projects.vercel.app (also www.kanpassit.com)
-- **GitHub**: https://github.com/kanpassit/yehey
-- **Status**: ✅ Ready for users | All tests passing | Analytics dashboard live
-
----
-
-## [2.1.0] — 2026-04-29 — Hard Caps & 
+- Result: corre
