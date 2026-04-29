@@ -2010,4 +2010,21 @@ async function deleteAccount() {
   const confirmEmail = document.getElementById('delete-confirm-email').value.trim();
   const errEl = document.getElementById('delete-account-err');
   errEl.textContent = '';
-  const { 
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || confirmEmail !== user.email) { errEl.textContent = 'Email does not match'; return; }
+  try {
+    toast('Contact support to delete your account');
+  } catch (err) { errEl.textContent = err.message; }
+}
+
+function showModal(modalId) { document.getElementById(modalId).classList.add('open'); }
+function closeModal(modalId) { document.getElementById(modalId).classList.remove('open'); }
+function showPage(pageId) {
+  if (pageId === 'settings') loadAccountData();
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  if (pageId !== 'quiz') document.getElementById('global-nav').style.display = 'flex';
+}
+</script>
+</body>
+</html>
