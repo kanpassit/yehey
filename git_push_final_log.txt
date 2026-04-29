@@ -1,0 +1,11 @@
+Simple Git Push - C:\Users\Mark Quion\Documents\Claude\Projects\Flashcards
+============================================================
+
+Warning: Could not delete .git: 'charmap' codec can't encode character '\u2713' in position 0: character maps to <undefined>
+
+
+Running git init...
+Output: Initialized empty Git repository in C:/Users/Mark Quion/Documents/Claude/Projects/Flashcards/.git/
+
+Return code: 0
+

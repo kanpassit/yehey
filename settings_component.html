@@ -1,0 +1,294 @@
+<!-- SETTINGS COMPONENT - Add this inside your v-app view alongside other pages -->
+
+<div class="page" id="p-settings">
+  <div class="header">
+    <div class="app-logo">Settings</div>
+    <button class="back-btn" onclick="showPage('home')">Done</button>
+  </div>
+
+  <div class="settings-body">
+
+    <!-- PROFILE SECTION -->
+    <div class="sec-title">Profile</div>
+
+    <div class="card">
+      <div class="card-title">📧 Email</div>
+      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+        <span style="flex: 1; font-size: 14px;" id="email-display">user@example.com</span>
+        <button class="btn-s" style="width: auto; margin: 0; padding: 5px 10px; font-size: 12px;" onclick="showModal('change-email-modal')">Change</button>
+      </div>
+      <div style="font-size: 11px; color: var(--text2);">Verified ✓</div>
+    </div>
+
+    <!-- ACCOUNT SECTION -->
+    <div class="sec-title" style="margin-top: 20px;">Account</div>
+
+    <div class="card">
+      <div class="card-title">📊 Subscription Tier</div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div>
+          <div style="font-size: 14px; font-weight: 700;" id="plan-display">Free</div>
+          <div style="font-size: 11px; color: var(--text2); margin-top: 4px;">Tier will be managed here when subscriptions launch</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECURITY SECTION -->
+    <div class="sec-title" style="margin-top: 20px;">Security</div>
+
+    <div class="card">
+      <div class="card-title">🔐 Password</div>
+      <div style="font-size: 13px; color: var(--text2); margin-bottom: 12px;">Change your password anytime</div>
+      <button class="btn-s" style="width: 100%; margin-top: 0;" onclick="showModal('change-password-modal')">Change Password</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔓 Sessions</div>
+      <div style="font-size: 13px; color: var(--text2); margin-bottom: 12px;">Sign out from all devices</div>
+      <button class="btn-s" style="width: 100%; margin-top: 0;" onclick="signOutAllDevices()">Sign Out Everywhere</button>
+    </div>
+
+    <!-- DATA & PRIVACY -->
+    <div class="sec-title" style="margin-top: 20px;">Data & Privacy</div>
+
+    <div class="card">
+      <div class="card-title">📥 Export Data</div>
+      <div class="sec-note">Download all your quiz responses and progress as JSON</div>
+      <button class="btn-s" style="width: 100%; margin-top: 0;" onclick="exportUserData()">Export My Data</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🗑️ Delete Account</div>
+      <div class="sec-note" style="color: var(--fail);">Permanently delete your account and all associated data. This cannot be undone.</div>
+      <button class="btn-s" style="width: 100%; margin-top: 0; color: var(--fail); border-color: rgba(224, 92, 92, 0.3);" onclick="showModal('delete-account-modal')">Delete Account</button>
+    </div>
+
+    <div class="legal-footer" style="margin-top: 30px;">
+      Version 1.0 • <a href="/privacy.html" target="_blank">Privacy</a> · <a href="/terms.html" target="_blank">Terms</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODALS -->
+<!-- ============================================ -->
+
+<!-- CHANGE EMAIL MODAL -->
+<div class="overlay" id="change-email-modal">
+  <div class="modal">
+    <div class="modal-title">Change Email</div>
+    <div class="field-lbl">New Email</div>
+    <input type="email" id="new-email-input" class="field" placeholder="you@example.com" autocomplete="email"/>
+    <div id="change-email-err" class="err-msg"></div>
+    <div id="change-email-ok" class="ok-msg"></div>
+    <button class="btn-p" onclick="changeEmail()">Send Verification</button>
+    <button class="modal-cancel" onclick="closeModal('change-email-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="overlay" id="change-password-modal">
+  <div class="modal">
+    <div class="modal-title">Change Password</div>
+    <div class="field-lbl">Current Password</div>
+    <input type="password" id="current-password-input" class="field" placeholder="••••••••" autocomplete="current-password"/>
+    <div class="field-lbl" style="margin-top: 12px;">New Password</div>
+    <input type="password" id="new-password-input" class="field" placeholder="••••••••" autocomplete="new-password"/>
+    <div class="field-lbl" style="margin-top: 12px;">Confirm Password</div>
+    <input type="password" id="confirm-password-input" class="field" placeholder="••••••••" autocomplete="new-password"/>
+    <div id="change-password-err" class="err-msg"></div>
+    <div id="change-password-ok" class="ok-msg"></div>
+    <button class="btn-p" onclick="changePassword()">Update Password</button>
+    <button class="modal-cancel" onclick="closeModal('change-password-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- DELETE ACCOUNT MODAL -->
+<div class="overlay" id="delete-account-modal">
+  <div class="modal">
+    <div class="confirm-icon">⚠️</div>
+    <div class="modal-title" style="text-align: center;">Delete Account?</div>
+    <div class="confirm-body">All your data will be permanently deleted. This cannot be undone.</div>
+    <div class="field-lbl" style="margin-top: 16px;">Type your email to confirm:</div>
+    <input type="email" id="delete-confirm-email" class="field" placeholder="your@email.com" autocomplete="email"/>
+    <div id="delete-account-err" class="err-msg"></div>
+    <button class="btn-p confirm-action-btn" onclick="deleteAccount()">Delete My Account</button>
+    <button class="modal-cancel" onclick="closeModal('delete-account-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- JAVASCRIPT -->
+<!-- ============================================ -->
+
+<script>
+// Load user account data on settings open
+async function loadAccountData() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Display email
+    document.getElementById('email-display').textContent = user.email || 'Not set';
+
+    // Fetch subscription tier from user_accounts (if exists)
+    const { data: account } = await supabase
+      .from('user_accounts')
+      .select('subscription_tier')
+      .eq('user_id', user.id)
+      .single();
+
+    if (account) {
+      const tierDisplay = account.subscription_tier === 'free'
+        ? 'Free'
+        : account.subscription_tier.charAt(0).toUpperCase() + account.subscription_tier.slice(1);
+      document.getElementById('plan-display').textContent = tierDisplay;
+    }
+  } catch (err) {
+    console.error('Error loading account data:', err);
+  }
+}
+
+// Change email
+async function changeEmail() {
+  const newEmail = document.getElementById('new-email-input').value.trim();
+  const errEl = document.getElementById('change-email-err');
+  const okEl = document.getElementById('change-email-ok');
+
+  errEl.textContent = '';
+  okEl.textContent = '';
+
+  if (!newEmail) {
+    errEl.textContent = 'Please enter a new email';
+    return;
+  }
+
+  try {
+    const { error } = await supabase.auth.updateUser({ email: newEmail });
+    if (error) throw error;
+
+    okEl.textContent = 'Verification link sent to ' + newEmail;
+    setTimeout(() => closeModal('change-email-modal'), 2000);
+  } catch (err) {
+    errEl.textContent = err.message;
+  }
+}
+
+// Change password
+async function changePassword() {
+  const newPassword = document.getElementById('new-password-input').value;
+  const confirmPassword = document.getElementById('confirm-password-input').value;
+  const errEl = document.getElementById('change-password-err');
+  const okEl = document.getElementById('change-password-ok');
+
+  errEl.textContent = '';
+  okEl.textContent = '';
+
+  if (newPassword !== confirmPassword) {
+    errEl.textContent = 'Passwords do not match';
+    return;
+  }
+
+  if (newPassword.length < 6) {
+    errEl.textContent = 'Password must be at least 6 characters';
+    return;
+  }
+
+  try {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+
+    okEl.textContent = 'Password updated successfully';
+    setTimeout(() => closeModal('change-password-modal'), 2000);
+  } catch (err) {
+    errEl.textContent = err.message;
+  }
+}
+
+// Delete account
+async function deleteAccount() {
+  const confirmEmail = document.getElementById('delete-confirm-email').value.trim();
+  const errEl = document.getElementById('delete-account-err');
+
+  errEl.textContent = '';
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || confirmEmail !== user.email) {
+    errEl.textContent = 'Email does not match';
+    return;
+  }
+
+  try {
+    // Note: Client-side deletion requires a backend function
+    // For now, show a placeholder. Later, create a Supabase Edge Function
+    // that calls supabase.auth.admin.deleteUser(user.id)
+
+    showToast('Contact support to delete your account');
+    // TODO: Create Supabase Edge Function for account deletion
+  } catch (err) {
+    errEl.textContent = err.message;
+  }
+}
+
+// Export user data
+async function exportUserData() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Fetch all progress data
+    const { data: progress, error } = await supabase
+      .from('user_progress')
+      .select('*')
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+
+    // Create JSON file
+    const dataStr = JSON.stringify(progress, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `kanpassit-export-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showToast('Data exported');
+  } catch (err) {
+    showToast('Error: ' + err.message);
+  }
+}
+
+// Sign out all devices
+async function signOutAllDevices() {
+  try {
+    await supabase.auth.signOut({ scope: 'global' });
+    showToast('Signed out everywhere');
+    setTimeout(() => location.reload(), 1000);
+  } catch (err) {
+    showToast('Error: ' + err.message);
+  }
+}
+
+// Modal helpers
+function showModal(modalId) {
+  document.getElementById(modalId).classList.add('open');
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('open');
+}
+
+// Hook into your existing page show logic
+// When settings page opens, load account data
+const originalShowPage = window.showPage || function(){};
+window.showPage = function(pageId) {
+  if (pageId === 'settings') {
+    loadAccountData();
+  }
+  originalShowPage(pageId);
+};
+</script>

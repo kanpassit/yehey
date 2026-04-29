@@ -1,0 +1,2 @@
+Working directory: C:\Users\Mark Quion\Documents\Claude\Projects\Flashcards
+Git repository check:

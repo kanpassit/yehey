@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FlashAI · AB-900</title>
+  <style>
+    :root {
+      --bg: #0d0d1a;
+      --surface: #16162a;
+      --surface2: #1e1e38;
+      --accent: #0078d4;
+      --accent2: #6264a7;
+      --text: #f0f0f5;
+      --text2: #8888aa;
+      --border: #252540;
+      --know: #2ecc71;
+      --learning: #e05c5c;
+      --radius: 18px;
+      --shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      padding: 14px 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 50;
+      border-bottom: 1px solid var(--border);
+    }
+    .app-logo {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      background: linear-gradient(125deg, #0078d4 0%, #6264a7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .streak-pill {
+      background: linear-gradient(125deg, #f39c12, #e74c3c);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 11px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    /* ── PROGRESS ── */
+    .progress-wrap { padding: 12px 20px 0; }
+    .progress-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 7px; }
+    .progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #0078d4, #6264a7); border-radius: 2px; transition: width .4s ease; }
+
+    /* ── CATEGORY CHIPS ── */
+    .chips { display: flex; gap: 7px; padding: 13px 20px; overflow-x: auto; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      padding: 5px 13px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all .18s;
+      color: var(--text2);
+      background: transparent;
+      user-select: none;
+    }
+    .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .chip:hover:not(.active) { border-color: var(--accent); color: var(--text); }
+
+    /* ── CARD ── */
+    .card-area { padding: 0 20px; user-select: none; }
+    .card-wrap { width: 100%; aspect-ratio: 3/2.1; perspective: 1000px; cursor: pointer; }
+    .card-inner {
+      width: 100%; height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .55s cubic-bezier(.4,0,.2,1);
+      position: relative;
+    }
+    .card-wrap.flipped .card-inner { transform: rotateY(180deg); }
+    .card-face {
+      position: absolute; width: 100%; height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: var(--radius);
+      padding: 22px 22px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow);
+    }
+    .card-front { background: var(--surface2); border: 1px solid var(--border); }
+    .card-back  { background: #0d2240; border: 1px solid #1a3a60; transform: rotateY(180deg); }
+    .card-tag { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text2); }
+    .card-body { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px 4px; }
+    .card-q { font-size: 17px; font-weight: 650; line-height: 1.45; }
+    .card-a { font-size: 14px; line-height: 1.65; color: #cce4ff; }
+    .card-foot { display: flex; justify-content: space-between; align-items: center; }
+    .cat-badge { font-size: 10px; padding: 3px 9px; border-radius: 10px; background: rgba(0,120,212,.18); color: #5aadff; font-weight: 600; }
+    .hint { font-size: 11px; color: var(--text2); }
+
+    /* ── ACTIONS ── */
+    .actions { display: flex; gap: 11px; padding: 14px 20px 0; }
+    .btn {
+      flex: 1; padding: 13px; border-radius: 12px; border: none;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: all .17s; display: flex; align-items: center; justify-content: center; gap: 7px;
+    }
+    .btn-no  { background: rgba(224,92,92,.13);  color: #ff7070; border: 1px solid rgba(224,92,92,.28); }
+    .btn-yes { background: rgba(46,204,113,.13); color: #2ecc71; border: 1px solid rgba(46,204,113,.28); }
+    .btn:hover { opacity: .82; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    /* ── AI BUTTON ── */
+    .ai-wrap { padding: 11px 20px 0; }
+    .btn-ai {
+      width: 100%; padding: 11px;
+      border-radius: 12px;
+      border: 1px solid rgba(98,100,167,.35);
+      background: rgba(98,100,167,.09);
+      color: #9092cc;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all .17s;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+    }
+    .btn-ai:hover { background: rgba(98,100,167,.18); color: #b0b2e0; }
+    .ai-cred { font-size: 11px; color: var(--text2); }
+
+    /* ── PREMIUM BANNER ── */
+    .premium-bar {
+      margin: 12px 20px 0;
+      background: linear-gradient(125deg,rgba(0,120,212,.12),rgba(98,100,167,.12));
+      border: 1px solid rgba(98,100,167,.28);
+      border-radius: 12px;
+      padding: 13px 15px;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .premium-bar p { font-size: 12px; line-height: 1.5; color: var(--text2); }
+    .premium-bar strong { color: #9092cc; }
+    .btn-upgrade {
+      padding: 7px 14px; border-radius: 8px;
+      background: linear-gradient(125deg,#0078d4,#6264a7);
+      color: #fff; border: none; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+
+    /* ── BOTTOM NAV ── */
+    .nav {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 480px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 50;
+    }
+    .nav-btn {
+      flex: 1; padding: 10px 4px 8px;
+      background: none; border: none; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      color: var(--text2); font-size: 10px; font-weight: 600; transition: color .17s;
+    }
+    .nav-btn.active { color: var(--accent); }
+    .nav-btn svg { width: 20px; height: 20px; }
+
+    /* ── PAGES ── */
+    .page { display: none; padding-bottom: 72px; }
+    .page.active { display: block; }
+
+    /* ── COMPLETION ── */
+    .done-screen { padding: 40px 20px; text-align: center; }
+    .done-emoji { font-size: 60px; margin-bottom: 14px; }
+    .done-h { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .done-sub { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 24px; }
+    .btn-restart {
+      width: 100%; padding: 14px; border-radius: 12px;
+      background: linear-gradient(125deg,#0078d4,#6264a7);
+      color: #fff; border: none; font-size: 15px; font-weight: 700; cursor: pointer;
+    }
+
+    /* ── BROWSE ── */
+    .browse-list { padding: 14px 20px; display: flex; flex-direction: column; gap: 9px; }
+    .b-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 13px 15px; cursor: pointer; transition: border-color .17s;
+    }
+    .b-card:hover { border-color: var(--accent); }
+    .b-q { font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+    .b-a { font-size: 12px; color: var(--text2); line-height: 1.4; }
+    .b-meta { display: flex; gap: 7px; margin-top: 7px; align-items: center; }
+    .b-cat { font-size: 10px; padding: 2px 8px; border-radius: 9px; background: rgba(0,120,212,.15); color: #5aadff; font-weight: 600; }
+    .b-status-k { font-size: 11px; color: var(--know); }
+    .b-status-l { font-size: 11px; color: var(--learning); }
+    .b-status-u { font-size: 11px; color: var(--text2); }
+
+    /* ── STATS ── */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; padding: 18px 20px 4px; }
+    .s-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; }
+    .s-num {
+      font-size: 34px; font-weight: 800;
+      background: linear-gradient(125deg,#0078d4,#6264a7);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .s-lbl { font-size: 12px; color: var(--text2); margin-top: 3px; }
+    .section-lbl { padding: 16px 20px 8px; font-size: 11px; font-weight: 700; color: var(--text2); letter-spacing: .8px; text-transform: uppercase; }
+    .domain-row { display: flex; align-items: center; gap: 11px; padding: 11px 20px; border-bottom: 1px solid var(--border); }
+    .domain-name { flex: 1; font-size: 13px; }
+    .domain-sub { font-size: 11px; color: var(--text2); }
+    .d-bar-wrap { width: 72px; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .d-bar { height: 100%; border-radius: 3px; }
+    .d-pct { font-size: 11px; color: var(--text2); width: 28px; text-align: right; }
+
+    /* ── SETTINGS ── */
+    .settings-body { padding: 18px 20px; }
+    .settings-sec-title { font-size: 11px; font-weight: 700; color: var(--text2); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 10px; }
+    .settings-note { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 12px; }
+    .settings-note a { color: #5aadff; text-decoration: none; }
+    .api-input {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 13px; color: var(--text);
+      font-size: 13px; font-family: monospace;
+    }
+    .api-input:focus { outline: none; border-color: var(--accent); }
+    .btn-save {
+      width: 100%; margin-top: 9px; padding: 11px; border-radius: 10px;
+      background: var(--accent); color: #fff; border: none; font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+    .s-row {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 11px;
+      padding: 13px 15px; margin-bottom: 9px;
+      display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+    }
+    .s-row-lbl { font-size: 14px; }
+    .s-row-val { font-size: 13px; color: var(--text2); }
+    .mt { margin-top: 22px; }
+
+    /* ── AI MODAL ── */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.72);
+      z-index: 200; display: none; align-items: flex-end;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      width: 100%; max-width: 480px; margin: 0 auto;
+      background: var(--surface); border-radius: 22px 22px 0 0;
+      padding: 22px 20px calc(22px + env(safe-area-inset-bottom));
+      max-height: 72vh; overflow-y: auto;
+    }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .modal-title { font-size: 15px; font-weight: 800; }
+    .modal-close {
+      background: var(--border); border: none; color: var(--text);
+      width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+      font-size: 13px; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-q { font-size: 12px; color: var(--text2); margin-bottom: 12px; line-height: 1.5; }
+    .ai-response {
+      font-size: 14px; line-height: 1.75; color: var(--text2);
+      padding: 14px; background: var(--surface2);
+      border-radius: 10px; border-left: 3px solid var(--accent2);
+    }
+    .ai-loading { display: flex; align-items: center; gap: 10px; color: var(--text2); font-size: 14px; padding: 14px; }
+    .spinner {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--border); border-top-color: var(--accent);
+      animation: spin .8s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 78px; left: 50%; transform: translateX(-50%) translateY(12px);
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 9px 17px; font-size: 13px; opacity: 0; transition: all .28s;
+      z-index: 300; pointer-events: none; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════
+     STUDY PAGE
+═══════════════════════════════════ -->
+<div class="page active" id="page-study">
+  <div class="header">
+    <div class="app-logo">FlashAI · AB-900</div>
+    <div class="streak-pill">🔥 <span id="streak-val">0</span></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span id="prog-label">Card 1 of 20</span>
+      <span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="chips" id="chips">
+    <div class="chip active" data-cat="all" onclick="setCategory('all',this)">All</div>
+    <div class="chip" data-cat="M365 Core" onclick="setCategory('M365 Core',this)">M365 Core</div>
+    <div class="chip" data-cat="Data & Governance" onclick="setCategory('Data & Governance',this)">Data &amp; Governance</div>
+    <div class="chip" data-cat="Copilot" onclick="setCategory('Copilot',this)">Copilot</div>
+    <div class="chip" data-cat="Agents" onclick="setCategory('Agents',this)">Agents</div>
+  </div>
+
+  <div class="card-area">
+    <div class="card-wrap" id="card-wrap" onclick="flip()">
+      <div class="card-inner" id="card-inner">
+        <div class="card-face card-front">
+          <div class="card-tag">Question</div>
+          <div class="card-body"><div class="card-q" id="card-q">Loading…</div></div>
+          <div class="card-foot">
+            <div class="cat-badge" id="cat-front">—</div>
+            <div class="hint">tap to reveal ↩</div>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-tag">Answer</div>
+          <div class="card-body"><div class="card-a" id="card-a">—</div></div>
+          <div class="card-foot">
+            <div class="cat-badge" id="cat-back">—</div>
+            <div class="hint">tap to flip ↩</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions" id="actions" style="display:none">
+    <button class="btn btn-no"  onclick="rate(false)">😅 Still Learning</button>
+    <button class="btn btn-yes" onclick="rate(true)">✓ Got It</button>
+  </div>
+
+  <div class="ai-wrap">
+    <button class="btn-ai" onclick="openAI()">
+      ✦ Ask AI to explain this
+      <span class="ai-cred" id="ai-cred-lbl"></span>
+    </button>
+  </div>
+
+  <div class="premium-bar" id="prem-bar" style="display:none">
+    <p><strong>Unlock Premium</strong><br>All 50 cards + unlimited AI + spaced repetition</p>
+    <button class="btn-upgrade" onclick="toast('Premium coming soon!')">Upgrade</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     BROWSE PAGE
+═══════════════════════════════════ -->
+<div class="page" id="page-browse">
+  <div class="header">
+    <div class="app-logo">Browse</div>
+    <div style="font-size:12px;color:var(--text2)" id="browse-count">50 cards</div>
+  </div>
+  <div class="browse-list" id="browse-list"></div>
+</div>
+
+<!-- ═══════════════════════════════════
+     STATS PAGE
+═══════════════════════════════════ -->
+<div class="page" id="page-stats">
+  <div class="header"><div class="app-logo">Progress</div></div>
+  <div class="stats-grid">
+    <div class="s-card"><div class="s-num" id="st-known">0</div><div class="s-lbl">Cards Known</div></div>
+    <div class="s-card"><div class="s-num" id="st-seen">0</div><div class="s-lbl">Cards Seen</div></div>
+    <div class="s-card"><div class="s-num" id="st-streak">0</div><div class="s-lbl">Day Streak</div></div>
+    <div class="s-card"><div class="s-num" id="st-ai">0</div><div class="s-lbl">AI Queries</div></div>
+  </div>
+  <div class="section-lbl">Domain Breakdown</div>
+  <div id="domain-rows"></div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SETTINGS PAGE
+═══════════════════════════════════ -->
+<div class="page" id="page-settings">
+  <div class="header"><div class="app-logo">Settings</div></div>
+  <div class="settings-body">
+    <div class="settings-sec-title">AI Integration (Claude API)</div>
+    <p class="settings-note">
+      Enter your Anthropic API key to power AI explanations. Stored only on this device.<br>
+      Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
+    </p>
+    <input type="password" id="api-input" class="api-input" placeholder="sk-ant-api03-…" />
+    <button class="btn-save" onclick="saveKey()">Save API Key</button>
+
+    <div class="settings-sec-title mt">Study Controls</div>
+    <div class="s-row" onclick="doShuffle()">
+      <span class="s-row-lbl">Shuffle Cards</span>
+      <span class="s-row-val">🔀</span>
+    </div>
+    <div class="s-row" onclick="doReset()">
+      <span class="s-row-lbl">Reset All Progress</span>
+      <span class="s-row-val">↺</span>
+    </div>
+
+    <div class="settings-sec-title mt">About</div>
+    <div class="s-row" style="cursor:default"><span class="s-row-lbl">Exam</span><span class="s-row-val">AB-900</span></div>
+    <div class="s-row" style="cursor:default"><span class="s-row-lbl">Total Cards</span><span class="s-row-val">50</span></div>
+    <div class="s-row" style="cursor:default"><span class="s-row-lbl">Free Tier</span><span class="s-row-val">20 cards · 3 AI/day</span></div>
+    <div class="s-row" style="cursor:default"><span class="s-row-lbl">Version</span><span class="s-row-val">1.0.0</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     BOTTOM NAV
+═══════════════════════════════════ -->
+<nav class="nav">
+  <button class="nav-btn active" id="nav-study" onclick="showPage('study')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    Study
+  </button>
+  <button class="nav-btn" id="nav-browse" onclick="showPage('browse')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.2" fill="currentColor"/><circle cx="3" cy="12" r="1.2" fill="currentColor"/><circle cx="3" cy="18" r="1.2" fill="currentColor"/></svg>
+    Browse
+  </button>
+  <button class="nav-btn" id="nav-stats" onclick="showPage('stats')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Stats
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="showPage('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════
+     AI MODAL
+═══════════════════════════════════ -->
+<div class="overlay" id="ai-overlay" onclick="closeAI(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">✦ AI Explanation</div>
+      <button class="modal-close" onclick="closeAI()">✕</button>
+    </div>
+    <div class="modal-q" id="ai-modal-q"></div>
+    <div id="ai-modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// FLASHCARD DATA — AB-900 (50 cards)
+// ═══════════════════════════════════════════════════════════
+const CARDS = [
+
+  // ── M365 Core (14 cards) ────────────────────────────────
+  { id:1,  cat:"M365 Core",
+    q:"What is Microsoft 365?",
+    a:"A cloud-based productivity and collaboration suite combining Office apps (Word, Excel, PowerPoint, Outlook), cloud services (Exchange Online, SharePoint, Teams, OneDrive), and built-in security and compliance capabilities — licensed on a monthly or annual subscription."
+  },
+  { id:2,  cat:"M365 Core",
+    q:"What is Exchange Online?",
+    a:"Microsoft's cloud-hosted email and calendar service included in Microsoft 365. It replaces on-premises Exchange servers and provides enterprise email, shared calendars, contacts, and global address lists. Copilot can read and summarize emails through Exchange Online."
+  },
+  { id:3,  cat:"M365 Core",
+    q:"What is SharePoint in Microsoft 365?",
+    a:"A cloud-based document management and team collaboration platform. Organizations use it to build intranet sites, store and share files, and manage content. SharePoint is one of Copilot's primary data sources when grounding responses in organizational content."
+  },
+  { id:4,  cat:"M365 Core",
+    q:"What is Microsoft Teams?",
+    a:"A unified communication and collaboration hub combining persistent chat, video/audio meetings, file sharing, and app integrations. Copilot is embedded in Teams to summarize meetings, recap missed chats, and assist during live calls."
+  },
+  { id:5,  cat:"M365 Core",
+    q:"What is Microsoft Entra ID?",
+    a:"Microsoft's cloud-based identity and access management (IAM) service (formerly Azure Active Directory). It handles authentication, single sign-on, multi-factor authentication, and conditional access policies for all Microsoft 365 services, including Copilot."
+  },
+  { id:6,  cat:"M365 Core",
+    q:"What is Microsoft Purview?",
+    a:"A unified data governance and compliance platform covering information protection, data loss prevention (DLP), records management, eDiscovery, audit, and insider risk management. Purview controls how Copilot accesses and handles sensitive organizational data."
+  },
+  { id:7,  cat:"M365 Core",
+    q:"What is the Microsoft 365 Admin Center?",
+    a:"The primary web portal (admin.microsoft.com) for managing a Microsoft 365 tenant — adding users, assigning licenses, configuring services, and accessing specialized admin centers for Exchange, Teams, SharePoint, Purview, and Copilot."
+  },
+  { id:8,  cat:"M365 Core",
+    q:"What is OneDrive in Microsoft 365?",
+    a:"Cloud storage for individual users included with Microsoft 365. Each user gets personal file storage accessible from any device. Copilot can access and reference files stored in OneDrive when responding to user queries, respecting the file owner's sharing permissions."
+  },
+  { id:9,  cat:"M365 Core",
+    q:"What is Microsoft Intune?",
+    a:"A cloud-based endpoint management service used to manage and secure devices (PCs, phones, tablets) that access Microsoft 365 resources. Intune can enforce device compliance policies as a condition for Copilot access via Conditional Access in Entra ID."
+  },
+  { id:10, cat:"M365 Core",
+    q:"What is a Microsoft 365 tenant?",
+    a:"A dedicated, isolated instance of Microsoft 365 services for an organization — its own users, data, apps, and configuration. Identified by a domain like contoso.onmicrosoft.com. All Copilot interactions are bounded within the tenant and never shared across tenants."
+  },
+  { id:11, cat:"M365 Core",
+    q:"What license is required for Microsoft 365 Copilot?",
+    a:"Users need BOTH a qualifying base Microsoft 365 license (E3, E5, Business Standard, or Business Premium) AND the Microsoft 365 Copilot add-on license. The add-on is assigned per user and enables the full Copilot experience inside M365 apps."
+  },
+  { id:12, cat:"M365 Core",
+    q:"What is Microsoft Graph in Microsoft 365?",
+    a:"A unified API platform that provides a single endpoint to access data across Microsoft 365 services — users, emails, files, calendar events, Teams messages. Copilot uses Microsoft Graph to retrieve organizational data in real-time, always respecting the signed-in user's permissions."
+  },
+  { id:13, cat:"M365 Core",
+    q:"What is Microsoft Viva?",
+    a:"An employee experience platform built on top of Microsoft 365 and Teams. Viva modules include Viva Insights (productivity analytics), Viva Learning (training content), and Viva Connections (intranet). Viva Insights provides Copilot adoption and usage analytics to admins."
+  },
+  { id:14, cat:"M365 Core",
+    q:"What admin centers are used to manage Microsoft 365 workloads?",
+    a:"Key admin centers include: Microsoft 365 Admin Center (users/licenses), Exchange Admin Center (email), SharePoint Admin Center (sites), Teams Admin Center (meetings/apps), Microsoft Entra Admin Center (identity), Microsoft Purview (compliance), and the Copilot admin center (copilot.cloud.microsoft)."
+  },
+
+  // ── Data & Governance (18 cards) ─────────────────────────
+  { id:15, cat:"Data & Governance",
+    q:"What are sensitivity labels in Microsoft Purview?",
+    a:"Classification tags applied to documents, emails, Teams chats, and containers (SharePoint sites, Teams). Labels like 'Confidential' or 'Public' can enforce encryption, access restrictions, and watermarks. Copilot respects sensitivity labels — it will not surface content across label boundaries the user isn't permitted to access."
+  },
+  { id:16, cat:"Data & Governance",
+    q:"What is Data Loss Prevention (DLP) in Microsoft 365?",
+    a:"A policy system that detects and prevents the inappropriate sharing of sensitive information (credit card numbers, SSNs, health records). DLP policies apply across Exchange, Teams, SharePoint, and Copilot outputs — blocking or warning when Copilot would expose sensitive data in a response."
+  },
+  { id:17, cat:"Data & Governance",
+    q:"What is a retention policy in Microsoft Purview?",
+    a:"A policy that defines how long content (emails, Teams messages, SharePoint files, Copilot interaction logs) is kept or deleted. Ensures compliance with legal and regulatory requirements. Organizations can configure retention for Copilot activity logs independently."
+  },
+  { id:18, cat:"Data & Governance",
+    q:"What is Conditional Access in Microsoft Entra ID?",
+    a:"A policy engine that grants, blocks, or limits access to resources (including Copilot) based on signals: user identity, device compliance, location, risk score, and app being accessed. Example: require MFA and a compliant device before a user can use Copilot from an unmanaged PC."
+  },
+  { id:19, cat:"Data & Governance",
+    q:"What is eDiscovery in Microsoft Purview?",
+    a:"The process of identifying, collecting, preserving, and exporting electronically stored information (ESI) for legal or regulatory proceedings. Purview eDiscovery can search Exchange, Teams, SharePoint, and Copilot interaction logs, and place content on legal hold to prevent deletion."
+  },
+  { id:20, cat:"Data & Governance",
+    q:"What is data residency in Microsoft 365?",
+    a:"The geographic location where Microsoft stores an organization's data at rest. Enterprises in regulated industries (e.g., EU GDPR) can use data residency commitments or Multi-Geo configurations to ensure M365 and Copilot data stays within required geographic boundaries."
+  },
+  { id:21, cat:"Data & Governance",
+    q:"What is Microsoft Purview Audit?",
+    a:"A logging service that records user and admin activities across Microsoft 365 services, including Copilot prompts and responses. Audit Standard provides 90-day log retention; Audit Premium extends to 1 year (or longer) and adds intelligent insights for security investigations."
+  },
+  { id:22, cat:"Data & Governance",
+    q:"What are information barriers (IB)?",
+    a:"Policies that restrict communication between defined user segments to prevent conflicts of interest (e.g., separating an investment banking group from a trading desk). Information barriers apply to Teams, SharePoint, and Copilot — Copilot won't surface content across IB-restricted boundaries."
+  },
+  { id:23, cat:"Data & Governance",
+    q:"What is Customer Lockbox?",
+    a:"A feature that requires explicit customer approval before a Microsoft support engineer can access organizational content to resolve a support case. All access requests are logged in the Microsoft 365 audit log, providing an auditable chain of custody."
+  },
+  { id:24, cat:"Data & Governance",
+    q:"How does Copilot handle sensitivity-labeled content?",
+    a:"Copilot respects Microsoft Purview sensitivity labels. It only accesses content the signed-in user already has permission to see. If Copilot generates a response combining content from multiple documents, the output inherits the most restrictive sensitivity label present."
+  },
+  { id:25, cat:"Data & Governance",
+    q:"What is communication compliance in Microsoft Purview?",
+    a:"A feature that monitors Teams, email, and other communications for policy violations — inappropriate language, sensitive data sharing, regulatory breaches. Communication compliance policies can be extended to monitor Copilot-generated content, helping organizations meet financial and HR regulatory requirements."
+  },
+  { id:26, cat:"Data & Governance",
+    q:"What is Privileged Identity Management (PIM) in Microsoft Entra?",
+    a:"A service for just-in-time, time-bound assignment of privileged admin roles rather than permanent assignment. Reduces the attack surface by ensuring admin roles (including Copilot admin roles) are active only when needed, with approval workflows and audit trails."
+  },
+  { id:27, cat:"Data & Governance",
+    q:"What are Microsoft's six responsible AI principles?",
+    a:"Microsoft's responsible AI framework for Copilot and all AI products is guided by: Fairness, Reliability & Safety, Privacy & Security, Inclusiveness, Transparency, and Accountability. These principles are reflected in how Copilot is designed to cite sources, avoid harmful outputs, and respect user permissions."
+  },
+  { id:28, cat:"Data & Governance",
+    q:"Does Microsoft train AI models on your Microsoft 365 Copilot data?",
+    a:"No. Microsoft does not use customer content (prompts, responses, or referenced documents) from Microsoft 365 Copilot to train foundation AI models. Copilot interactions are bounded within the customer's tenant. Microsoft's enterprise data protection commitments apply."
+  },
+  { id:29, cat:"Data & Governance",
+    q:"What is the Microsoft Purview Compliance Portal?",
+    a:"The admin center (compliance.microsoft.com) for managing compliance features: DLP policies, sensitivity labels, retention policies, eDiscovery, insider risk, communication compliance, audit, and information barriers. A required tool for admins governing Copilot in regulated environments."
+  },
+  { id:30, cat:"Data & Governance",
+    q:"What is insider risk management in Microsoft Purview?",
+    a:"A solution that uses machine learning to detect potentially risky activities by users inside the organization — such as mass file downloads before resignation, or unusual data exfiltration. Insider risk signals can include anomalous interactions with Copilot or large-scale use of Copilot to access sensitive files."
+  },
+  { id:31, cat:"Data & Governance",
+    q:"What is multi-factor authentication (MFA) and why is it important for Copilot?",
+    a:"MFA requires users to verify their identity with two or more factors (password + phone approval, authenticator app, etc.). Since Copilot can access a wide range of organizational data on behalf of the user, ensuring strong identity verification via MFA is a critical security baseline before granting Copilot access."
+  },
+  { id:32, cat:"Data & Governance",
+    q:"What is oversharing risk with Microsoft 365 Copilot?",
+    a:"Because Copilot surfaces content based on the user's existing Microsoft 365 permissions, files that were broadly shared (e.g., 'Everyone' SharePoint permissions) become easily discoverable through Copilot. Admins should audit SharePoint permissions, use sensitivity labels, and apply access governance to minimize oversharing exposure before Copilot rollout."
+  },
+
+  // ── Copilot (10 cards) ────────────────────────────────────
+  { id:33, cat:"Copilot",
+    q:"What is Microsoft 365 Copilot?",
+    a:"An AI assistant embedded in Microsoft 365 apps (Word, Excel, PowerPoint, Outlook, Teams) that uses large language models (LLMs) grounded in real-time organizational data via Microsoft Graph. It helps users draft content, summarize documents and meetings, analyze data, and answer questions based on their work data."
+  },
+  { id:34, cat:"Copilot",
+    q:"What is 'grounding' in the context of Microsoft 365 Copilot?",
+    a:"Grounding connects the LLM's responses to specific, up-to-date organizational data from Microsoft Graph (emails, files, calendars, Teams messages). Without grounding, Copilot would give generic AI answers; with grounding, it gives relevant answers about your actual work — like 'Summarize last week's Teams messages from the sales channel.'"
+  },
+  { id:35, cat:"Copilot",
+    q:"Where do admins manage Microsoft 365 Copilot settings?",
+    a:"In the Microsoft 365 Admin Center (admin.microsoft.com) under Settings → Copilot, and in the dedicated Copilot admin center (copilot.cloud.microsoft). Key settings include enabling/disabling web content access, managing pinned features, and accessing Copilot usage reports."
+  },
+  { id:36, cat:"Copilot",
+    q:"How do you assign the Microsoft 365 Copilot license?",
+    a:"In the Microsoft 365 Admin Center: Users → Active Users → select a user → Licenses and Apps → check Microsoft 365 Copilot. Bulk assignment is possible via group-based licensing in Entra ID or PowerShell. The user must also have a qualifying base M365 license (E3, E5, Business Standard, Business Premium)."
+  },
+  { id:37, cat:"Copilot",
+    q:"What are Copilot usage reports?",
+    a:"Reports available in the Microsoft 365 Admin Center (Reports → Usage → Microsoft 365 Copilot) and via Viva Insights showing active users, features used (by app), prompts sent, and adoption trends over time. Admins use these to track ROI and identify opportunities to drive adoption."
+  },
+  { id:38, cat:"Copilot",
+    q:"What is prompt governance for Copilot?",
+    a:"Administrative controls that manage what users can ask Copilot and what it can return. Includes DLP policies (blocking sensitive data in outputs), communication compliance policies (monitoring prompts/responses for violations), and content filtering. Helps organizations use Copilot responsibly in regulated industries."
+  },
+  { id:39, cat:"Copilot",
+    q:"How can admins control Copilot's access to web content?",
+    a:"In the Copilot admin center or Microsoft 365 Admin Center (Settings → Copilot), admins can toggle 'Web search for Copilot' off to prevent Copilot from incorporating public internet results. With it on, Copilot can reference current web information to supplement organizational data."
+  },
+  { id:40, cat:"Copilot",
+    q:"What adoption strategies does Microsoft recommend for Copilot rollout?",
+    a:"Microsoft recommends: 1) Identify champion users in each department, 2) Provide prompt engineering training (Microsoft offers prompt guides per app), 3) Share scenario-based use case libraries, 4) Use Viva Learning for training content delivery, 5) Monitor adoption via usage reports, 6) Create internal Copilot communities of practice."
+  },
+  { id:41, cat:"Copilot",
+    q:"What is Copilot for Microsoft 365 vs. Copilot for Security vs. Copilot in Windows?",
+    a:"Microsoft 365 Copilot: productivity AI in M365 apps, grounded in org data. Copilot for Security: separate product for SOC analysts, grounded in security signals (Defender, Sentinel). Copilot in Windows: consumer/OS-level assistant. Each requires separate licensing and has different data access and admin controls."
+  },
+  { id:42, cat:"Copilot",
+    q:"What is the difference between Copilot (M365) and a Copilot agent?",
+    a:"Microsoft 365 Copilot is a general-purpose AI assistant working across M365 apps. An agent is a purpose-built AI experience scoped to a specific task, role, or data source — built with Copilot Studio. Example: a 'HR Policy Agent' that only answers questions about your company's HR policies using a SharePoint site as its knowledge source."
+  },
+
+  // ── Agents (8 cards) ─────────────────────────────────────
+  { id:43, cat:"Agents",
+    q:"What is Microsoft Copilot Studio?",
+    a:"A low-code platform for building, testing, and publishing custom AI agents and copilots. Business users and developers use Copilot Studio to create agents that answer questions from specific knowledge sources (SharePoint, websites, Dataverse), trigger Power Automate workflows, and deploy to Teams, websites, or other channels."
+  },
+  { id:44, cat:"Agents",
+    q:"What is a declarative agent?",
+    a:"A type of Microsoft 365 Copilot agent that extends Copilot by providing a specific persona, instructions, and scoped knowledge sources — without custom code or a separate AI model. Declarative agents run on the Microsoft 365 Copilot infrastructure, inherit the same security boundaries, and appear in the Copilot app interface."
+  },
+  { id:45, cat:"Agents",
+    q:"What is a custom engine agent?",
+    a:"An agent built in Copilot Studio that uses its own AI model, orchestration, and logic — independent of the Microsoft 365 Copilot LLM. Suitable for complex, specialized scenarios requiring custom AI behavior. Requires more configuration than a declarative agent and may consume Power Platform capacity."
+  },
+  { id:46, cat:"Agents",
+    q:"How do you publish an agent to Microsoft Teams?",
+    a:"In Copilot Studio, after building and testing the agent, click Publish, then configure the Teams channel. Enterprise-wide deployment requires a Teams admin to approve the agent in the Teams Admin Center (Manage Apps). Once approved, the agent can be pinned or made available to all users in the tenant."
+  },
+  { id:47, cat:"Agents",
+    q:"How do admins govern agents in a Microsoft 365 organization?",
+    a:"Admins control agents via: 1) Teams Admin Center (approve/block agents for Teams), 2) M365 Admin Center → Integrated Apps (approve org-wide agent deployments), 3) Power Platform Admin Center (control who can create agents in Copilot Studio), 4) DLP policies (restrict which connectors agents can use)."
+  },
+  { id:48, cat:"Agents",
+    q:"What is a knowledge source in Copilot Studio?",
+    a:"A connection that tells an agent where to retrieve information — such as a SharePoint site, an uploaded document, a public website URL, or a Dataverse table. The agent uses knowledge sources to generate grounded, accurate responses instead of relying on generic LLM training data."
+  },
+  { id:49, cat:"Agents",
+    q:"How does an agent respect data permissions when accessing M365 data?",
+    a:"Agents operate under the signed-in user's permissions — they can only access data the user is already authorized to see. Agents do not elevate privileges. This means the same sensitivity labels, SharePoint permissions, and information barriers that apply to the user also apply to what the agent can surface."
+  },
+  { id:50, cat:"Agents",
+    q:"What is the role of Power Automate in Copilot Studio agents?",
+    a:"Power Automate enables agents to take actions, not just answer questions. By connecting a Power Automate cloud flow to an agent, it can trigger workflows like creating a support ticket in ServiceNow, sending an approval email, updating a Dataverse record, or posting a message to Teams — making the agent truly agentic."
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// CONSTANTS & STATE
+// ═══════════════════════════════════════════════════════════
+const FREE_CARDS = 20;
+const FREE_AI_DAILY = 3;
+
+let S = JSON.parse(localStorage.getItem('ab900v1') || 'null') || {
+  known: {}, seen: {}, streak: 0, lastDate: null,
+  aiToday: 0, aiDate: null, aiTotal: 0,
+  isPremium: false, apiKey: '',
+  activeCat: 'all', idx: 0
+};
+
+let deck = [];     // current filtered + ordered deck
+let flipped = false;
+
+function save() { localStorage.setItem('ab900v1', JSON.stringify(S)); }
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+function init() {
+  // Reset daily AI quota
+  const today = new Date().toDateString();
+  if (S.aiDate !== today) { S.aiToday = 0; S.aiDate = today; }
+
+  // Streak logic
+  if (S.lastDate) {
+    const last = new Date(S.lastDate);
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+    if (last.toDateString() !== yesterday.toDateString() &&
+        last.toDateString() !== today) {
+      S.streak = 0;
+    }
+  }
+
+  if (S.apiKey) document.getElementById('api-input').value = S.apiKey;
+
+  // Restore chip state
+  const activeChip = document.querySelector(`.chip[data-cat="${S.activeCat || 'all'}"]`);
+  buildDeck(S.activeCat || 'all');
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  if (activeChip) activeChip.classList.add('active');
+
+  showCard(S.idx || 0);
+  updateStreak();
+  updateAICred();
+}
+
+// ═══════════════════════════════════════════════════════════
+// DECK
+// ═══════════════════════════════════════════════════════════
+function buildDeck(cat) {
+  if (cat === 'all') deck = [...CARDS];
+  else deck = CARDS.filter(c => c.cat === cat);
+  if (!S.isPremium) deck = deck.slice(0, FREE_CARDS);
+}
+
+function setCategory(cat, el) {
+  S.activeCat = cat; S.idx = 0;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  buildDeck(cat);
+  restoreStudyDOM();
+  showCard(0);
+  save();
+}
+
+// ═══════════════════════════════════════════════════════════
+// CARD DISPLAY
+// ═══════════════════════════════════════════════════════════
+function showCard(idx) {
+  if (!deck.length) return;
+  if (idx >= deck.length) { showDone(); return; }
+
+  const card = deck[idx];
+  S.idx = idx;
+
+  // Mark seen & update streak
+  if (!S.seen[card.id]) {
+    S.seen[card.id] = true;
+    const today = new Date().toDateString();
+    if (S.lastDate !== today) {
+      if (S.lastDate) {
+        const last = new Date(S.lastDate);
+        const yest = new Date(); yest.setDate(yest.getDate() - 1);
+        S.streak = (last.toDateString() === yest.toDateString()) ? S.streak + 1 : 1;
+      } else {
+        S.streak = 1;
+      }
+      S.lastDate = today;
+    }
+    save();
+  }
+
+  flipped = false;
+  document.getElementById('card-wrap').classList.remove('flipped');
+  document.getElementById('actions').style.display = 'none';
+
+  document.getElementById('card-q').textContent = card.q;
+  document.getElementById('card-a').textContent = card.a;
+  document.getElementById('cat-front').textContent = card.cat;
+  document.getElementById('cat-back').textContent = card.cat;
+
+  // Progress
+  const total = deck.length;
+  const pct = total > 1 ? Math.round((idx / (total - 1)) * 100) : 100;
+  document.getElementById('prog-label').textContent = `Card ${idx + 1} of ${total}`;
+  document.getElementById('prog-pct').textContent = `${pct}%`;
+  document.getElementById('prog-fill').style.width = pct + '%';
+
+  updateStreak();
+  updateAICred();
+
+  // Premium nudge near limit
+  const showBanner = !S.isPremium && deck.length === FREE_CARDS && idx >= FREE_CARDS - 4;
+  document.getElementById('prem-bar').style.display = showBanner ? 'flex' : 'none';
+}
+
+function flip() {
+  flipped = !flipped;
+  document.getElementById('card-wrap').classList.toggle('flipped', flipped);
+  document.getElementById('actions').style.display = flipped ? 'flex' : 'none';
+}
+
+function rate(knew) {
+  const card = deck[S.idx];
+  if (!card) return;
+  S.known[card.id] = knew;
+  save();
+  S.idx++;
+  if (S.idx >= deck.length) showDone();
+  else showCard(S.idx);
+  renderStats();
+}
+
+function updateStreak() {
+  document.getElementById('streak-val').textContent = S.streak || 0;
+}
+
+function updateAICred() {
+  const lbl = document.getElementById('ai-cred-lbl');
+  if (S.isPremium) { lbl.textContent = '(unlimited)'; return; }
+  const rem = FREE_AI_DAILY - (S.aiToday || 0);
+  lbl.textContent = `(${Math.max(0,rem)} free today)`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// DONE SCREEN
+// ═══════════════════════════════════════════════════════════
+function showDone() {
+  const known = deck.filter(c => S.known[c.id] === true).length;
+  const pct = deck.length ? Math.round((known / deck.length) * 100) : 0;
+  const emoji = pct >= 80 ? '🎉' : pct >= 50 ? '💪' : '📚';
+  const title = pct >= 80 ? 'Excellent work!' : pct >= 50 ? 'Good progress!' : 'Keep going!';
+
+  document.querySelector('.card-area').innerHTML = `
+    <div class="done-screen">
+      <div class="done-emoji">${emoji}</div>
+      <div class="done-h">${title}</div>
+      <div class="done-sub">You knew ${known} of ${deck.length} cards (${pct}%)</div>
+      <button class="btn-restart" onclick="doRestart()">Study Again</button>
+    </div>`;
+  document.getElementById('actions').style.display = 'none';
+  document.querySelector('.ai-wrap').style.display = 'none';
+}
+
+function doRestart() {
+  S.idx = 0; save();
+  restoreStudyDOM();
+  showCard(0);
+  document.querySelector('.ai-wrap').style.display = 'block';
+}
+
+function restoreStudyDOM() {
+  document.querySelector('.card-area').innerHTML = `
+    <div class="card-wrap" id="card-wrap" onclick="flip()">
+      <div class="card-inner" id="card-inner">
+        <div class="card-face card-front">
+          <div class="card-tag">Question</div>
+          <div class="card-body"><div class="card-q" id="card-q">Loading…</div></div>
+          <div class="card-foot">
+            <div class="cat-badge" id="cat-front">—</div>
+            <div class="hint">tap to reveal ↩</div>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-tag">Answer</div>
+          <div class="card-body"><div class="card-a" id="card-a">—</div></div>
+          <div class="card-foot">
+            <div class="cat-badge" id="cat-back">—</div>
+            <div class="hint">tap to flip ↩</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// AI EXPLANATION
+// ═══════════════════════════════════════════════════════════
+function openAI() {
+  if (!S.isPremium && S.aiToday >= FREE_AI_DAILY) {
+    toast('Daily AI limit reached — upgrade for unlimited!'); return;
+  }
+  if (!S.apiKey) {
+    toast('Add your API key in Settings first'); showPage('settings'); return;
+  }
+  const card = deck[S.idx];
+  if (!card) return;
+
+  document.getElementById('ai-overlay').classList.add('open');
+  document.getElementById('ai-modal-q').textContent = `Q: ${card.q}`;
+  document.getElementById('ai-modal-body').innerHTML =
+    `<div class="ai-loading"><div class="spinner"></div>Asking Claude…</div>`;
+
+  callClaude(card);
+}
+
+async function callClaude(card) {
+  const prompt = `You are an expert Microsoft 365 tutor helping someone prepare for the AB-900 exam (Microsoft 365 Copilot and Agent Administration Fundamentals).
+
+The flashcard question is: "${card.q}"
+The answer is: "${card.a}"
+
+Write a concise explanation (3-5 sentences) that:
+1. Reinforces WHY this answer is correct in the context of AB-900
+2. Adds a real-world admin scenario or analogy to make it memorable
+3. Flags any related concepts or common exam traps
+
+Be direct and exam-focused. Write as flowing prose, no bullet points.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': S.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 320,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!res.ok) {
+      const e = await res.json();
+      throw new Error(e.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const text = data.content[0].text;
+    document.getElementById('ai-modal-body').innerHTML =
+      `<div class="ai-response">${text}</div>`;
+
+    S.aiToday++; S.aiTotal++; save();
+    updateAICred(); renderStats();
+
+  } catch (err) {
+    document.getElementById('ai-modal-body').innerHTML =
+      `<div class="ai-response" style="border-color:#e05c5c;color:#ff8080">
+        Error: ${err.message}<br><small>Check your API key in Settings.</small>
+       </div>`;
+  }
+}
+
+function closeAI(e) {
+  if (!e || e.target === document.getElementById('ai-overlay')) {
+    document.getElementById('ai-overlay').classList.remove('open');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// BROWSE
+// ═══════════════════════════════════════════════════════════
+function renderBrowse() {
+  const list = document.getElementById('browse-list');
+  const cards = S.isPremium ? CARDS : CARDS.slice(0, FREE_CARDS);
+  document.getElementById('browse-count').textContent = `${cards.length} cards`;
+
+  list.innerHTML = cards.map(card => {
+    const k = S.known[card.id];
+    const statusClass = k === true ? 'b-status-k">✓ Known'
+                      : k === false ? 'b-status-l">↺ Studying'
+                      : 'b-status-u">· Unseen';
+    const preview = card.a.length > 90 ? card.a.slice(0, 90) + '…' : card.a;
+    return `<div class="b-card" onclick="jumpTo(${card.id})">
+      <div class="b-q">${card.q}</div>
+      <div class="b-a">${preview}</div>
+      <div class="b-meta">
+        <span class="b-cat">${card.cat}</span>
+        <span class="${statusClass}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function jumpTo(id) {
+  S.activeCat = 'all'; S.idx = 0;
+  buildDeck('all');
+  const idx = deck.findIndex(c => c.id === id);
+  if (idx === -1) return;
+  S.idx = idx;
+  showPage('study');
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  document.querySelector('.chip[data-cat="all"]').classList.add('active');
+  if (!document.getElementById('card-q')) restoreStudyDOM();
+  showCard(idx);
+}
+
+// ═══════════════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════════════
+function renderStats() {
+  const known = Object.values(S.known).filter(v => v === true).length;
+  const seen  = Object.keys(S.seen).length;
+  document.getElementById('st-known').textContent  = known;
+  document.getElementById('st-seen').textContent   = seen;
+  document.getElementById('st-streak').textContent = S.streak || 0;
+  document.getElementById('st-ai').textContent     = S.aiTotal || 0;
+
+  const domains = ['M365 Core','Data & Governance','Copilot','Agents'];
+  const colors  = ['#0078d4','#6264a7','#2ecc71','#f39c12'];
+
+  document.getElementById('domain-rows').innerHTML = domains.map((d, i) => {
+    const all    = CARDS.filter(c => c.cat === d);
+    const kn     = all.filter(c => S.known[c.id] === true).length;
+    const pct    = all.length ? Math.round(kn / all.length * 100) : 0;
+    return `<div class="domain-row">
+      <div class="domain-name">${d}<br><span class="domain-sub">${kn}/${all.length}</span></div>
+      <div class="d-bar-wrap"><div class="d-bar" style="width:${pct}%;background:${colors[i]}"></div></div>
+      <div class="d-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════
+function saveKey() {
+  const k = document.getElementById('api-input').value.trim();
+  if (!k.startsWith('sk-ant-')) { toast('Key should start with sk-ant-'); return; }
+  S.apiKey = k; save();
+  toast('API key saved ✓');
+}
+
+function doShuffle() {
+  deck.sort(() => Math.random() - 0.5);
+  S.idx = 0; save();
+  showPage('study');
+  if (!document.getElementById('card-q')) restoreStudyDOM();
+  showCard(0);
+  toast('Cards shuffled 🔀');
+}
+
+function doReset() {
+  if (!confirm('Reset all progress? This cannot be undone.')) return;
+  S.known = {}; S.seen = {}; S.streak = 0;
+  S.idx = 0; S.aiToday = 0; S.aiTotal = 0;
+  save();
+  buildDeck(S.activeCat || 'all');
+  showPage('study');
+  restoreStudyDOM();
+  showCard(0);
+  renderStats();
+  toast('Progress reset ↺');
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAV & PAGES
+// ═══════════════════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'browse') renderBrowse();
+  if (name === 'stats')  renderStats();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ═══════════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('page-study').classList.contains('active')) return;
+  if (e.key === ' ' || e.key === 'ArrowUp') { e.preventDefault(); flip(); }
+  else if ((e.key === 'ArrowRight' || e.key === '1') && flipped) rate(true);
+  else if ((e.key === 'ArrowLeft'  || e.key === '2') && flipped) rate(false);
+});
+
+// ═══════════════════════════════════════════════════════════
+// TOUCH SWIPE (mobile)
+// ═══════════════════════════════════════════════════════════
+let txStart = null;
+document.getElementById('card-wrap') && document.addEventListener('touchstart', e => {
+  if (e.target.closest('.card-wrap')) txStart = e.touches[0].clientX;
+});
+document.addEventListener('touchend', e => {
+  if (txStart === null) return;
+  const dx = e.changedTouches[0].clientX - txStart;
+  txStart = null;
+  if (Math.abs(dx) < 50) return;
+  if (!flipped) return; // only swipe after reveal
+  if (dx > 0) rate(true);   // swipe right = Got It
+  else        rate(false);  // swipe left  = Still Learning
+});
+
+// ═══════════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>

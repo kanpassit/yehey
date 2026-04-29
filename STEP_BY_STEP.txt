@@ -1,0 +1,67 @@
+═══════════════════════════════════════════════════════════════════════════════
+COPY & PASTE SQL IN 2 MINUTES
+═══════════════════════════════════════════════════════════════════════════════
+
+STEP 1: OPEN THE SQL FILE
+────────────────────────────────────────────────────────────────────────────────
+• Open File Explorer (Windows key + E)
+• Go to: Documents\Claude\Projects\Flashcards
+• Find: RUN_THIS_IN_SUPABASE.sql
+• Right-click it
+• Choose "Open with" → Notepad
+• You should see SQL code
+
+STEP 2: SELECT ALL & COPY
+────────────────────────────────────────────────────────────────────────────────
+• In Notepad, press: Ctrl + A (selects all text)
+• Then press: Ctrl + C (copies to clipboard)
+• You now have the SQL copied
+
+STEP 3: OPEN SUPABASE
+────────────────────────────────────────────────────────────────────────────────
+• Open Google Chrome (or your browser)
+• Go to: https://dashboard.supabase.com
+• You should already be logged in
+• Look at the LEFT SIDEBAR
+• Find "SQL Editor" (should be 2nd or 3rd option)
+• Click it
+
+STEP 4: CREATE NEW QUERY
+────────────────────────────────────────────────────────────────────────────────
+• You should see a big text editor in the middle
+• If it's empty, click the "+ New query" button
+• Now you have a blank SQL editor
+
+STEP 5: PASTE THE SQL
+────────────────────────────────────────────────────────────────────────────────
+• Click inside the text editor (the white area where you can type)
+• Press: Ctrl + V (pastes the SQL you copied)
+• You should see all the CREATE TABLE code appear
+
+STEP 6: RUN IT
+────────────────────────────────────────────────────────────────────────────────
+• Look at the BOTTOM RIGHT of the page
+• You should see a blue button that says "Run" or "Execute"
+• Click it
+• WAIT for it to finish (takes 5-10 seconds)
+• You should see green "Success" message
+
+STEP 7: VERIFY
+────────────────────────────────────────────────────────────────────────────────
+• In the left sidebar, click "Tables"
+• Scroll down
+• You should see these new tables:
+  ✓ usage_tracking
+  ✓ question_skips
+  ✓ ai_explanations
+  ✓ api_logs
+
+If you see all 4 = SUCCESS! ✓
+
+═══════════════════════════════════════════════════════════════════════════════
+THAT'S IT! YOU'RE DONE
+═══════════════════════════════════════════════════════════════════════════════
+
+Now the app is ready to use. All hard caps and analytics are live.
+
+Next: Test the app using QUICK_START_TESTING.txt

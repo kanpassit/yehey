@@ -1,0 +1,231 @@
+{
+  "subject": "shrm-scp",
+  "fullName": "SHRM Senior Certified Professional",
+  "questions": [
+    {
+      "id": "shrm-scp-001",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "An HR leader identifies that several high-performing employees are leaving the organization within 18 months of promotion. What is the BEST first step to address this retention issue?",
+      "options": ["Increase compensation for newly promoted employees", "Conduct exit interviews and analyze departure patterns", "Implement a formal mentoring program for all promoted staff", "Create retention bonuses contingent on 2-year tenure"],
+      "correct_index": 1,
+      "explanation": "Exit interviews and analysis of departure patterns provide data-driven insights into why employees are leaving, enabling targeted interventions. While mentoring and retention bonuses may help, diagnosis through analysis is the logical first step before implementing solutions."
+    },
+    {
+      "id": "shrm-scp-002",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "A manufacturing plant experiences a 35% increase in workplace injuries over the past quarter. Which metric would BEST help the HR leader understand the root cause?",
+      "options": ["Injury severity rate (ISR)", "Lost workday injury frequency rate (LWIFR)", "Total injury frequency rate and correlation with staffing changes", "Workers' compensation claim denial rate"],
+      "correct_index": 2,
+      "explanation": "Analyzing the total injury frequency rate alongside staffing changes (such as turnover, new hires, or overtime increases) allows the HR leader to identify contributing factors. While ISR and LWIFR are valuable metrics, they don't directly reveal causation related to workforce changes."
+    },
+    {
+      "id": "shrm-scp-003",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "A company's voluntary turnover rate has doubled from 8% to 16% over two years. Which stakeholder group should the HR leader engage FIRST to understand external market factors?",
+      "options": ["Finance team to review compensation competitiveness", "Customers to gather feedback on service quality", "Industry peers and recruiters through stay interviews", "Terminated employees through detailed exit surveys"],
+      "correct_index": 2,
+      "explanation": "Engaging industry peers and recruiters provides critical external market context on competitive compensation, hiring trends, and industry-wide talent challenges. This helps distinguish between internal (company-specific) and external (market-wide) causes of turnover."
+    },
+    {
+      "id": "shrm-scp-004",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "An organization's healthcare costs have increased 22% year-over-year while industry average is 12%. What is the MOST strategic HR intervention?",
+      "options": ["Switch to a high-deductible health plan to shift costs to employees", "Increase employee cost-sharing for prescription drugs", "Conduct a claims analysis and implement targeted wellness programs", "Reduce healthcare coverage options to basic plans only"],
+      "correct_index": 2,
+      "explanation": "Conducting a claims analysis identifies patterns (obesity, stress-related illness, chronic disease prevalence) enabling targeted wellness interventions. This addresses root causes rather than simply shifting costs or reducing benefits, which can harm employee morale and retention."
+    },
+    {
+      "id": "shrm-scp-005",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "Performance data shows that 40% of employees in one department have underperformed for two consecutive review cycles, while other departments show 5% underperformance. What should HR investigate FIRST?",
+      "options": ["Individual employee capability and training needs", "Department manager effectiveness and leadership style", "Job design and alignment of role expectations", "Staffing levels and workload distribution"],
+      "correct_index": 1,
+      "explanation": "A systemic pattern of underperformance in one department suggests a leadership or environmental issue rather than individual capability problems. The manager may lack coaching skills, have unclear expectations, or create a poor team dynamic. This requires investigation of the department manager and team environment."
+    },
+    {
+      "id": "shrm-scp-006",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "An HR leader discovers that the company's offer acceptance rate has dropped from 85% to 62% in six months. Which analysis should be prioritized to identify the cause?",
+      "options": ["Compare current offer compensation to market benchmarks", "Survey declined candidates about their decision factors", "Review time-to-offer and application-to-hire cycle time", "Analyze competitor hiring activity in the region"],
+      "correct_index": 1,
+      "explanation": "Surveying declined candidates provides direct insights into their decision-making. While benchmarking and process analysis are valuable, direct feedback from those who rejected offers reveals whether issues are compensation, role clarity, culture fit, or timing."
+    },
+    {
+      "id": "shrm-scp-007",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "An analysis of engagement survey results shows that new hires (0-6 months) score 25 percentage points lower on 'connection to company purpose' than established employees. What is the BEST initial response?",
+      "options": ["Redesign the onboarding program to include purpose-driven content", "Create mentoring pairs between new hires and tenured employees", "Increase frequency of company all-hands meetings", "Revise the orientation to include more cultural immersion"],
+      "correct_index": 0,
+      "explanation": "A 25-point gap in purpose connection among new hires indicates a direct onboarding gap. The primary fix should address onboarding content and messaging about purpose. While mentoring and cultural immersion are valuable, deliberately embedding purpose messaging in onboarding is the most direct intervention."
+    },
+    {
+      "id": "shrm-scp-008",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "Absenteeism rates are 4.8 days per employee annually, compared to industry benchmark of 3.2 days. Which root cause analysis approach would BEST identify the drivers?",
+      "options": ["Survey all employees on their reasons for absences", "Review absence patterns by department, tenure, and shift", "Implement stricter attendance policies", "Compare absenteeism to job satisfaction scores"],
+      "correct_index": 1,
+      "explanation": "Analyzing absence patterns by department, tenure, and shift reveals clusters (e.g., high in manufacturing vs. office, or among specific tenure groups) that point to root causes. This segmented analysis is more revealing than broad surveys and provides actionable targeting."
+    },
+    {
+      "id": "shrm-scp-009",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "A company's internal promotion rate is 15%, while industry benchmark is 28%. An HR leader wants to understand if this reflects poor internal talent development or if talent is being hired externally for strategic reasons. What data should be gathered?",
+      "options": ["Promotion pipeline by level and time-in-role; percentage of openings filled externally with rationale", "Salary comparison of internally promoted vs. externally hired employees", "Performance ratings of all internal candidates considered for promotion", "Training and development spending per employee"],
+      "correct_index": 0,
+      "explanation": "Understanding the promotion pipeline (depth of internal candidates at each level) and the reasons for external hiring (strategic, specialized skills, culture shift) directly answers whether the issue is inadequate development or intentional strategy. This provides clarity on whether intervention is needed."
+    },
+    {
+      "id": "shrm-scp-010",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "Skill gap analysis reveals that 35% of managers lack proficiency in the new enterprise system, six months after implementation. What is the BEST diagnostic question to guide next steps?",
+      "options": ["How much additional training budget is required?", "Which managers should be replaced due to technology incompetence?", "What barriers prevent adoption—training quality, system usability, time allocation, or motivation?", "Should a mandatory training certification be implemented?"],
+      "correct_index": 2,
+      "explanation": "Before implementing solutions, the root barrier must be identified. A 35% gap could stem from poor training design, system usability issues, lack of time to practice, or resistance to change. Each requires different interventions. Identifying the barrier is essential for effective remediation."
+    },
+    {
+      "id": "shrm-scp-011",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "An HR leader observes that referral hires have a 92% one-year retention rate, while general applicants have 71% retention. What is the MOST valuable next step?",
+      "options": ["Increase referral bonus amounts to encourage more referrals", "Implement a mandatory referral program for all employees", "Analyze characteristics of referral hires vs. applicant hires to understand retention drivers", "Close external recruiting channels and hire exclusively through referrals"],
+      "correct_index": 2,
+      "explanation": "Understanding why referral hires have higher retention (cultural fit, realistic job previews through referrer, self-selection, peer connection) enables replication of those factors for all hires. This analysis can improve overall retention without over-indexing on referrals."
+    },
+    {
+      "id": "shrm-scp-012",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "Employee survey results show high dissatisfaction with work-life balance, yet exit interview data shows few departures cite balance as a reason. What is the MOST likely explanation?",
+      "options": ["Employees are exaggerating dissatisfaction in anonymous surveys", "Work-life balance dissatisfaction is causing disengagement, not departure", "High performers are leaving due to balance while surveys represent lower performers who stay", "The survey question was poorly worded and should be revised"],
+      "correct_index": 2,
+      "explanation": "Survey respondents and departure cohorts differ—high performers may be more likely to leave for better-balanced roles elsewhere, while those with fewer options stay despite dissatisfaction. This disconnect points to a retention risk among top talent that may not appear in exit interviews."
+    },
+    {
+      "id": "shrm-scp-013",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "A manufacturing facility's supervisor-to-worker ratio is 1:28, compared to the company's target of 1:15. What data should be analyzed to determine if additional supervisors are needed?",
+      "options": ["Labor cost as a percentage of revenue", "Supervisor workload assessment, safety incident rates, and production defect rates", "Industry average supervisor ratios", "Employee satisfaction scores for supervision and support"],
+      "correct_index": 1,
+      "explanation": "The appropriate supervisor ratio depends on workload intensity and outcomes. Higher accident rates, quality defects, or documented supervisor burnout indicate inadequate staffing. Industry averages and cost alone don't account for facility-specific demands and current performance gaps."
+    },
+    {
+      "id": "shrm-scp-014",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "Post-acquisition integration data shows that 28% of acquired company employees have left within 12 months, compared to 12% from the acquiring company. What is the FIRST analysis to conduct?",
+      "options": ["Compare salary and benefits between the two companies", "Analyze retention rates by tenure and role in the acquired company", "Implement retention bonuses for critical acquired company talent", "Conduct culture assessment and communication effectiveness review"],
+      "correct_index": 1,
+      "explanation": "Understanding which roles and tenure groups are leaving provides insight into whether departures reflect job insecurity (leadership/middle management), role redundancy, or integration challenges. This segmentation guides targeted retention and integration strategies."
+    },
+    {
+      "id": "shrm-scp-015",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "An HR leader discovers that performance ratings have been inflated across the board (85% of employees rated as 'meets/exceeds expectations'), making succession planning impossible. What is the underlying HR process issue?",
+      "options": ["Managers lack training in objective performance assessment", "The performance management system does not enforce a differentiation requirement", "Employees are truly high performers and ratings are accurate", "Performance documentation is insufficient"],
+      "correct_index": 1,
+      "explanation": "Systems without forced distribution or differentiation requirements allow rating inflation. While manager training and documentation matter, the root issue is an HR process that permits and incentivizes leniency. The system design must enforce meaningful differentiation."
+    },
+    {
+      "id": "shrm-scp-016",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "An HR leader is analyzing whether to consolidate three HR service centers into one shared services center. What metric BEST validates the decision?",
+      "options": ["Total cost per HR transaction", "Employee satisfaction with HR services; HR team productivity; quality of hiring and onboarding outcomes", "Percentage reduction in HR headcount", "Reduction in HR department operating budget"],
+      "correct_index": 1,
+      "explanation": "While cost reduction is important, shared services success requires balancing efficiency with quality and employee experience. Employee satisfaction, HR productivity, and outcomes (hiring quality, compliance, onboarding effectiveness) must not degrade. Cost-only focus can harm service quality and business outcomes."
+    },
+    {
+      "id": "shrm-scp-017",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "Talent market analysis shows that competitors are offering remote-first arrangements while your company requires three days onsite. How should HR validate whether this policy impacts recruitment?",
+      "options": ["Survey current employees on remote work preferences", "Benchmark competitor remote policies", "Track offer acceptance rates and reasons for declined offers; compare sourcing and hiring timelines", "Conduct a focus group on workplace flexibility"],
+      "correct_index": 2,
+      "explanation": "Actual hiring data (offer acceptance rates, reasons for declines, hiring timeline/difficulty) provides concrete evidence of policy impact on recruitment. Surveys of current employees and focus groups reflect preferences but not actual hiring outcomes. Benchmarking shows peer practices but not impact on your hiring."
+    },
+    {
+      "id": "shrm-scp-018",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "An HR leader observes that contractors represent 22% of the workforce (up from 8% five years ago). What is the MOST important strategic analysis?",
+      "options": ["Comparison of contractor vs. employee hourly rates", "Assessment of core vs. non-core work allocation and contractor dependency risks", "Trends in contractor market availability", "Legal compliance review of contractor classifications"],
+      "correct_index": 1,
+      "explanation": "A significant increase in contractor reliance requires strategic assessment of whether this reflects intended workforce flexibility or uncontrolled contingency growth. Understanding which roles are contingent (and whether they're core or non-core) informs risk management and workforce strategy."
+    },
+    {
+      "id": "shrm-scp-019",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "A company's leadership pipeline analysis reveals that only 18% of senior leaders are under age 50, while the general workforce averages 38% under 50. What diagnostic question should be explored?",
+      "options": ["Is age discrimination occurring in promotion decisions?", "Are younger high-potentials being identified and developed, or are internal succession candidates aging in place?", "Should external leadership recruitment focus on younger candidates?", "What is the average age of employees hired externally for leadership roles?"],
+      "correct_index": 1,
+      "explanation": "This pattern could reflect stagnation in the leadership pipeline (high-potentials leaving, internal candidates aging without promotion) rather than bias. Understanding whether young talent is being identified and developed, or departing, guides succession planning and development strategies."
+    },
+    {
+      "id": "shrm-scp-020",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "An HR leader notes that the time-to-fill for engineering roles is 95 days, while other roles average 45 days. Before implementing corrective action, what data would clarify the root cause?",
+      "options": ["Increase recruiter focus on engineering to speed up hiring", "Analyze hiring source (referral vs. external), interview-to-offer acceptance rates, and offer negotiation duration", "Benchmark engineering time-to-fill against industry standards", "Increase sign-on bonuses for engineering roles"],
+      "correct_index": 1,
+      "explanation": "The extended timeline could reflect sourcing challenges (limited referral pipeline), high rejection rates (poor fit or interview process), or extended negotiations (competitive market). Data on source quality, acceptance rates, and negotiation duration points to which stage needs attention."
+    },
+    {
+      "id": "shrm-scp-021",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "An organization implemented a new LMS and engagement metrics show only 32% of employees have completed assigned courses within 30 days of assignment. What is the BEST diagnostic approach?",
+      "options": ["Make training completions mandatory and monitor compliance", "Analyze which employee segments, departments, and course types show lower engagement", "Reduce course length to improve completion rates", "Survey employees on LMS usability"],
+      "correct_index": 1,
+      "explanation": "Segmented analysis (by department, role, course type, demographics) reveals patterns. Lower compliance in certain groups may reflect relevance issues, technical barriers, lack of manager reinforcement, or workload. This diagnosis is essential before mandates or broad solutions."
+    },
+    {
+      "id": "shrm-scp-022",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "A business unit's revenue per employee is $280K, while the company average is $350K. How should HR partner with the business unit leader to diagnose the issue?",
+      "options": ["Request an increase in headcount to boost absolute revenue", "Analyze employee productivity, product mix, pricing, and staffing composition relative to performance", "Benchmark the business unit against similar external competitors", "Implement performance management changes to increase output"],
+      "correct_index": 1,
+      "explanation": "Revenue per employee reflects both workforce factors (productivity, skill mix, staffing levels) and business factors (product mix, pricing, market demand). HR must collaborate to analyze all contributors—not just blame workforce factors. The diagnostic work informs appropriate solutions."
+    },
+    {
+      "id": "shrm-scp-023",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "Women comprise 45% of the workforce but only 22% of senior management. What analysis should HR lead to understand if this reflects systemic issues or other factors?",
+      "options": ["Compare hiring rates of men vs. women at all levels", "Analyze representation trends over time, exit rates by gender at each level, and promotion rates; conduct qualitative interviews with high-potential women", "Increase recruitment targets for female senior leaders externally", "Review performance ratings to identify gender bias"],
+      "correct_index": 1,
+      "explanation": "Comprehensive analysis includes pipeline representation (are women advancing to senior-level pools?), exit patterns (are women leaving before senior roles?), and promotion rates. Qualitative interviews reveal barriers (bias, culture, development opportunities). This multi-factor approach reveals root causes."
+    },
+    {
+      "id": "shrm-scp-024",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "An organization's diversity hiring initiative has brought women representation in engineering from 12% to 18% over two years. What is the MOST critical metric to track next?",
+      "options": ["Continue expanding diversity hiring targets to reach 40% by year three", "Monitor retention and advancement of newly hired women engineers at 2-year and 5-year marks", "Measure engagement scores of female engineers vs. male engineers", "Assess whether current female engineers are distributed across all technical levels"],
+      "correct_index": 1,
+      "explanation": "Hiring diverse talent is step one; retention and advancement reveal whether the culture supports diversity. Early departures or stalled advancement of women hired under diversity initiatives indicate systemic barriers. This data guides culture and inclusion interventions."
+    },
+    {
+      "id": "shrm-scp-025",
+      "subject_slug": "shrm-scp",
+      "domain": "Acuity",
+      "question_text": "A post-training evaluation shows that 87% of participants rate a leadership development program as 'excellent,' yet subsequent 360-degree feedback shows minimal behavioral change. What is the likely explanation?",
+      "options": ["Participants were not receptive to feedback", "The training was effective but participants did not apply learning on the job", "Reaction evaluations ('excellent rating') do not validate learning or behavior change; evaluation design should include on-the-job application metrics", "Facilitators were skilled but program content was weak"],
+      "correct_index": 2,
+      "explanation": "This illustrates the Kirkpatrick model limitation: participant satisfaction (Level 1 reaction) does not ensure learning or behavior change (Levels 2-4). Evaluation design must include pre/post knowledge assessments and follow-up behavioral indicators. Redesign should focus on application reinforcement and accountability."
+    }
+  ]
+}

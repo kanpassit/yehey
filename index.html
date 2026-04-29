@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>KanPassIt — AI-Powered Exam Prep</title>
+<meta name="description" content="KanPassIt — AI-powered exam prep for AB-900 (Microsoft 365 Copilot), LVN NCLEX-PN, SHRM-CP, and SHRM-SCP certifications. Adaptive quizzes, domain performance tracking, and AI study analysis.">
+<meta name="keywords" content="exam prep, AB-900, NCLEX, SHRM-CP, SHRM-SCP, quiz, certification, study app, AI tutor">
+<meta property="og:title" content="KanPassIt — AI-Powered Exam Prep">
+<meta property="og:description" content="Ace your certification exam with adaptive quizzes, AI-powered weak area analysis, and cross-device progress tracking.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kanpassit.com">
+<link rel="canonical" href="https://kanpassit.com">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6787955359497496" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0d0d1a;--surface:#16162a;--surface2:#1e1e38;--accent:#0078d4;--accent2:#6264a7;--text:#f0f0f5;--text2:#8888aa;--border:#252540;--pass:#2ecc71;--warn:#f39c12;--fail:#e05c5c;--radius:16px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;min-height:100vh;overflow-x:hidden}
+.view{display:none;min-height:100vh}.view.active{display:block}
+.center-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px}
+.logo-big{font-size:28px;font-weight:900;background:linear-gradient(125deg,#0078d4,#6264a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.logo-sub{font-size:14px;color:var(--text2);margin-bottom:32px;text-align:center}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;width:100%;margin-bottom:14px}
+.card-title{font-size:15px;font-weight:800;margin-bottom:14px}
+.field-lbl{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px}
+.field{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-size:14px;font-family:inherit;margin-bottom:12px}
+.field:focus{outline:none;border-color:var(--accent)}
+.field-mono{font-family:monospace;font-size:12px}
+.btn-p{width:100%;padding:14px;border-radius:12px;background:linear-gradient(125deg,#0078d4,#6264a7);color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn-p:hover{opacity:.88}.btn-p:disabled{opacity:.45;cursor:not-allowed}
+.btn-s{width:100%;padding:12px;border-radius:12px;background:transparent;border:1px solid var(--border);color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;margin-top:9px}
+.btn-s:hover{border-color:var(--accent);color:var(--text)}
+.auth-toggle{font-size:13px;color:var(--text2);text-align:center;margin-top:14px;cursor:pointer}
+.auth-toggle span{color:#5aadff}
+.err-msg{font-size:13px;color:var(--fail);margin-bottom:10px;min-height:18px}
+.ok-msg{font-size:13px;color:var(--pass);margin-bottom:10px;min-height:18px}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--accent);font-size:11px;font-weight:800;margin-right:7px;flex-shrink:0}
+.step-row{display:flex;align-items:flex-start;font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px}
+.sql-block{background:#0a0a14;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:monospace;font-size:10px;color:#7a9fbf;white-space:pre;overflow-x:auto;margin:10px 0;line-height:1.5}
+a.la{color:#5aadff;text-decoration:none}
+.skip-link{font-size:12px;color:var(--text2);text-align:center;margin-top:12px;cursor:pointer}
+.skip-link span{color:#5aadff}
+.landing-tagline{font-size:13px;color:var(--text2);text-align:center;margin-bottom:20px;max-width:300px;line-height:1.6}
+.feature-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px}
+.feature-pill{font-size:11px;font-weight:700;color:#5aadff;background:rgba(0,120,212,0.12);border:1px solid rgba(0,120,212,0.25);border-radius:20px;padding:5px 12px;letter-spacing:.3px}
+.auth-card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px}
+.subjects-header{padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.subjects-title{font-size:20px;font-weight:900}
+.user-pill{font-size:12px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer}
+.subjects-grid{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+.subject-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:border-color .15s;position:relative;overflow:hidden}
+.subject-card:hover{border-color:var(--accent)}
+.subject-card-accent{position:absolute;top:0;left:0;right:0;height:3px}
+.subject-card-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.subject-icon{font-size:28px}
+.subject-name{font-size:16px;font-weight:800}
+.subject-desc{font-size:12px;color:var(--text2);margin-top:2px}
+.subject-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.ss-item{background:var(--surface2);border-radius:8px;padding:8px;text-align:center}
+.ss-num{font-size:18px;font-weight:800;background:linear-gradient(125deg,#0078d4,#6264a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ss-lbl{font-size:9px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+#v-app{padding-bottom:72px}#v-subjects{padding-bottom:72px}
+.header{padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:50;border-bottom:1px solid var(--border)}
+.app-logo{font-size:16px;font-weight:800;background:linear-gradient(125deg,#0078d4,#6264a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-right{display:flex;gap:8px;align-items:center}
+.streak-pill{background:linear-gradient(125deg,#f39c12,#e74c3c);color:#fff;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
+.back-btn{font-size:13px;color:var(--text2);background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer}
+.page{display:none;padding-bottom:80px}.page.active{display:block}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;padding:10px 4px 8px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text2);font-size:10px;font-weight:600;transition:color .15s}
+.nav-btn.active{color:var(--accent)}.nav-btn svg{width:20px;height:20px}
+.home-body{padding:18px 20px 0}
+.gauge-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:14px}
+.gauge-wrap{position:relative;width:160px;margin:0 auto 10px}.gauge-wrap svg{width:100%}
+.gauge-center{position:absolute;top:55%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.gauge-pct{font-size:30px;font-weight:800}
+.gauge-lbl{font-size:10px;color:var(--text2);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.gauge-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.gauge-sub{font-size:12px;color:var(--text2)}
+.pass-line-note{font-size:11px;color:var(--text2);margin-top:8px}
+.pass-line-note span{color:var(--pass);font-weight:600}
+.quick-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:14px}
+.qs-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 10px;text-align:center}
+.qs-num{font-size:22px;font-weight:800;background:linear-gradient(125deg,#0078d4,#6264a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.qs-lbl{font-size:10px;color:var(--text2);margin-top:2px;font-weight:600}
+.section-lbl{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin:16px 0 10px}
+.domain-grid{display:flex;flex-direction:column;gap:9px}
+.domain-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s}
+.domain-card:hover{border-color:var(--accent)}
+.domain-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.domain-info{flex:1}.domain-name{font-size:13px;font-weight:700}
+.domain-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.domain-bar-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px}
+.domain-bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.domain-score-lbl{font-size:11px;color:var(--text2);text-align:right;width:40px}
+.quiz-header{padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.quiz-prog-wrap{flex:1}
+.quiz-prog-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:5px}
+.quiz-prog-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.quiz-prog-fill{height:100%;background:linear-gradient(90deg,#0078d4,#6264a7);border-radius:2px;transition:width .4s}
+.quit-btn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:12px;padding:5px 10px;cursor:pointer}
+.quit-btn:hover{border-color:var(--fail);color:var(--fail)}
+.q-body{padding:0 20px}
+.q-meta{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.q-cat{font-size:11px;padding:3px 9px;border-radius:10px;background:rgba(0,120,212,.15);color:#5aadff;font-weight:600}
+.q-num{font-size:11px;color:var(--text2)}
+.q-text{font-size:16px;font-weight:650;line-height:1.5;margin-bottom:20px}
+.options{display:flex;flex-direction:column;gap:10px}
+.option{padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;transition:all .17s;display:flex;align-items:flex-start;gap:12px;text-align:left}
+.option:hover:not(.locked){border-color:var(--accent);background:rgba(0,120,212,.07)}
+.option.correct{border-color:var(--pass);background:rgba(46,204,113,.1)}
+.option.wrong{border-color:var(--fail);background:rgba(224,92,92,.1)}
+.option.locked{cursor:default}
+.option.reveal-correct{border-color:var(--pass);background:rgba(46,204,113,.08)}
+.opt-letter{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;transition:all .15s;background:var(--surface2)}
+.option.correct .opt-letter,.option.reveal-correct .opt-letter{background:var(--pass);border-color:var(--pass);color:#fff}
+.option.wrong .opt-letter{background:var(--fail);border-color:var(--fail);color:#fff}
+.opt-text{font-size:14px;line-height:1.45;padding-top:3px}
+.feedback{margin-top:16px;padding:14px;border-radius:12px;font-size:13px;line-height:1.65;display:none}
+.feedback.correct-fb{background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3)}
+.feedback.wrong-fb{background:rgba(224,92,92,.08);border:1px solid rgba(224,92,92,.25)}
+.feedback-head{font-size:13px;font-weight:700;margin-bottom:6px}
+.correct-head{color:var(--pass)}.wrong-head{color:var(--fail)}
+.feedback-body{color:var(--text2)}
+.next-wrap{padding:14px 20px 0}
+.btn-next{width:100%;padding:14px;border-radius:12px;background:linear-gradient(125deg,#0078d4,#6264a7);color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;display:none}
+.quiz-skip-link{font-size:12px;color:var(--text2);text-align:right;display:block;margin-top:10px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;opacity:.7}
+.quiz-skip-link:hover{opacity:1;color:var(--text)}
+.session-done{padding:32px 20px;text-align:center}
+.done-emoji{font-size:56px;margin-bottom:14px}
+.done-h{font-size:22px;font-weight:800;margin-bottom:8px}
+.done-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px}
+.done-breakdown{text-align:left;background:var(--surface);border-radius:12px;padding:16px;margin-bottom:20px}
+.done-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.done-row:last-child{border-bottom:none}
+.done-row-score{font-weight:700}
+.score-good{color:var(--pass)}.score-mid{color:var(--warn)}.score-bad{color:var(--fail)}
+.analysis-body{padding:18px 20px 0}
+.wrong-log-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 15px;cursor:pointer;margin-top:20px;color:var(--text2);transition:border-color .15s}
+.wrong-log-toggle:hover{border-color:var(--accent)}
+.wrong-log-count{font-size:11px;font-weight:700;background:var(--surface2);color:var(--text2);border-radius:20px;padding:2px 8px}
+.wrong-log-count.has-items{background:rgba(224,92,92,0.15);color:var(--fail)}
+.wrong-log-wrap{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.wrong-log-wrap.open{max-height:9999px}
+.analysis-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.analysis-card-title{font-size:14px;font-weight:700;margin-bottom:8px}
+.analysis-card-body{font-size:13px;color:var(--text2);line-height:1.7}
+.btn-ai-analyze{width:100%;padding:13px;border-radius:12px;border:1px solid rgba(98,100,167,.4);background:rgba(98,100,167,.1);color:#a0a4e0;font-size:14px;font-weight:700;cursor:pointer;transition:all .17s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
+.btn-ai-analyze:hover{background:rgba(98,100,167,.2);color:#c0c4f0}
+.ai-result{background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:10px;padding:14px;font-size:13px;line-height:1.75;color:var(--text2)}
+.spinner{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--accent);animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.settings-body{padding:18px 20px}
+.sec-title{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.sec-note{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px}
+.sec-note a{color:#5aadff;text-decoration:none}
+.s-row{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px 15px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.s-row:hover{border-color:var(--accent)}
+.s-row-lbl{font-size:14px}.s-row-val{font-size:13px;color:var(--text2)}
+.mt{margin-top:22px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;display:none;align-items:flex-end}
+.overlay.open{display:flex}
+.modal{width:100%;max-width:480px;margin:0 auto;background:var(--surface);border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom))}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:16px}
+.mode-btn{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);text-align:left;cursor:pointer;margin-bottom:9px;transition:border-color .15s}
+.mode-btn:hover{border-color:var(--accent)}
+.mode-btn-title{font-size:14px;font-weight:700}.mode-btn-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.modal-cancel{width:100%;padding:12px;border-radius:12px;background:transparent;border:1px solid var(--border);color:var(--text2);font-size:14px;cursor:pointer;margin-top:4px}
+.confirm-icon{font-size:32px;text-align:center;margin-bottom:12px}
+.confirm-body{font-size:13px;color:var(--text2);text-align:center;line-height:1.6}
+.confirm-action-btn{background:linear-gradient(125deg,#e05c5c,#c0392b) !important}
+.toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 17px;font-size:13px;opacity:0;transition:all .28s;z-index:300;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--pass);display:inline-block}
+.sync-dot.offline{background:var(--warn)}
+.legal-footer{text-align:center;padding:20px 20px 28px;font-size:11px;color:var(--text2)}
+.legal-footer a{color:var(--text2);text-decoration:none;border-bottom:1px solid var(--border)}
+.legal-footer a:hover{color:var(--text)}
+.cookie-banner{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#1a1a2e;border-top:1px solid var(--border);padding:14px 20px calc(14px + env(safe-area-inset-bottom));z-index:500;display:none}
+.cookie-banner.show{display:block}
+.cookie-text{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:10px}
+.cookie-text a{color:#5aadff;text-decoration:none}
+.cookie-btns{display:flex;gap:8px}
+.cookie-accept{flex:1;padding:9px;border-radius:9px;background:var(--accent);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer}
+.cookie-decline{flex:1;padding:9px;border-radius:9px;background:transparent;border:1px solid var(--border);color:var(--text2);font-size:13px;cursor:pointer}
+.disclaimer-text{background:rgba(98,100,167,0.08);border-left:2px solid var(--accent2);padding:8px 10px;border-radius:6px;font-size:11px;color:var(--text2);margin-top:10px;line-height:1.5}
+.milestone-badge{background:linear-gradient(125deg,rgba(46,204,113,0.15),rgba(98,100,167,0.15));border:1px solid rgba(46,204,113,0.4);border-left:3px solid var(--pass);border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;color:var(--text);animation:slideIn 0.3s ease-out}
+@keyframes slideIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.milestone-text{flex:1;font-weight:600}
+.category-section{margin-bottom:20px}
+.category-header{display:flex;align-items:center;gap:10px;padding:12px 0;cursor:pointer;user-select:none}
+.category-name{font-size:14px;font-weight:700;color:var(--text);flex:1;text-transform:uppercase;letter-spacing:0.5px}
+.category-count{font-size:12px;color:var(--text2);background:var(--surface2);padding:3px 8px;border-radius:12px}
+.category-chevron{color:var(--text2);transition:transform 0.25s}
+.category-subjects{display:block;padding-bottom:8px}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<div class="cookie-banner" id="cookie-banner">
+  <div class="cookie-text">We use cookies to improve your experience and show relevant ads. By continuing, you agree to our <a href="/privacy.html" target="_blank">Privacy Policy</a>.</div>
+  <div class="cookie-btns">
+    <button class="cookie-accept" onclick="acceptCookies()">Accept</button>
+    <button class="cookie-decline" onclick="declineCookies()">Decline</button>
+  </div>
+</div>
+
+<div class="view active" id="v-loading">
+  <div class="center-wrap" style="justify-content:center;align-items:center;height:100vh">
+    <div class="logo-big">KanPassIt</div>
+    <div style="margin-top:24px;color:var(--muted);font-size:0.95rem">Loading questions…</div>
+  </div>
+</div>
+
+<div class="view" id="v-setup">
+  <div class="center-wrap" style="justify-content:flex-start;padding-top:40px;overflow-y:auto">
+    <div class="logo-big">KanPassIt</div>
+    <div class="logo-sub">AI-Powered Exam Prep</div>
+    <p class="landing-tagline">Ace your certification exam with adaptive quizzes and AI-powered study analysis.</p>
+    <div class="feature-pills">
+      <span class="feature-pill">✦ AI Study Analysis</span>
+      <span class="feature-pill">📊 Domain Tracking</span>
+      <span class="feature-pill">🎯 Weak Area Drills</span>
+    </div>
+    <div class="card">
+      <div class="card-title">🔧 Connect Supabase (Optional)</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Enables real accounts &amp; cross-device sync. Skip to use local-only mode.</p>
+      <div class="step-row"><span class="step-num">1</span>Create a free project at <a class="la" href="https://supabase.com" target="_blank">supabase.com</a></div>
+      <div class="step-row"><span class="step-num">2</span>Run this SQL in your project's SQL Editor:</div>
+      <div class="sql-block">CREATE TABLE IF NOT EXISTS public.user_progress (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  subject text NOT NULL,
+  question_id integer NOT NULL,
+  last_result text NOT NULL,
+  attempts integer DEFAULT 1 NOT NULL,
+  wrong_count integer DEFAULT 0 NOT NULL,
+  updated_at timestamptz DEFAULT now() NOT NULL,
+  UNIQUE(user_id, subject, question_id)
+);
+ALTER TABLE public.user_progress ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own progress"
+  ON public.user_progress FOR ALL
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);</div>
+      <div class="step-row"><span class="step-num">3</span>Paste your Project URL and anon key below (Project Settings → API)</div>
+      <div class="field-lbl">Supabase Project URL</div>
+      <input id="sb-url" class="field field-mono" placeholder="https://xxxx.supabase.co" autocomplete="off"/>
+      <div class="field-lbl">Supabase Anon Key</div>
+      <input id="sb-key" class="field field-mono" placeholder="eyJhbGciOi…" autocomplete="off"/>
+      <div id="setup-err" class="err-msg"></div>
+      <button class="btn-p" onclick="saveSetup()">Save &amp; Continue →</button>
+    </div>
+    <div class="skip-link" onclick="skipSetup()">Skip — use <span>local-only mode</span> (no accounts)</div>
+  </div>
+</div>
+
+<div class="view" id="v-auth">
+  <div class="center-wrap">
+    <div class="logo-big">KanPassIt</div>
+    <div class="logo-sub">AI-Powered Exam Prep</div>
+    <p class="landing-tagline">Ace your certification exam with adaptive quizzes and AI-powered study analysis.</p>
+    <div class="feature-pills">
+      <span class="feature-pill">✦ AI Study Analysis</span>
+      <span class="feature-pill">📊 Domain Tracking</span>
+      <span class="feature-pill">🎯 Weak Area Drills</span>
+    </div>
+    <div class="card" style="width:100%">
+      <div class="auth-card-title" id="auth-subtitle">Sign in to your account</div>
+      <div id="auth-err" class="err-msg"></div>
+      <div id="auth-ok" class="ok-msg"></div>
+      <div class="field-lbl">Email</div>
+      <input id="auth-email" class="field" type="email" placeholder="you@example.com" autocomplete="email"/>
+      <div class="field-lbl">Password</div>
+      <input id="auth-pass" class="field" type="password" placeholder="Password" autocomplete="current-password"/>
+      <button id="auth-btn" class="btn-p" onclick="submitAuth()">Sign In</button>
+    </div>
+    <div class="auth-toggle" onclick="toggleAuthMode()">Don't have an account? <span>Sign up</span></div>
+    <div class="skip-link" style="margin-top:12px" onclick="guestMode()">Continue as <span>guest</span> (local only)</div>
+  </div>
+  <div class="legal-footer"><a href="/privacy.html" target="_blank">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms.html" target="_blank">Terms of Service</a></div>
+</div>
+
+<div class="view" id="v-subjects">
+  <div class="subjects-header">
+    <div class="subjects-title">Choose Subject</div>
+    <div class="user-pill" id="user-pill" onclick="signOut()">Sign Out</div>
+  </div>
+  <div style="padding:0 20px;margin-bottom:12px">
+    <input type="text" id="subject-search" class="field" placeholder="🔍 Search subjects..." oninput="filterSubjects(this.value)" autocomplete="off"/>
+  </div>
+  <div class="subjects-grid" id="subjects-grid"></div>
+  <div class="legal-footer"><a href="/privacy.html" target="_blank">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms.html" target="_blank">Terms of Service</a></div>
+</div>
+
+<div class="view" id="v-app">
+  <div class="header">
+    <button class="back-btn" onclick="backToSubjects()">← Subjects</button>
+    <div class="app-logo" id="app-subject-logo">Study</div>
+    <div class="header-right">
+      <div class="streak-pill">🔥 <span id="streak-val">0</span></div>
+      <div class="sync-dot offline" id="sync-dot"></div>
+    </div>
+  </div>
+  <div class="page active" id="page-home">
+    <div class="home-body">
+      <div class="gauge-card">
+        <div class="gauge-title">Pass Likelihood</div>
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 20 90 A 60 60 0 0 1 140 90" fill="none" stroke="#252540" stroke-width="12" stroke-linecap="round"/>
+            <path id="gauge-arc" d="M 20 90 A 60 60 0 0 1 140 90" fill="none" stroke="#252540" stroke-width="12" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+          </svg>
+          <div class="gauge-center">
+            <div class="gauge-pct" id="gauge-pct-text">—</div>
+            <div class="gauge-lbl">Likelihood</div>
+          </div>
+        </div>
+        <div class="gauge-sub" id="gauge-sub">Answer more questions to see your estimate</div>
+        <div class="pass-line-note">Passing threshold ≈ <span id="pass-threshold-lbl">700/1000</span></div>
+        <div class="disclaimer-text">ⓘ This estimate is based on your quiz performance and does not guarantee actual exam results.</div>
+      </div>
+      <div id="milestone-badge" class="milestone-badge" style="display:none">
+        <div class="milestone-text" id="milestone-text"></div>
+        <button onclick="closeMilestone()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;padding:0;margin:0">×</button>
+      </div>
+      <div class="quick-stats">
+        <div class="qs-card"><div class="qs-num" id="qs-answered">0</div><div class="qs-lbl">Answered</div></div>
+        <div class="qs-card"><div class="qs-num" id="qs-correct">—</div><div class="qs-lbl">Accuracy</div></div>
+        <div class="qs-card"><div class="qs-num" id="qs-weak">0</div><div class="qs-lbl">Weak Areas</div></div>
+      </div>
+      <div class="section-lbl">Domain Performance</div>
+      <div class="domain-grid" id="domain-grid"></div>
+      <div style="margin-top:18px">
+        <button class="btn-p" onclick="startQuiz('quick');closeModeModal()">▶ Start Practice</button>
+        <button class="btn-s" id="weak-btn" onclick="startQuiz('weak')" style="display:none">🎯 Focus Weak Areas</button>
+      </div>
+    </div>
+  </div>
+  <div class="page" id="page-quiz"><div id="quiz-content"></div></div>
+  <div class="page" id="page-analysis">
+    <div class="analysis-body">
+      <button class="btn-ai-analyze" id="analyze-btn" onclick="runAnalysis()">✦ Analyze with AI</button>
+      <div id="ai-analysis-output"></div>
+      <div class="sec-title mt" style="margin-top:22px">Progress</div>
+      <div class="s-row" onclick="doReset()"><span class="s-row-lbl">Reset This Subject's Progress</span><span class="s-row-val">↺</span></div>
+      <div class="s-row" onclick="backToSubjects()"><span class="s-row-lbl">Switch Subject</span><span class="s-row-val">→</span></div>
+      <div class="sec-title mt">Exam Info</div>
+      <div id="exam-info-rows"></div>
+      <button class="wrong-log-toggle" id="wrong-log-toggle" onclick="toggleWrongLog()">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase">Wrong Answer Log</span>
+          <span class="wrong-log-count" id="wrong-log-count"></span>
+        </div>
+        <svg id="wrong-log-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;transition:transform .25s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="wrong-log-wrap" id="wrong-log-wrap">
+        <div id="wrong-log" style="padding-top:4px"></div>
+      </div>
+    </div>
+  </div>
+  <div class="page" id="page-settings">
+    <div class="header">
+      <div class="app-logo">Settings</div>
+      <button class="back-btn" onclick="showPage('home')">Done</button>
+    </div>
+    <div class="settings-body">
+      <div class="sec-title">Profile</div>
+      <div class="card">
+        <div class="card-title">📧 Email</div>
+        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+          <span style="flex: 1; font-size: 14px;" id="email-display">user@example.com</span>
+          <button class="btn-s" style="width: auto; margin: 0; padding: 5px 10px; font-size: 12px;" onclick="showModal('change-email-modal')">Change</button>
+        </div>
+        <div style="font-size: 11px; color: var(--text2);">Verified ✓</div>
+      </div>
+      <div class="sec-title" style="margin-top: 20px;">Account</div>
+      <div class="card">
+        <div class="card-title">📊 Subscription Tier</div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <div style="font-size: 14px; font-weight: 700;" id="plan-display">Free</div>
+            <div style="font-size: 11px; color: var(--text2); margin-top: 4px;">Tier will be managed here when subscriptions launch</div>
+          </div>
+        </div>
+      </div>
+      <div class="sec-title" style="margin-top: 20px;">Security</div>
+      <div class="card">
+        <div class="card-title">🔐 Password</div>
+        <div style="font-size: 13px; color: var(--text2); margin-bottom: 12px;">Change your password anytime</div>
+        <button class="btn-s" style="width: 100%; margin-top: 0;" onclick="showModal('change-password-modal')">Change Password</button>
+      </div>
+      <div class="card">
+        <div class="card-title">🔓 Sessions</div>
+        <div style="font-size: 13px; color: var(--text2); margin-bottom: 12px;">Sign out from all devices</div>
+        <button class="btn-s" style="width: 100%; margin-top: 0;" onclick="signOutAllDevices()">Sign Out Everywhere</button>
+      </div>
+      <div class="sec-title" style="margin-top: 20px;">Data & Privacy</div>
+      <div class="card">
+        <div class="card-title">📥 Export Data</div>
+        <div class="sec-note">Download all your quiz responses and progress as JSON</div>
+        <button class="btn-s" style="width: 100%; margin-top: 0;" onclick="exportUserData()">Export My Data</button>
+      </div>
+      <div class="card">
+        <div class="card-title">🗑️ Delete Account</div>
+        <div class="sec-note" style="color: var(--fail);">Permanently delete your account and all associated data. This cannot be undone.</div>
+        <button class="btn-s" style="width: 100%; margin-top: 0; color: var(--fail); border-color: rgba(224, 92, 92, 0.3);" onclick="showModal('delete-account-modal')">Delete Account</button>
+      </div>
+      <div class="legal-footer" style="margin-top: 30px;">
+        Version 1.0 • <a href="/privacy.html" target="_blank">Privacy</a> · <a href="/terms.html" target="_blank">Terms</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALS -->
+  <div class="overlay" id="change-email-modal">
+    <div class="modal">
+      <div class="modal-title">Change Email</div>
+      <div class="field-lbl">New Email</div>
+      <input type="email" id="new-email-input" class="field" placeholder="you@example.com" autocomplete="email"/>
+      <div id="change-email-err" class="err-msg"></div>
+      <div id="change-email-ok" class="ok-msg"></div>
+      <button class="btn-p" onclick="changeEmail()">Send Verification</button>
+      <button class="modal-cancel" onclick="closeModal('change-email-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="change-password-modal">
+    <div class="modal">
+      <div class="modal-title">Change Password</div>
+      <div class="field-lbl">Current Password</div>
+      <input type="password" id="current-password-input" class="field" placeholder="••••••••" autocomplete="current-password"/>
+      <div class="field-lbl" style="margin-top: 12px;">New Password</div>
+      <input type="password" id="new-password-input" class="field" placeholder="••••••••" autocomplete="new-password"/>
+      <div class="field-lbl" style="margin-top: 12px;">Confirm Password</div>
+      <input type="password" id="confirm-password-input" class="field" placeholder="••••••••" autocomplete="new-password"/>
+      <div id="change-password-err" class="err-msg"></div>
+      <div id="change-password-ok" class="ok-msg"></div>
+      <button class="btn-p" onclick="changePassword()">Update Password</button>
+      <button class="modal-cancel" onclick="closeModal('change-password-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="delete-account-modal">
+    <div class="modal">
+      <div class="confirm-icon">⚠️</div>
+      <div class="modal-title" style="text-align: center;">Delete Account?</div>
+      <div class="confirm-body">All your data will be permanently deleted. This cannot be undone.</div>
+      <div class="field-lbl" style="margin-top: 16px;">Type your email to confirm:</div>
+      <input type="email" id="delete-confirm-email" class="field" placeholder="your@email.com" autocomplete="email"/>
+      <div id="delete-account-err" class="err-msg"></div>
+      <button class="btn-p confirm-action-btn" onclick="deleteAccount()">Delete My Account</button>
+      <button class="modal-cancel" onclick="closeModal('delete-account-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<nav class="nav" id="global-nav" style="display:none">
+  <button class="nav-btn active" id="nav-home" onclick="showPage('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
+  </button>
+  <button class="nav-btn" id="nav-quiz" onclick="openModeModal()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>Practice
+  </button>
+  <button class="nav-btn" id="nav-analysis" onclick="showPage('analysis')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Analysis
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="showPage('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+  </button>
+</nav>
+
+<div class="overlay" id="mode-overlay" onclick="closeModeModal(event)">
+  <div class="modal">
+    <div class="modal-title">Choose Practice Mode</div>
+    <button class="mode-btn" onclick="startQuiz('quick');closeModeModal()">
+      <div class="mode-btn-title">⚡ Quick Session (10 Random)</div>
+      <div class="mode-btn-sub">10 questions — great for a study break</div>
+    </button>
+    <button class="mode-btn" id="modal-weak-btn" onclick="startQuiz('weak');closeModeModal()">
+      <div class="mode-btn-title">🎯 Weak Areas Only</div>
+      <div class="mode-btn-sub">Questions you've answered incorrectly</div>
+    </button>
+    <button class="mode-btn" onclick="startQuiz('all');closeModeModal()">
+      <div class="mode-btn-title">📋 Full Exam Simulation</div>
+      <div class="mode-btn-sub" id="modal-full-sub">All questions in random order</div>
+    </button>
+    <div style="margin-top:4px;margin-bottom:10px">
+      <div class="section-lbl" style="margin:0 0 8px">By Domain</div>
+      <div id="modal-domains" style="display:flex;flex-wrap:wrap;gap:7px"></div>
+    </div>
+    <button class="modal-cancel" onclick="closeModeModal()">Cancel</button>
+  </div>
+</div>
+
+<div class="overlay" id="confirm-overlay">
+  <div class="modal" style="max-width:340px">
+    <div class="confirm-icon" id="confirm-icon">⚠️</div>
+    <div class="modal-title" id="confirm-title" style="text-align:center;margin-bottom:8px"></div>
+    <div class="confirm-body" id="confirm-body"></div>
+    <button class="btn-p confirm-action-btn" id="confirm-ok" style="margin-top:18px"></button>
+    <button class="modal-cancel" id="confirm-cancel" onclick="closeConfirm()">Cancel</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// QUESTION BANKS — loaded from Supabase at runtime
+// ═══════════════════════════════════════════════════════
+let QB = {};
+
+
+// ═══════════════════════════════════════════════════════
+// SUBJECT CONFIG
+// ═══════════════════════════════════════════════════════
+const SUBJECTS = {
+  'ab900': {
+    key: 'ab900',
+    name: 'AB-900',
+    fullName: 'Microsoft 365 Copilot & Agent Administration',
+    icon: '🏢',
+    color: '#0078d4',
+    category: 'Tech',
+    passThreshold: '700/1000 scaled score',
+    examInfo: [
+      ['Exam','AB-900'],
+      ['Questions','60'],
+      ['Passing Score','700 / 1000'],
+      ['Domains','Data & Governance (37.5%) · Admin Tasks (27.5%) · Core M365 (35%)']
+    ],
+    domains: [
+      {name:'Data & Governance',icon:'🔒', color:'#6264a7', weight:0.375},
+      {name:'Admin Tasks',      icon:'⚙️', color:'#f39c12', weight:0.275},
+      {name:'Core M365',        icon:'🏢', color:'#0078d4', weight:0.35}
+    ],
+    aiContext: 'Microsoft 365 Copilot and Agent Administration Fundamentals (AB-900). Exam domains: M365 Core Services (33%), Data Protection & Governance (37%), Copilot Administration (15%), Agent Administration (15%). Passing score: 700/1000.'
+  },
+  'lvn': {
+    key: 'lvn',
+    name: 'LVN NCLEX-PN',
+    fullName: 'NCLEX-PN Licensed Vocational Nurse',
+    icon: '🩺',
+    color: '#2ecc71',
+    category: 'Healthcare',
+    passThreshold: 'Passing Standard (Next Generation NCLEX)',
+    examInfo: [
+      ['Exam','NCLEX-PN'],
+      ['Questions','150'],
+      ['Format','Next Generation NCLEX (NGN)'],
+      ['Domains','Coordinated Care (21%) · Safety & Infection (13%) · Health Promotion (9%) · Physiological (57%)']
+    ],
+    domains: [
+      {name:'Coordinated Care',                  icon:'🛡️', color:'#0078d4', weight:0.21},
+      {name:'Safety & Infection Control',       icon:'🔒', color:'#e74c3c', weight:0.13},
+      {name:'Health Promotion & Maintenance',   icon:'💚', color:'#2ecc71', weight:0.09},
+      {name:'Physiological Integrity',          icon:'❤️', color:'#9b59b6', weight:0.57}
+    ],
+    aiContext: 'NCLEX-PN (Licensed Vocational/Practical Nurse) licensure exam. Domains: Safe and Effective Care Environment (30%), Physiological Integrity (45%), Pharmacological Therapies (15%), Psychosocial Integrity (10%). Next Generation NCLEX format.'
+  },
+  'shrm': {
+    key: 'shrm',
+    name: 'SHRM-CP',
+    fullName: 'SHRM Certified Professional (HR)',
+    icon: '👥',
+    color: '#f39c12',
+    category: 'HR',
+    passThreshold: '200 scale score (passing varies by exam form)',
+    examInfo: [
+      ['Exam','SHRM-CP'],
+      ['Questions','110'],
+      ['Format','Knowledge + Situational Judgment Items'],
+      ['Domains','Employment Law (38%) · People & Talent (32%) · HR Strategy (18%) · HR Operations (12%)']
+    ],
+    domains: [
+      {name:'Employment Law',  icon:'⚖️', color:'#e74c3c', weight:0.50},
+      {name:'People & Talent', icon:'👥', color:'#f39c12', weight:0.40},
+      {name:'HR Strategy',     icon:'📈', color:'#0078d4', weight:0.07},
+      {name:'HR Operations',   icon:'⚙️', color:'#6264a7', weight:0.03}
+    ],
+    aiContext: 'SHRM Certified Professional (SHRM-CP) exam. Domains: Employment Law & Regulations (38%), People & Talent Management (32%), HR Strategy & Business Acumen (18%), HR Operations & Technology (12%).'
+  },
+  'shrm-scp': {
+    key: 'shrm-scp',
+    name: 'SHRM-SCP',
+    fullName: 'SHRM Senior Certified Professional',
+    icon: '👔',
+    color: '#6f42c1',
+    category: 'HR',
+    passThreshold: '200 scale score (passing varies by exam form)',
+    examInfo: [
+      ['Exam','SHRM-SCP'],
+      ['Questions','110'],
+      ['Format','Knowledge + Situational Judgment Items'],
+      ['Domains','Acuity (25%) · Strategic HR Mgmt (25%) · HR Expertise (25%) · Consultation (25%)']
+    ],
+    domains: [
+      {name:'Acuity',                    icon:'📊', color:'#6f42c1', weight:0.50},
+      {name:'Strategic HR Management',   icon:'🎯', color:'#0078d4', weight:0.40},
+      {name:'HR Expertise',              icon:'🔧', color:'#f39c12', weight:0.07},
+      {name:'Consultation & Business Acumen', icon:'💼', color:'#2ecc71', weight:0.03}
+    ],
+    aiContext: 'SHRM Senior Certified Professional (SHRM-SCP) exam. Domains: Acuity (25%), Strategic HR Management (25%), HR Expertise (25%), Consultation & Business Acumen (25%). Senior level certification requiring strategic thinking, business partnering, and advanced HR expertise.'
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// GLOBALS
+// ═══════════════════════════════════════════════════════
+let sbClient = null;
+let currentUser = null;   // { id, email } or { id:'guest', email:'guest' }
+let currentSubject = null;  // subject key string
+let answers = {};           // { qId: { attempts, wrongCount, lastResult } }
+let streak = 0, lastDate = null;
+let session = { questions: [], idx: 0, score: 0, results: [] };
+let authMode = 'signin';
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+async function init() {
+  try {
+    const SUPABASE_URL = 'https://kcycuabxhowpdprrulyn.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtjeWN1YWJ4aG93cGRwcnJ1bHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMjg4OTQsImV4cCI6MjA5MjkwNDg5NH0.69f-JBkd8dAalymT7p4of-nihweiJcKeffUZxv7-T2c';
+    const sbCfg = { url: SUPABASE_URL, key: SUPABASE_KEY };
+    localStorage.setItem('studyapp_supabase', JSON.stringify(sbCfg));
+
+    // Show loading screen while we fetch questions + auth state
+    showView('v-loading');
+
+    initSupabase(sbCfg.url, sbCfg.key);
+
+    // Pre-fill setup form fields
+    const urlEl = document.getElementById('sb-url');
+    const keyEl = document.getElementById('sb-key');
+    if (urlEl) urlEl.value = sbCfg.url;
+    if (keyEl) keyEl.value = sbCfg.key;
+
+    // Load questions with timeout (max 5 seconds)
+    const loadQuestionsPromise = Promise.race([
+      loadQuestions(),
+      new Promise(resolve => setTimeout(() => { console.warn('[QB] loadQuestions timeout'); resolve(false); }, 5000))
+    ]);
+
+    // Check auth with timeout (max 2 seconds)
+    const authPromise = Promise.race([
+      sbClient ? sbClient.auth.getSession().catch(e => { console.warn('[AUTH] getSession error:', e); return { data: { session: null } }; }) : Promise.resolve({ data: { session: null } }),
+      new Promise(resolve => setTimeout(() => { console.warn('[AUTH] getSession timeout'); resolve({ data: { session: null } }); }, 2000))
+    ]);
+
+    // Wait for both to complete
+    const [qLoaded, sessionResult] = await Promise.all([
+      loadQuestionsPromise,
+      authPromise
+    ]);
+
+    console.log('[INIT] Questions loaded:', qLoaded, 'Session result:', sessionResult);
+
+    // Determine next view based on session
+    if (sessionResult?.data?.session) {
+      currentUser = { id: sessionResult.data.session.user.id, email: sessionResult.data.session.user.email };
+      console.log('[INIT] Authenticated user:', currentUser.email);
+      showView('v-subjects');
+      renderSubjectsView();
+    } else {
+      console.log('[INIT] No session, showing auth view');
+      showView('v-auth');
+    }
+  } catch (err) {
+    console.error('[INIT] Error during initialization:', err);
+    // Fallback: show auth view
+    showView('v-auth');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// SUPABASE
+// ═══════════════════════════════════════════════════════
+function initSupabase(url, key) {
+  sbClient = supabase.createClient(url, key);
+}
+// ═══════════════════════════════════════════════════════
+// QUESTION LOADER — fetches from Supabase, caches 24h
+// ═══════════════════════════════════════════════════════
+const QB_CACHE_KEY = 'kanpassit_qb_v1';
+const QB_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+async function loadQuestions() {
+  // 1. Try localStorage cache first
+  try {
+    const cached = JSON.parse(localStorage.getItem(QB_CACHE_KEY) || 'null');
+    if (cached && Date.now() - cached.ts < QB_CACHE_TTL) {
+      QB = cached.data;
+      console.log('[QB] Loaded from cache:', Object.entries(QB).map(([k,v])=>`${k}:${v.length}`).join(', '));
+      return true;
+    }
+  } catch(e) {
+    console.warn('[QB] Cache parse error:', e);
+  }
+
+  // 2. Fallback: ensure QB has all subjects even if cache/Supabase fails
+  // This prevents "Cannot read property 'length' of undefined" errors
+  if (!QB['ab900']) QB['ab900'] = [];
+  if (!QB['lvn']) QB['lvn'] = [];
+  if (!QB['shrm']) QB['shrm'] = [];
+  if (!QB['shrm-scp']) QB['shrm-scp'] = [];
+
+  // 3. Try Supabase fetch only if client exists
+  if (!sbClient) {
+    console.warn('[QB] sbClient not initialized, using empty question banks');
+    return false;
+  }
+
+  try {
+    const { data, error } = await sbClient
+      .from('questions')
+      .select('id, subject_slug, domain, question_text, options, correct_index, explanation')
+      .eq('active', true)
+      .order('id');
+
+    if (error || !data?.length) {
+      console.warn('[QB] Supabase fetch failed:', error);
+      return false;
+    }
+
+    // Transform Supabase rows → app format, grouped by subject
+    const grouped = {};
+    for (const row of data) {
+      const slug = row.subject_slug;
+      if (!grouped[slug]) grouped[slug] = [];
+      grouped[slug].push({
+        id:      row.id,
+        cat:     row.domain,
+        q:       row.question_text,
+        opts:    Array.isArray(row.options) ? row.options : JSON.parse(row.options),
+        correct: row.correct_index,
+        exp:     row.explanation
+      });
+    }
+    QB = grouped;
+
+    // Cache for next load
+    try {
+      localStorage.setItem(QB_CACHE_KEY, JSON.stringify({ ts: Date.now(), data: QB }));
+    } catch(e) {
+      console.warn('[QB] Cache save error:', e);
+    }
+
+    console.log('[QB] Loaded from Supabase:', Object.entries(QB).map(([k,v])=>`${k}:${v.length}`).join(', '));
+    return true;
+  } catch(e) {
+    console.error('[QB] loadQuestions error:', e);
+    return false;
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════
+// SETUP VIEW
+// ═══════════════════════════════════════════════════════
+function saveSetup() {
+  const url = document.getElementById('sb-url').value.trim();
+  const key = document.getElementById('sb-key').value.trim();
+  const errEl = document.getElementById('setup-err');
+  errEl.textContent = '';
+
+  if (!url.startsWith('https://') || !url.includes('.supabase.co')) {
+    errEl.textContent = 'Please enter a valid Supabase project URL (https://xxxx.supabase.co)';
+    return;
+  }
+  if (!key.startsWith('eyJ')) {
+    errEl.textContent = 'Please enter a valid Supabase anon key (starts with eyJ...)';
+    return;
+  }
+
+  localStorage.setItem('studyapp_supabase', JSON.stringify({ url, key }));
+  localStorage.removeItem('studyapp_guest');
+  initSupabase(url, key);
+  showView('v-auth');
+}
+
+function skipSetup() {
+  localStorage.removeItem('studyapp_supabase');
+  currentUser = { id: 'guest', email: 'guest' };
+  localStorage.setItem('studyapp_guest', '1');
+  showView('v-subjects');
+  renderSubjectsView();
+}
+
+// ═══════════════════════════════════════════════════════
+// AUTH VIEW
+// ═══════════════════════════════════════════════════════
+function toggleAuthMode() {
+  authMode = authMode === 'signin' ? 'signup' : 'signin';
+  const isSignup = authMode === 'signup';
+  document.getElementById('auth-subtitle').textContent = isSignup ? 'Create your account' : 'Sign in to your account';
+  document.getElementById('auth-btn').textContent = isSignup ? 'Create Account' : 'Sign In';
+  document.getElementById('auth-toggle').innerHTML = isSignup
+    ? 'Already have an account? <span>Sign in</span>'
+    : "Don't have an account? <span>Sign up</span>";
+  document.getElementById('auth-err').textContent = '';
+  document.getElementById('auth-ok').textContent = '';
+}
+
+async function submitAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-pass').value;
+  const errEl = document.getElementById('auth-err');
+  const okEl  = document.getElementById('auth-ok');
+  const btn   = document.getElementById('auth-btn');
+
+  errEl.textContent = '';
+  okEl.textContent  = '';
+
+  if (!email || !pass) { errEl.textContent = 'Please enter your email and password.'; return; }
+  if (!sbClient) { errEl.textContent = 'Supabase not configured. Use guest mode or set up Supabase first.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = authMode === 'signin' ? 'Signing in…' : 'Creating account…';
+
+  try {
+    let result;
+    if (authMode === 'signin') {
+      result = await sbClient.auth.signInWithPassword({ email, password: pass });
+    } else {
+      result = await sbClient.auth.signUp({ email, password: pass });
+    }
+
+    if (result.error) throw result.error;
+
+    if (authMode === 'signup' && result.data?.user && !result.data.session) {
+      okEl.textContent = 'Check your email to confirm your account, then sign in.';
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+      return;
+    }
+
+    currentUser = { id: result.data.user.id, email: result.data.user.email };
+    showView('v-subjects');
+    renderSubjectsView();
+  } catch (err) {
+    errEl.textContent = err.message || 'Authentication failed. Please try again.';
+  }
+
+  btn.disabled = false;
+  btn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+}
+
+function guestMode() {
+  currentUser = { id: 'guest', email: 'guest' };
+  localStorage.setItem('studyapp_guest', '1');
+  showView('v-subjects');
+  renderSubjectsView();
+}
+
+async function signOut() {
+  if (sbClient && currentUser.id !== 'guest') {
+    await sbClient.auth.signOut().catch(() => {});
+  }
+  currentUser = null;
+  currentSubject = null;
+  localStorage.removeItem('studyapp_guest');
+  // Keep supabase config but clear session
+  showView('v-auth');
+  document.getElementById('auth-err').textContent = '';
+  document.getElementById('auth-ok').textContent = '';
+}
+
+// ═══════════════════════════════════════════════════════
+// SUBJECTS VIEW
+// ═══════════════════════════════════════════════════════
+function renderSubjectsView() {
+  // Guard: ensure currentUser is initialized
+  if (!currentUser) {
+    currentUser = { id: 'guest', email: 'guest' };
+  }
+
+  const pill = document.getElementById('user-pill');
+  if (currentUser.id === 'guest') {
+    pill.textContent = 'Guest Mode';
+  } else {
+    pill.textContent = currentUser.email.split('@')[0] + ' · Sign Out';
+  }
+
+  // Reset search
+  const searchInput = document.getElementById('subject-search');
+  if (searchInput) searchInput.value = '';
+
+  renderCategorizedSubjects(Object.values(SUBJECTS));
+}
+
+function renderCategorizedSubjects(subjects) {
+  // Group subjects by category
+  const categories = {};
+  subjects.forEach(s => {
+    const cat = s.category || 'Other';
+    if (!categories[cat]) categories[cat] = [];
+    categories[cat].push(s);
+  });
+
+  const categoryOrder = ['Tech', 'Healthcare', 'HR', 'Other'];
+  const grid = document.getElementById('subjects-grid');
+
+  grid.innerHTML = categoryOrder
+    .filter(cat => categories[cat])
+    .map(cat => {
+      const subjectsInCat = categories[cat];
+      const catId = `cat-${cat.toLowerCase().replace(/\s+/g, '-')}`;
+
+      const subjectCards = subjectsInCat.map(s => {
+        // Ensure QB[s.key] exists
+        if (!QB[s.key]) QB[s.key] = [];
+
+        const subAnswers = getLocalAnswers(s.key);
+        const answered = Object.keys(subAnswers).length;
+        const correct = Object.values(subAnswers).filter(a => a.lastResult === 'correct').length;
+        const acc = answered ? Math.round(correct / answered * 100) : 0;
+        const likelihood = calcLikelihood(s.key, subAnswers);
+        const likeStr = typeof likelihood === 'object' ? (likelihood.percentage > 0 ? likelihood.percentage + '%' : '—') : (likelihood > 0 ? likelihood + '%' : '—');
+        const likeColor = (typeof likelihood === 'object' ? likelihood.percentage : likelihood) >= 75 ? 'var(--pass)' : (typeof likelihood === 'object' ? likelihood.percentage : likelihood) >= 55 ? 'var(--warn)' : (typeof likelihood === 'object' ? likelihood.percentage : likelihood) > 0 ? 'var(--fail)' : 'var(--text2)';
+
+        return `<div class="subject-card" onclick="selectSubject('${s.key}')">
+          <div class="subject-card-accent" style="background:${s.color}"></div>
+          <div class="subject-card-row">
+            <div class="subject-icon">${s.icon}</div>
+            <div>
+              <div class="subject-name">${s.name}</div>
+              <div class="subject-desc">${s.fullName}</div>
+            </div>
+          </div>
+          <div class="subject-stats">
+            <div class="ss-item"><div class="ss-num">${answered}</div><div class="ss-lbl">Answered</div></div>
+            <div class="ss-item"><div class="ss-num">${answered ? acc + '%' : '—'}</div><div class="ss-lbl">Accuracy</div></div>
+            <div class="ss-item"><div class="ss-num" style="color:${likeColor};-webkit-text-fill-color:${likeColor}">${likeStr}</div><div class="ss-lbl">Pass %</div></div>
+          </div>
+        </div>`;
+      }).join('');
+
+      return `<div class="category-section">
+        <div class="category-header" onclick="toggleCategory('${catId}')">
+          <span class="category-name">${cat}</span>
+          <span class="category-count">${subjectsInCat.length}</span>
+          <svg class="category-chevron" id="${catId}-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;transition:transform 0.25s">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+        <div class="category-subjects" id="${catId}" style="display:block">
+          ${subjectCards}
+        </div>
+      </div>`;
+    }).join('');
+}
+
+function filterSubjects(query) {
+  const subjects = Object.values(SUBJECTS).filter(s =>
+    s.name.toLowerCase().includes(query.toLowerCase()) ||
+    s.fullName.toLowerCase().includes(query.toLowerCase()) ||
+    s.category.toLowerCase().includes(query.toLowerCase())
+  );
+
+  if (query.trim() === '') {
+    renderCategorizedSubjects(Object.values(SUBJECTS));
+  } else {
+    renderCategorizedSubjects(subjects);
+  }
+}
+
+function toggleCategory(catId) {
+  const section = document.getElementById(catId);
+  const chevron = document.getElementById(catId + '-chevron');
+  const isOpen = section.style.display !== 'none';
+
+  section.style.display = isOpen ? 'none' : 'block';
+  chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+async function selectSubject(key) {
+  currentSubject = key;
+  // Load progress
+  await loadProgress();
+  enterApp();
+}
+
+// ═══════════════════════════════════════════════════════
+// PROGRESS: LOCAL + SUPABASE SYNC
+// ═══════════════════════════════════════════════════════
+function localKey() {
+  return `studyapp_progress_${currentUser.id}_${currentSubject}`;
+}
+
+function getLocalAnswers(subjectKey) {
+  const uid = currentUser ? currentUser.id : 'guest';
+  const k = `studyapp_progress_${uid}_${subjectKey}`;
+  const d = JSON.parse(localStorage.getItem(k) || '{}');
+  return d.answers || {};
+}
+
+function saveLocal() {
+  const d = JSON.parse(localStorage.getItem(localKey()) || '{}');
+  d.answers   = answers;
+  d.streak    = streak;
+  d.lastDate  = lastDate;
+  localStorage.setItem(localKey(), JSON.stringify(d));
+
+  const cfg = JSON.parse(localStorage.getItem('studyapp_config') || '{}');
+  localStorage.setItem('studyapp_config', JSON.stringify(cfg));
+}
+
+async function loadProgress() {
+  // Load from local first (instant)
+  const local = JSON.parse(localStorage.getItem(localKey()) || '{}');
+  answers  = local.answers  || {};
+  streak   = local.streak   || 0;
+  lastDate = local.lastDate || null;
+
+  // Then sync from Supabase
+  if (sbClient && currentUser.id !== 'guest') {
+    setSyncDot(false);
+    try {
+      const { data, error } = await sbClient
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .eq('subject', currentSubject);
+
+      if (!error && data) {
+        data.forEach(row => {
+          answers[row.question_id] = {
+            attempts:   row.attempts,
+            wrongCount: row.wrong_count,
+            lastResult: row.last_result
+          };
+        });
+        saveLocal();
+        setSyncDot(true);
+      }
+    } catch(e) { setSyncDot(false); }
+  } else {
+    setSyncDot(currentUser.id === 'guest');
+  }
+}
+
+async function syncAnswer(qId, result) {
+  if (!sbClient || currentUser.id === 'guest') return;
+  const a = answers[qId];
+  try {
+    await sbClient.from('user_progress').upsert({
+      user_id:     currentUser.id,
+      subject:     currentSubject,
+      question_id: qId,
+      last_result: a.lastResult,
+      attempts:    a.attempts,
+      wrong_count: a.wrongCount,
+      updated_at:  new Date().toISOString()
+    }, { onConflict: 'user_id,subject,question_id' });
+    setSyncDot(true);
+  } catch(e) { setSyncDot(false); }
+}
+
+async function resetProgressRemote() {
+  if (!sbClient || currentUser.id === 'guest') return;
+  try {
+    await sbClient.from('user_progress')
+      .delete()
+      .eq('user_id', currentUser.id)
+      .eq('subject', currentSubject);
+  } catch(e) {}
+}
+
+function setSyncDot(online) {
+  const dot = document.getElementById('sync-dot');
+  if (!dot) return;
+  dot.className = 'sync-dot' + (online ? '' : ' offline');
+  dot.title = online ? 'Synced to cloud' : 'Local only';
+}
+
+// ═══════════════════════════════════════════════════════
+// APP ENTRY
+// ═══════════════════════════════════════════════════════
+function enterApp() {
+  const sub = SUBJECTS[currentSubject];
+  document.getElementById('app-subject-logo').textContent = sub.name;
+  document.getElementById('streak-val').textContent = streak || 0;
+  document.getElementById('pass-threshold-lbl').textContent = sub.passThreshold;
+
+  // Exam info rows in settings
+  const infoDiv = document.getElementById('exam-info-rows');
+  if (infoDiv) {
+    infoDiv.innerHTML = sub.examInfo.map(([l,v]) =>
+      `<div class="s-row" style="cursor:default"><span class="s-row-lbl">${l}</span><span class="s-row-val" style="text-align:right;max-width:60%">${v}</span></div>`
+    ).join('');
+  }
+
+  // Domain buttons in modal
+  const modalDomains = document.getElementById('modal-domains');
+  if (modalDomains) {
+    modalDomains.innerHTML = sub.domains.map(d => `
+      <button class="mode-btn" style="flex:1;min-width:120px;padding:10px 12px" onclick="startQuiz('domain','${d.name}');closeModeModal()">
+        <div class="mode-btn-title" style="font-size:13px">${d.icon} ${d.name}</div>
+        <div class="mode-btn-sub">${QB[currentSubject].filter(q=>q.cat===d.name).length} questions</div>
+      </button>`).join('');
+  }
+
+  const totalQ = QB[currentSubject].length;
+  document.getElementById('modal-full-sub').textContent = `All ${totalQ} questions in random order`;
+
+  showView('v-app');
+  showPage('home');
+  renderHome();
+}
+
+function backToSubjects() {
+  currentSubject = null;
+  showView('v-subjects');
+  renderSubjectsView();
+}
+
+// ═══════════════════════════════════════════════════════
+// PASS LIKELIHOOD
+// ═══════════════════════════════════════════════════════
+function calcLikelihood(subKey, ans) {
+  const sub = SUBJECTS[subKey];
+  const qs  = QB[subKey];
+  const totalAnswered = Object.keys(ans).length;
+
+  // Define per-subject thresholds for Pass Likelihood
+  const thresholds = {
+    'ab900': 50,
+    'lvn': 125,
+    'shrm': 90,
+    'shrm-scp': 90
+  };
+  const threshold = thresholds[subKey] || 30;
+
+  // Don't show estimate until threshold reached
+  if (totalAnswered < threshold) {
+    return { percentage: 0, gated: true, threshold, answered: totalAnswered };
+  }
+
+  // Calculate weighted score by domain
+  let weightedScore = 0, totalWeight = 0;
+  sub.domains.forEach(d => {
+    const dqs     = qs.filter(q => q.cat === d.name);
+    const answered = dqs.filter(q => ans[q.id]);
+    if (!answered.length) return;
+    const correct = answered.filter(q => ans[q.id].lastResult === 'correct').length;
+    weightedScore += (correct / answered.length) * d.weight;
+    totalWeight   += d.weight;
+  });
+
+  const rawPct = totalWeight > 0 ? (weightedScore / totalWeight) * 100 : 0;
+
+  // Define max questions per subject (for confidence scaling)
+  const maxQuestions = {
+    'ab900': 60,
+    'lvn': 150,
+    'shrm': 110,
+    'shrm-scp': 110
+  }[subKey] || 100;
+
+  // Keep climbing after threshold; don't plateau
+  const confidence = Math.min(1, Math.max(0.5, totalAnswered / maxQuestions));
+  const blended   = 50 + (rawPct - 50) * confidence;
+  const percentage = Math.round(Math.max(2, Math.min(97, blended)));
+
+  return {
+    percentage,
+    gated: false,
+    threshold,
+    answered: totalAnswered,
+    maxQuestions
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// HOME PAGE
+// ═══════════════════════════════════════════════════════
+function renderHome() {
+  renderGauge();
+  renderQuickStats();
+  renderDomains();
+  document.getElementById('streak-val').textContent = streak || 0;
+  const hasWeak = getWeakQs().length > 0;
+  document.getElementById('weak-btn').style.display = hasWeak ? 'block' : 'none';
+  document.getElementById('modal-weak-btn').style.display = hasWeak ? 'block' : 'none';
+}
+
+function renderGauge() {
+  const result = calcLikelihood(currentSubject, answers);
+  const { percentage, gated, threshold, answered } = result;
+
+  if (gated) {
+    // Before threshold: show progress countdown
+    const remaining = threshold - answered;
+    document.getElementById('gauge-pct-text').textContent = `${answered}/${threshold}`;
+    document.getElementById('gauge-pct-text').style.fontSize = '18px';
+    document.getElementById('gauge-pct-text').style.color = 'var(--text2)';
+    document.getElementById('gauge-sub').textContent =
+      `Complete ${remaining} more question${remaining === 1 ? '' : 's'} to unlock pass estimates`;
+    setGaugeArc(answered / threshold * 0.5, '#6264a7');  // partial arc for progress
+    return;
+  }
+
+  const likelihood = percentage;
+  const color = likelihood >= 75 ? '#2ecc71' : likelihood >= 55 ? '#f39c12' : '#e05c5c';
+  document.getElementById('gauge-pct-text').textContent = `${likelihood}%`;
+  document.getElementById('gauge-pct-text').style.fontSize = '30px';
+  document.getElementById('gauge-pct-text').style.color = color;
+  document.getElementById('gauge-sub').textContent =
+    likelihood >= 75 ? '✓ Looking strong — keep it up!' :
+    likelihood >= 55 ? '⚠ Getting there — focus on weak areas' :
+    '→ More practice needed across key domains';
+  setGaugeArc(likelihood / 100, color);
+
+  // Check if we just crossed the threshold
+  if (answered === threshold) {
+    showMilestoneBadge(`🎉 Confidence unlocked! You've reached ${threshold} questions.`);
+  }
+}
+
+function setGaugeArc(pct, color) {
+  const arc = document.getElementById('gauge-arc');
+  const total = 188.5;
+  arc.setAttribute('stroke', color);
+  arc.setAttribute('stroke-dashoffset', total * (1 - pct));
+}
+
+function showMilestoneBadge(text) {
+  const badge = document.getElementById('milestone-badge');
+  const milestoneText = document.getElementById('milestone-text');
+  milestoneText.textContent = text;
+  badge.style.display = 'flex';
+  setTimeout(() => closeMilestone(), 5000);  // Auto-close after 5s
+}
+
+function closeMilestone() {
+  document.getElementById('milestone-badge').style.display = 'none';
+}
+
+function renderQuickStats() {
+  const ans   = Object.keys(answers).length;
+  const cor   = Object.values(answers).filter(a => a.lastResult === 'correct').length;
+  const acc   = ans ? Math.round(cor / ans * 100) : 0;
+  const weak  = getWeakQs().length;
+  document.getElementById('qs-answered').textContent = ans;
+  document.getElementById('qs-correct').textContent  = ans ? `${acc}%` : '—';
+  document.getElementById('qs-weak').textContent     = weak;
+}
+
+function renderDomains() {
+  const sub = SUBJECTS[currentSubject];
+  const qs  = QB[currentSubject];
+  document.getElementById('domain-grid').innerHTML = sub.domains.map(d => {
+    const dqs     = qs.filter(q => q.cat === d.name);
+    const answered = dqs.filter(q => answers[q.id]);
+    const correct = answered.filter(q => answers[q.id].lastResult === 'correct').length;
+    const pct     = answered.length ? Math.round(correct / answered.length * 100) : 0;
+    const scoreColor = pct >= 70 ? 'var(--pass)' : pct >= 50 ? 'var(--warn)' : pct > 0 ? 'var(--fail)' : 'var(--text2)';
+    return `<div class="domain-card" onclick="startQuiz('domain','${d.name}');closeModeModal()">
+      <div class="domain-icon" style="background:${d.color}22">${d.icon}</div>
+      <div class="domain-info">
+        <div class="domain-name">${d.name}</div>
+        <div class="domain-sub">${answered.length}/${dqs.length} answered · ${Math.round(d.weight*100)}% of exam</div>
+        <div class="domain-bar-track"><div class="domain-bar-fill" style="width:${pct}%;background:${d.color}"></div></div>
+      </div>
+      <div class="domain-score-lbl" style="color:${scoreColor}">${answered.length ? pct+'%' : 'Start'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// QUIZ ENGINE
+// ═══════════════════════════════════════════════════════
+function getWeakQs() {
+  return QB[currentSubject].filter(q => answers[q.id]?.lastResult === 'wrong');
+}
+
+function startQuiz(mode, domainName) {
+  const qs = QB[currentSubject];
+  let pool = [];
+  if (mode === 'all')    pool = shuffle([...qs]);
+  if (mode === 'quick')  pool = shuffle([...qs]).slice(0, 10);
+  if (mode === 'weak')   pool = shuffle(getWeakQs());
+  if (mode === 'domain') pool = shuffle(qs.filter(q => q.cat === domainName));
+  if (!pool.length) { toast('No questions available for this mode'); return; }
+  session = { questions: pool, idx: 0, score: 0, results: [] };
+  showPage('quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q   = session.questions[session.idx];
+  const tot = session.questions.length;
+  const pct = Math.round((session.idx / tot) * 100);
+
+  document.getElementById('quiz-content').innerHTML = `
+    <div class="quiz-header">
+      <div class="quiz-prog-wrap">
+        <div class="quiz-prog-meta">
+          <span>Question ${session.idx+1} of ${tot}</span>
+          <span>${session.score} correct</span>
+        </div>
+        <div class="quiz-prog-track"><div class="quiz-prog-fill" style="width:${pct}%"></div></div>
+      </div>
+      <button class="quit-btn" onclick="quitQuiz()">Quit</button>
+    </div>
+    <div class="q-body">
+      <div class="q-meta">
+        <span class="q-cat">${q.cat}</span>
+        <span class="q-num">#${q.id}</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="options" id="options">
+        ${q.opts.map((o, i) => `
+          <div class="option" id="opt-${i}" onclick="selectAnswer(${i})">
+            <div class="opt-letter">${'ABCD'[i]}</div>
+            <div class="opt-text">${o}</div>
+          </div>`).join('')}
+        <div class="option" id="opt-${q.opts.length}" onclick="selectAnswer(${q.opts.length})" style="border-style:dashed;opacity:.75">
+          <div class="opt-letter" style="background:var(--surface2);color:var(--text2)">${'ABCDE'[q.opts.length]}</div>
+          <div class="opt-text" style="color:var(--text2);font-style:italic">I don't know</div>
+        </div>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      <a class="quiz-skip-link" id="skip-link" onclick="skipQuestion()">Skip — return to later</a>
+    </div>
+    <div class="next-wrap">
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()">
+        ${session.idx + 1 === tot ? 'See Results →' : 'Next Question →'}
+      </button>
+    </div>`;
+}
+
+function selectAnswer(chosen) {
+  document.querySelectorAll('.option').forEach(o => o.classList.add('locked'));
+  const skipLink = document.getElementById('skip-link');
+  if (skipLink) skipLink.style.display = 'none';
+  const q       = session.questions[session.idx];
+  const correct = chosen === q.correct; // "I don't know" (index = q.opts.length) is always wrong
+
+  document.getElementById(`opt-${chosen}`).classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) document.getElementById(`opt-${q.correct}`).classList.add('reveal-correct');
+
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'block';
+  fb.className = `feedback ${correct ? 'correct-fb' : 'wrong-fb'}`;
+  fb.innerHTML = `
+    <div class="feedback-head ${correct ? 'correct-head' : 'wrong-head'}">
+      ${correct ? '✓ Correct!' : '✗ Incorrect'}
+    </div>
+    <div class="feedback-body">${q.exp}</div>`;
+
+  const prev = answers[q.id] || { attempts: 0, wrongCount: 0 };
+  answers[q.id] = {
+    attempts:   prev.attempts + 1,
+    wrongCount: correct ? prev.wrongCount : prev.wrongCount + 1,
+    lastResult: correct ? 'correct' : 'wrong'
+  };
+  saveLocal();
+  syncAnswer(q.id, correct ? 'correct' : 'wrong');
+
+  if (correct) session.score++;
+  session.results.push({ id: q.id, cat: q.cat, correct });
+
+  // Streak
+  const today = new Date().toDateString();
+  if (lastDate !== today) {
+    if (lastDate) {
+      const last = new Date(lastDate);
+      const yest = new Date(); yest.setDate(yest.getDate() - 1);
+      streak = last.toDateString() === yest.toDateString() ? streak + 1 : 1;
+    } else { streak = 1; }
+    lastDate = today;
+    saveLocal();
+  }
+  document.getElementById('streak-val').textContent = streak;
+  document.getElementById('btn-next').style.display = 'block';
+}
+
+function nextQuestion() {
+  session.idx++;
+  session.idx >= session.questions.length ? showSessionResults() : renderQuestion();
+}
+
+function quitQuiz() {
+  showConfirm({
+    icon: '🚪',
+    title: 'Quit Session?',
+    body: 'Your progress so far will be saved.',
+    okLabel: 'Quit',
+    onOk: () => { showPage('home'); renderHome(); }
+  });
+}
+
+async function skipQuestion() {
+  const q = session.questions[session.idx];
+  const remaining = session.questions.length - session.idx;
+  if (remaining <= 1) { toast('No other questions to skip to'); return; }
+
+  // Mark question as skipped in database
+  if (currentUser && currentUser.id !== 'guest') {
+    try {
+      await sbClient.from('question_skips').upsert({
+        user_id: currentUser.id,
+        subject: currentSubject,
+        question_id: q.id,
+        skipped_at: new Date()
+      }, { onConflict: 'user_id,subject,question_id' });
+    } catch(err) {
+      console.warn('[SKIP] Database error:', err);
+    }
+  }
+
+  // Move current question to the end of the queue
+  const [skipped] = session.questions.splice(session.idx, 1);
+  session.questions.push(skipped);
+  // idx stays the same — it now points to the next question
+  renderQuestion();
+}
+
+function showSessionResults() {
+  const tot = session.questions.length;
+  const sc  = session.score;
+  const pct = Math.round(sc / tot * 100);
+  const emoji = pct >= 80 ? '🎉' : pct >= 60 ? '💪' : '📚';
+  const title = pct >= 80 ? 'Excellent Work!' : pct >= 60 ? 'Good Progress!' : 'Keep Practicing!';
+
+  const sub = SUBJECTS[currentSubject];
+  const breakdown = sub.domains.map(d => {
+    const drs = session.results.filter(r => r.cat === d.name);
+    if (!drs.length) return '';
+    const correct = drs.filter(r => r.correct).length;
+    const dpct = Math.round(correct / drs.length * 100);
+    const cls  = dpct >= 70 ? 'score-good' : dpct >= 50 ? 'score-mid' : 'score-bad';
+    return `<div class="done-row">
+      <span>${d.icon} ${d.name}</span>
+      <span class="done-row-score ${cls}">${correct}/${drs.length} (${dpct}%)</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('quiz-content').innerHTML = `
+    <div class="session-done">
+      <div class="done-emoji">${emoji}</div>
+      <div class="done-h">${title}</div>
+      <div class="done-sub">You scored ${sc} / ${tot} (${pct}%) this session</div>
+      ${breakdown ? `<div class="done-breakdown">${breakdown}</div>` : ''}
+      <button class="btn-p" onclick="startQuiz('quick')">Practice Again</button>
+      <button class="btn-s" onclick="showPage('home');renderHome()">Back to Home</button>
+      <button class="btn-s" onclick="showPage('analysis');renderWrongLog()">View AI Analysis ✦</button>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// ANALYSIS PAGE
+// ═══════════════════════════════════════════════════════
+function renderAnalysisPage() {
+  const analysisOutput = document.getElementById('ai-analysis-output');
+  // Render analytics dashboard
+  renderAnalyticsDashboard();
+  renderWrongLog();
+}
+
+function renderWrongLog() {
+  const qs    = QB[currentSubject];
+  const wrong = qs.filter(q => answers[q.id]?.lastResult === 'wrong');
+  const log   = document.getElementById('wrong-log');
+  const countBadge = document.getElementById('wrong-log-count');
+
+  // Update count badge
+  if (countBadge) {
+    countBadge.textContent = wrong.length ? `${wrong.length}` : '0';
+    countBadge.className = 'wrong-log-count' + (wrong.length ? ' has-items' : '');
+  }
+
+  if (!wrong.length) {
+    log.innerHTML = '<div style="font-size:13px;color:var(--text2);padding:12px 0">No wrong answers yet — start a practice session!</div>';
+    return;
+  }
+  log.innerHTML = wrong.map(q => {
+    const a = answers[q.id];
+    return `<div class="analysis-card">
+      <div class="analysis-card-title">#${q.id} · <span style="color:var(--text2);font-size:11px;font-weight:500">${q.cat}</span></div>
+      <div class="analysis-card-body">${q.q}<br><br>
+        <strong style="color:var(--text)">Correct answer:</strong> ${q.opts[q.correct]}<br><br>
+        <span style="font-size:11px">Wrong ${a.wrongCount}× of ${a.attempts} attempt${a.attempts>1?'s':''}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleWrongLog() {
+  const wrap    = document.getElementById('wrong-log-wrap');
+  const chevron = document.getElementById('wrong-log-chevron');
+  const isOpen  = wrap.classList.contains('open');
+  wrap.classList.toggle('open', !isOpen);
+  chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+async function runAnalysis() {
+  const qs    = QB[currentSubject];
+  const wrong = qs.filter(q => answers[q.id]?.lastResult === 'wrong');
+  if (wrong.length < 3) { toast('Answer a few more questions first'); return; }
+
+  const btn = document.getElementById('analyze-btn');
+  btn.innerHTML = '<div class="spinner"></div> Analyzing…';
+  btn.disabled  = true;
+
+  const sub = SUBJECTS[currentSubject];
+  const totalAnswered = Object.keys(answers).length;
+  const totalCorrect  = Object.values(answers).filter(a => a.lastResult === 'correct').length;
+  const domainSummary = sub.domains.map(d => {
+    const dqs = qs.filter(q => q.cat === d.name);
+    const ans = dqs.filter(q => answers[q.id]);
+    const cor = ans.filter(q => answers[q.id].lastResult === 'correct').length;
+    return `${d.name}: ${cor}/${ans.length} correct${ans.length ? ` (${Math.round(cor/ans.length*100)}%)` : ' (not started)'}`;
+  }).join('\n');
+  const wrongList = wrong.slice(0, 15).map(q => `- [${q.cat}] ${q.q}`).join('\n');
+
+  const prompt = `You are an expert ${sub.name} exam coach. A student is preparing for the ${sub.fullName} exam.
+Context: ${sub.aiContext}
+
+Student performance:
+Overall: ${totalCorrect}/${totalAnswered} correct (${totalAnswered ? Math.round(totalCorrect/totalAnswered*100) : 0}%)
+
+Domain breakdown:
+${domainSummary}
+
+Questions answered incorrectly (recent):
+${wrongList}
+
+Provide a focused, actionable study plan in 200-250 words. Include:
+1. Their 2-3 biggest weak areas based on the data
+2. Specific concepts to review for each weak area
+3. Which domain to prioritize given its exam weight
+4. One encouraging closing note
+
+Write directly to the student in second person. Be specific and practical.`;
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Analysis failed'); }
+    const data = await res.json();
+    document.getElementById('ai-analysis-output').innerHTML =
+      `<div class="ai-result">${data.content.replace(/\n/g,'<br>')}</div><br>`;
+  } catch(err) {
+    document.getElementById('ai-analysis-output').innerHTML =
+      `<div class="ai-result" style="border-color:var(--fail);color:#ff8080">Error: ${err.message}</div>`;
+  }
+  btn.innerHTML = '✦ Refresh AI Analysis';
+  btn.disabled  = false;
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+
+function doReset() {
+  const subName = SUBJECTS[currentSubject].name;
+  showConfirm({
+    icon: '🗑️',
+    title: 'Reset Progress?',
+    body: `All progress for <strong style="color:var(--text)">${subName}</strong> will be permanently deleted. This cannot be undone.`,
+    okLabel: 'Reset Everything',
+    onOk: () => {
+      answers = {}; streak = 0; lastDate = null;
+      saveLocal();
+      resetProgressRemote();
+      renderHome();
+      showPage('home');
+      toast('Progress reset ↺');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// NAV & VIEW MANAGEMENT
+// ═══════════════════════════════════════════════════════
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const nav = document.getElementById('global-nav');
+  const showNav = (id === 'v-subjects' || id === 'v-app');
+  nav.style.display = showNav ? 'flex' : 'none';
+  if (id === 'v-subjects') {
+    // On subjects screen: show only Settings, centered
+    document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.style.display = 'none'; });
+    const settingsBtn = document.getElementById('nav-settings');
+    if (settingsBtn) {
+      settingsBtn.style.display = 'flex';
+      settingsBtn.style.opacity = '1';
+      settingsBtn.style.pointerEvents = 'auto';
+      settingsBtn.onclick = () => { showView('v-app'); showPage('settings'); };
+    }
+  } else if (id === 'v-app') {
+    // Restore all nav buttons to full visibility
+    document.querySelectorAll('.nav-btn').forEach(b => { b.style.display = 'flex'; b.style.opacity = ''; b.style.pointerEvents = ''; });
+    document.getElementById('nav-home').onclick = () => showPage('home');
+    document.getElementById('nav-settings').onclick = () => showPage('settings');
+  }
+}
+
+function showPage(name) {
+  document.querySelectorAll('#v-app .page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const nb = document.getElementById('nav-' + name);
+  if (nb) nb.classList.add('active');
+  if (name === 'home')     renderHome();
+  if (name === 'analysis') renderAnalysisPage();
+}
+
+function openModeModal()  { document.getElementById('mode-overlay').classList.add('open'); }
+function closeModeModal(e) {
+  if (!e || e.target === document.getElementById('mode-overlay'))
+    document.getElementById('mode-overlay').classList.remove('open');
+}
+
+let _confirmCallback = null;
+function showConfirm({ icon, title, body, okLabel, onOk }) {
+  document.getElementById('confirm-icon').textContent  = icon || '⚠️';
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-body').innerHTML    = body;
+  document.getElementById('confirm-ok').textContent   = okLabel || 'Confirm';
+  _confirmCallback = onOk;
+  document.getElementById('confirm-ok').onclick = () => { closeConfirm(); if (_confirmCallback) _confirmCallback(); };
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm() {
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _confirmCallback = null;
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ═══════════════════════════════════════════════════════
+// HARD CAPS & USAGE TRACKING
+// ═══════════════════════════════════════════════════════
+async function getUserTier() {
+  if (!currentUser || currentUser.id === 'guest') return 'free';
+  try {
+    const { data } = await sbClient.from('user_accounts').select('subscription_tier').eq('user_id', currentUser.id).single();
+    return data?.subscription_tier || 'free';
+  } catch(err) {
+    console.warn('[TIER] Error fetching tier:', err);
+    return 'free';
+  }
+}
+
+async function checkQuotaStudyPlan(userId, tier) {
+  if (!userId || userId === 'guest') return { allowed: false, message: 'Sign in to use AI study plans' };
+
+  const thisMonth = new Date().toISOString().slice(0, 7) + '-01';
+  try {
+    const { data } = await sbClient
+      .from('usage_tracking')
+      .select('count')
+      .eq('user_id', userId)
+      .eq('feature', 'study_plan')
+      .eq('month', thisMonth)
+      .single();
+
+    const used = data?.count || 0;
+    const limit = tier === 'free' ? 1 : 1; // both get 1/month for now
+
+    if (used >= limit) {
+      return { allowed: false, message: `Study plan limit reached. Next plan available 2026-05-01.` };
+    }
+    return { allowed: true };
+  } catch(err) {
+    console.warn('[QUOTA] Error:', err);
+    return { allowed: true }; // Fail open
+  }
+}
+
+async function checkQuotaQGeneration(userId, tier) {
+  if (tier === 'free') return { allowed: false, message: 'Q generation is a premium feature. Upgrade to Single Subject.' };
+  if (!userId || userId === 'guest') return { allowed: false, message: 'Sign in to use Q generation' };
+
+  const today = new Date().toISOString().slice(0, 10);
+  const monday = new Date();
+  monday.setDate(monday.getDate() - monday.getDay());
+  const weekStart = monday.toISOString().slice(0, 10);
+
+  try {
+    const { data } = await sbClient
+      .from('usage_tracking')
+      .select('count')
+      .eq('user_id', userId)
+      .eq('feature', 'q_generation')
+      .gte('date', weekStart)
+      .single();
+
+    const used = data?.count || 0;
+    const limits = { single: 4, all_access: 12 };
+    const limit = limits[tier] || 0;
+
+    if (used >= limit) {
+      return { allowed: false, message: `Weekly Q limit (${limit}) reached. Resets Sunday.` };
+    }
+    return { allowed: true };
+  } catch(err) {
+    console.warn('[QUOTA] Q Gen error:', err);
+    return { allowed: true };
+  }
+}
+
+async function logUsageAttempt(userId, feature, tier, allowed) {
+  if (!userId || userId === 'guest') return;
+  try {
+    await sbClient.from('api_logs').insert({
+      user_id: userId,
+      feature,
+      tier,
+      allowed,
+      created_at: new Date()
+    });
+  } catch(err) {
+    console.warn('[API_LOG] Error:', err);
+  }
+}
+
+async function incrementUsage(userId, feature) {
+  if (!userId || userId === 'guest') return;
+  const today = new Date().toISOString().slice(0, 10);
+  const thisMonth = new Date().toISOString().slice(0, 7) + '-01';
+  try {
+    await sbClient.from('usage_tracking').upsert({
+      user_id: userId,
+      feature,
+      date: today,
+      month: thisMonth,
+      count: 1
+    }, { onConflict: feature === 'study_plan' ? 'user_id,feature,month' : 'user_id,feature,date' });
+  } catch(err) {
+    console.warn('[USAGE] Increment error:', err);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ANALYTICS DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderAnalyticsDashboard() {
+  const sub = SUBJECTS[currentSubject];
+  const totalAnswered = Object.keys(answers).length;
+  const totalCorrect = Object.values(answers).filter(a => a.lastResult === 'correct').length;
+  const accuracy = totalAnswered ? Math.round(totalCorrect / totalAnswered * 100) : 0;
+
+  const domainStats = sub.domains.map(d => {
+    const dqs = QB[currentSubject].filter(q => q.cat === d.name);
+    const answered = dqs.filter(q => answers[q.id]);
+    const correct = answered.filter(q => answers[q.id].lastResult === 'correct').length;
+    const pct = answered.length ? Math.round(correct / answered.length * 100) : 0;
+    const needed = Math.ceil(dqs.length * d.weight);
+    const progress = answered.length;
+
+    return {
+      name: d.name,
+      icon: d.icon,
+      correct,
+      answered: answered.length,
+      total: dqs.length,
+      pct,
+      needed,
+      progress
+    };
+  });
+
+  const html = `
+    <div class="analysis-card">
+      <div class="analysis-card-title">📊 Overall Progress</div>
+      <div class="analysis-card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">
+          <div>
+            <div style="font-size:28px;font-weight:800;color:var(--accent)">${totalAnswered}</div>
+            <div style="font-size:11px;color:var(--text2)">Questions Answered</div>
+          </div>
+          <div>
+            <div style="font-size:28px;font-weight:800;color:var(--pass)">${accuracy}%</div>
+            <div style="font-size:11px;color:var(--text2)">Overall Accuracy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-lbl" style="margin-top:16px">Domain Breakdown</div>
+    ${domainStats.map(d => `
+      <div class="analysis-card">
+        <div class="analysis-card-title">${d.icon} ${d.name}</div>
+        <div class="analysis-card-body">
+          <div style="font-size:13px;margin-bottom:8px">
+            <strong>${d.correct}/${d.answered}</strong> correct of <strong>${d.total}</strong> questions
+          </div>
+          <div class="domain-bar-track">
+            <div class="domain-bar-fill" style="width:${(d.answered/d.total)*100}%;background:var(--accent)"></div>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:6px">
+            ${d.answered >= d.total ? '✓ Complete' : `${d.total - d.answered} remaining`}
+            · ${d.answered ? d.pct + '% accuracy' : 'Not started'}
+          </div>
+        </div>
+      </div>
+    `).join('')}
+  `;
+
+  const analysisOutput = document.getElementById('ai-analysis-output');
+  if (analysisOutput) {
+    analysisOutput.innerHTML = html;
+  }
+}
+
+init();
+
+// Settings page functions
+async function loadAccountData() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    document.getElementById('email-display').textContent = user.email || 'Not set';
+    const { data: account } = await supabase.from('user_accounts').select('subscription_tier').eq('user_id', user.id).single();
+    if (account) {
+      const tierDisplay = account.subscription_tier === 'free' ? 'Free' : account.subscription_tier.charAt(0).toUpperCase() + account.subscription_tier.slice(1);
+      document.getElementById('plan-display').textContent = tierDisplay;
+    }
+  } catch (err) {
+    console.error('Error loading account data:', err);
+  }
+}
+
+async function changeEmail() {
+  const newEmail = document.getElementById('new-email-input').value.trim();
+  const errEl = document.getElementById('change-email-err');
+  const okEl = document.getElementById('change-email-ok');
+  errEl.textContent = ''; okEl.textContent = '';
+  if (!newEmail) { errEl.textContent = 'Please enter a new email'; return; }
+  try {
+    const { error } = await supabase.auth.updateUser({ email: newEmail });
+    if (error) throw error;
+    okEl.textContent = 'Verification link sent to ' + newEmail;
+    setTimeout(() => closeModal('change-email-modal'), 2000);
+  } catch (err) { errEl.textContent = err.message; }
+}
+
+async function changePassword() {
+  const newPassword = document.getElementById('new-password-input').value;
+  const confirmPassword = document.getElementById('confirm-password-input').value;
+  const errEl = document.getElementById('change-password-err');
+  const okEl = document.getElementById('change-password-ok');
+  errEl.textContent = ''; okEl.textContent = '';
+  if (newPassword !== confirmPassword) { errEl.textContent = 'Passwords do not match'; return; }
+  if (newPassword.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
+  try {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+    okEl.textContent = 'Password updated successfully';
+    setTimeout(() => closeModal('change-password-modal'), 2000);
+  } catch (err) { errEl.textContent = err.message; }
+}
+
+async function exportUserData() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data: progress, error } = await supabase.from('user_progress').select('*').eq('user_id', user.id);
+    if (error) throw error;
+    const dataStr = JSON.stringify(progress, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `kanpassit-export-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast('Data exported');
+  } catch (err) { toast('Error: ' + err.message); }
+}
+
+async function signOutAllDevices() {
+  try {
+    await supabase.auth.signOut({ scope: 'global' });
+    toast('Signed out everywhere');
+    setTimeout(() => location.reload(), 1000);
+  } catch (err) { toast('Error: ' + err.message); }
+}
+
+async function deleteAccount() {
+  const confirmEmail = document.getElementById('delete-confirm-email').value.trim();
+  const errEl = document.getElementById('delete-account-err');
+  errEl.textContent = '';
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || confirmEmail !== user.email) { errEl.textContent = 'Email does not match'; return; }
+  try {
+    toast('Contact support to delete your account');
+  } catch (err) { errEl.textContent = err.message; }
+}
+
+function showModal(modalId) { document.getElementById(modalId).classList.add('open'); }
+function closeModal(modalId) { document.getElementById(modalId).classList.remove('open'); }
+function showPage(pageId) {
+  if (pageId === 'settings') loadAccountData();
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  if (pageId !== 'quiz') document.getElementById('global-nav').style.display = 'flex';
+}
+</script>
+</body>
+</html>
