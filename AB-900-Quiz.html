@@ -971,6 +971,9 @@ function startQuiz(mode, domainName) {
 
   if (!pool.length) { toast('No questions available for this mode'); return; }
 
+  // Shuffle answer options per question to eliminate positional bias
+  pool = pool.map(shuffleOptions);
+
   session = { questions: pool, idx: 0, score: 0, sessionResults: [] };
   showPage('quiz');
   renderQuestion();
@@ -1276,6 +1279,13 @@ function shuffle(arr) {
   return arr;
 }
 
+// Randomise answer positions so the correct answer isn't always B or C
+function shuffleOptions(q) {
+  const correctText = q.opts[q.correct];
+  const opts = shuffle([...q.opts]);
+  return { ...q, opts, correct: opts.indexOf(correctText) };
+}
+
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -1283,10 +1293,4 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2600);
 }
 
-// ═══════════════════════════════════════════════════════════════
-// START
-// ═══════════════════════════════════════════════════════════════
-init();
-</script>
-</body>
-</html>
+// ═════════════════════════�
