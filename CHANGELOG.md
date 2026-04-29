@@ -1,7 +1,47 @@
 # KanPassIt — Changelog
 
 ## 🚀 Latest Deployment
-**v2.2.0 deployed to production** — April 29, 2026
+**v2.3.0 deployed to production** — April 29, 2026
+
+---
+
+## [2.3.0] — 2026-04-29 — Answer Bias Fix (DB + UI)
+
+### 🐛 Bug Fixed: AI-Generated Answer Positional Bias
+All question banks had a systematic bias where the correct answer was almost always placed in the same position — a known artifact of AI-generated MCQs.
+
+**Before (correct answer distribution):**
+| Subject | A | B | C | D |
+|---------|---|---|---|---|
+| AB-900 | 2% | 46% | 48% | 4% |
+| CNA / RN | 100% | 0% | 0% | 0% |
+| LVN | 3% | 57% | 40% | 0% |
+| SHRM-CP | 4% | 76% | 20% | 0% |
+| SHRM-SCP | 3% | 86% | 11% | 0% |
+
+**After (target ~25% per letter):**
+All 6 subjects now balanced — no letter exceeds 38%.
+
+### ✦ UI-Layer Shuffle (index.html + AB-900-Quiz.html)
+- Added `applyOptionShuffle(QB)` to `index.html` — runs after questions load from either Supabase or localStorage cache, randomizing answer positions on every page load
+- Added `shuffleOptions(q)` to `AB-900-Quiz.html` — runs at quiz start via `pool.map(shuffleOptions)`, randomizing on every new quiz session
+- Both use Fisher-Yates shuffle, tracking correct answer by text content (not position), so question content is unchanged
+- Cache stores original unshuffled data; shuffle is applied after load so each session gets a fresh random order
+
+### 🗄️ Database Migration (598 questions updated)
+- All 598 questions in Supabase patched via REST API using service role key
+- `options` array and `correct_index` updated for every row across all 6 subjects
+- Result: correct answers distributed ~25% each across A/B/C/D in live DB
+
+### 📄 Seed Files Rewritten
+The following seed files were rewritten with shuffled options so future re-seeds produce clean data:
+- `kanpassit_migration.sql` (ab900, lvn, shrm — 300 questions)
+- `questions_cna_rn_seed.sql` (cna, rn — 61 questions)
+- `questions_cna_rn_batch2.sql` (cna, rn — 138 questions)
+- `shrm-scp-final.sql` (shrm-scp — 100 questions)
+
+### 💡 Architecture Note
+The UI shuffle acts as a permanent safety net — even if new questions are added with AI-generated positional bias, users will not notice it. The DB fix ensures the data is clean at rest.
 
 ---
 
@@ -27,35 +67,4 @@
 
 ---
 
-## [2.1.0] — 2026-04-29 — Hard Caps & Analytics Release — ✅ LIVE ON VERCEL
-
-### 🎯 Hard Caps System (Tier-Based Rate Limiting)
-- **Study Plan Limits:** 1/month for all tiers (free, single, all_access)
-- **Q Generation Limits:** Free (blocked), Single Subject (4/week), All Access (12/week)
-- **Functions Added:**
-  - `getUserTier()` — Fetches user's subscription tier from Supabase
-  - `checkQuotaStudyPlan(userId, tier)` — Enforces monthly study plan limits with next-available date
-  - `checkQuotaQGeneration(userId, tier)` — Enforces weekly Q generation limits by tier
-  - `logUsageAttempt(userId, feature, tier, allowed)` — Logs all API attempts (allowed/blocked) for audit trail
-  - `incrementUsage(userId, feature)` — Increments usage counter with upsert pattern (avoids race conditions)
-- **Fail-Graceful Design:** Features continue without hard caps if database unavailable; prevents hard errors
-- **Error Handling:** All functions wrapped in try/catch with console.warn() logging for debugging
-
-### 📊 Analytics Dashboard
-- **New Analysis Page Display:**
-  - **Overall Progress Card:** Shows total questions answered + overall accuracy % side-by-side
-  - **Domain Breakdown:** Separate card for each domain with:
-    - Correct/attempted count (e.g., "12/24 correct")
-    - Progress bar showing % of domain questions completed
-    - Accuracy percentage and completion status
-  - **Data Source:** Real-time from current session; no extra API calls needed
-- **New Functions:**
-  - `renderAnalyticsDashboard()` — Generates analytics UI from session data
-  - Modified `renderAnalysisPage()` — Now renders analytics dashboard + wrong log
-- **Visual Design:** Color-coded progress bars, domain icons, responsive grid layout
-
-### 📍 Skip Button with Database Persistence
-- **Skip Button UI:** "Skip — return to later" link below answer options during practice
-- **Behavior:** Moves current question to end of queue; revisitable later in same session
-- **Database Persistence:** Saves skips to `question_skips` table for future weak-area analysis
-- **Distinction:** Skipped questions tracked separately from answered quest
+## [2.1.0] — 2026-04-29 — Hard Caps & 
