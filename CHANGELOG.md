@@ -1,7 +1,56 @@
 # KanPassIt — Changelog
 
 ## 🚀 Latest Deployment
-**v2.3.1 deployed to production** — April 29, 2026
+**v2.3.4 deployed to production** — May 4, 2026
+
+---
+
+## [2.3.3] — 2026-05-04 — Lazy Question Loading
+
+### 🐛 Bug Fixed: App Stuck on "Loading Questions…" Screen (Recurring)
+
+**Root causes identified:**
+- `init()` fetched ALL questions from ALL 6 subjects in a single Supabase query before leaving the loading screen. As the question bank grew, this query exceeded the 5-second timeout.
+- Supabase free tier pauses projects after ~7 days of inactivity; cold-start wake-up takes 10–20s, always blowing the timeout.
+- The monolithic cache stored all subjects as one JSON blob, routinely hitting the ~5MB localStorage quota and failing silently — forcing a fresh full fetch every session.
+- When the 5s timeout fired, `QB` stayed empty and the background fetch wrote to `QB` too late, after the user was already past the loading screen.
+
+**Fix: lazy per-subject question loading**
+- Removed `loadQuestions()` from `init()`. Loading screen now only waits on auth check (~1–3s).
+- Added `loadQuestionsForSubject(slug)` — fetches only the selected subject's questions when a subject card is tapped, filtered by `.eq('subject_slug', slug)`.
+- Each subject gets its own localStorage cache key (`kanpassit_qb_v2_{slug}`) — small per-subject payload, no quota risk.
+- Subject cards dim briefly during load to signal activity; the user is already past the loading screen.
+- One-time cleanup of old `kanpassit_qb_v1` monolithic cache key on first load to reclaim localStorage space.
+
+---
+
+## [2.3.4] — 2026-05-04 — Exam Simulation Question Count Fix
+
+### 🐛 Bug Fixed: Full Exam Option Showing More Questions Than Real Exam
+
+The "Full Exam Simulation" mode was using every question in the database (`pool = shuffle([...qs])`) with no cap. Since the DB has more questions than any real exam, users were getting sessions far longer than the actual test.
+
+**Fix:** Added `examSimCount` to each subject config; `mode === 'all'` now slices the shuffled pool to that count. Modal label updated from "All N questions in random order" → "{examSimCount} questions — full exam simulation".
+
+| Subject | Exam Sim Count | Source |
+|---------|---------------|--------|
+| AB-900 | 60 | Microsoft Learn study guide |
+| NCLEX-RN | 145 | NCSBN 2023 NGN CAT upper bound |
+| NCLEX-PN | 150 | NCLEX-PN CAT upper bound |
+| NCLEX CNA | 60 | NNAAP 2024 scored questions |
+| SHRM-CP | 110 | SHRM scored questions (excl. 24 field-test items) |
+| SHRM-SCP | 110 | SHRM scored questions (excl. field-test items) |
+
+---
+
+## [2.3.2] — 2026-05-02 — Pass % Card Fix
+
+### 🐛 Bug Fixed: Subject Card Pass % Mismatched Detail Page Pass Likelihood
+The Pass % shown on the subject list card was lower than the Pass Likelihood shown on the detail page for the same subject (e.g. AB-900 showed 56% on the card vs 70% on the detail page).
+
+- **Root cause:** `getLocalAnswers()` (used by the card view) read answers from localStorage only, without backfilling the `.cat` (domain category) field. `calcLikelihood()` is domain-weighted — answers missing `.cat` are silently excluded from the weighted calculation, producing an artificially low score.
+- **Detail page** was unaffected because `loadProgress()` merges Supabase data and backfills `.cat` from the question bank before computing the gauge.
+- **Fix:** Added QB category backfill to `getLocalAnswers()` — mirrors the backfill already in `loadProgress()`. Now both views use fully-categorized answers and produce consistent scores.
 
 ---
 
