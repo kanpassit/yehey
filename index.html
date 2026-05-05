@@ -609,6 +609,7 @@ const SUBJECTS = {
     icon: '🏢',
     color: '#0078d4',
     category: 'Tech',
+    examSimCount: 60,
     passThreshold: '700/1000 scaled score',
     examInfo: [
       ['Exam','AB-900'],
@@ -631,6 +632,7 @@ const SUBJECTS = {
     icon: '👩‍⚕️',
     color: '#e74c3c',
     category: 'Healthcare',
+    examSimCount: 145,
     passThreshold: 'Passing Standard (Next Generation NCLEX)',
     examInfo: [
       ['Exam','NCLEX-RN'],
@@ -653,6 +655,7 @@ const SUBJECTS = {
     icon: '🩺',
     color: '#2ecc71',
     category: 'Healthcare',
+    examSimCount: 150,
     passThreshold: 'Passing Standard (Next Generation NCLEX)',
     examInfo: [
       ['Exam','NCLEX-PN'],
@@ -675,6 +678,7 @@ const SUBJECTS = {
     icon: '🏥',
     color: '#1abc9c',
     category: 'Healthcare',
+    examSimCount: 60,
     passThreshold: 'State-determined passing score',
     examInfo: [
       ['Exam','CNA State Competency'],
@@ -697,6 +701,7 @@ const SUBJECTS = {
     icon: '👥',
     color: '#f39c12',
     category: 'HR',
+    examSimCount: 110,
     passThreshold: '200 scale score (passing varies by exam form)',
     examInfo: [
       ['Exam','SHRM-CP'],
@@ -719,6 +724,7 @@ const SUBJECTS = {
     icon: '👔',
     color: '#6f42c1',
     category: 'HR',
+    examSimCount: 110,
     passThreshold: '200 scale score (passing varies by exam form)',
     examInfo: [
       ['Exam','SHRM-SCP'],
@@ -1273,8 +1279,8 @@ function enterApp() {
       </button>`).join('');
   }
 
-  const totalQ = QB[currentSubject].length;
-  document.getElementById('modal-full-sub').textContent = `All ${totalQ} questions in random order`;
+  const simCount = Math.min(QB[currentSubject].length, sub.examSimCount || QB[currentSubject].length);
+  document.getElementById('modal-full-sub').textContent = `${simCount} questions — full exam simulation`;
 
   showView('v-app');
   showPage('home');
@@ -1461,8 +1467,9 @@ function getWeakQs() {
 
 function startQuiz(mode, domainName) {
   const qs = QB[currentSubject];
+  const sub = SUBJECTS[currentSubject];
   let pool = [];
-  if (mode === 'all')    pool = shuffle([...qs]);
+  if (mode === 'all')    pool = shuffle([...qs]).slice(0, sub.examSimCount || qs.length);
   if (mode === 'quick')  pool = shuffle([...qs]).slice(0, 10);
   if (mode === 'weak')   pool = shuffle(getWeakQs());
   if (mode === 'domain') pool = shuffle(qs.filter(q => q.cat === domainName));
