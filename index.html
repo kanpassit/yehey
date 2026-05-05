@@ -66,7 +66,6 @@
   gtag('js', new Date());
   gtag('config', 'G-4FD4X607Z7');
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6787955359497496" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#0d0d1a;--surface:#16162a;--surface2:#1e1e38;--accent:#0078d4;--accent2:#6264a7;--text:#f0f0f5;--text2:#8888aa;--border:#252540;--pass:#2ecc71;--warn:#f39c12;--fail:#e05c5c;--radius:16px}
@@ -328,29 +327,159 @@ CREATE POLICY "Users manage own progress"
 </div>
 
 <div class="view" id="v-auth">
-  <div class="center-wrap">
-    <div class="logo-big">KanPassIt</div>
-    <div class="logo-sub">AI-Powered Exam Prep</div>
-    <p class="landing-tagline">Ace your certification exam with adaptive quizzes and AI-powered study analysis.</p>
-    <div class="feature-pills">
-      <span class="feature-pill">✦ AI Study Analysis</span>
-      <span class="feature-pill">📊 Domain Tracking</span>
-      <span class="feature-pill">🎯 Weak Area Drills</span>
+  <div style="max-width:480px;margin:0 auto;padding:0 0 60px 0;overflow-y:auto;min-height:100vh">
+
+    <!-- Hero -->
+    <div style="text-align:center;padding:48px 24px 32px">
+      <div class="logo-big" style="font-size:32px;margin-bottom:8px">KanPassIt</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:16px;font-weight:600;letter-spacing:.8px;text-transform:uppercase">Free AI-Powered Exam Prep</div>
+      <p style="font-size:15px;color:var(--text);line-height:1.7;max-width:360px;margin:0 auto 20px">
+        KanPassIt helps you pass your certification exam on the first try. Our adaptive quiz engine identifies your weak areas and drills you on exactly what you need — powered by AI and real exam data.
+      </p>
+      <div class="feature-pills">
+        <span class="feature-pill">✦ AI Study Analysis</span>
+        <span class="feature-pill">📊 Domain Tracking</span>
+        <span class="feature-pill">🎯 Weak Area Drills</span>
+        <span class="feature-pill">📈 Pass Likelihood</span>
+        <span class="feature-pill">🔄 Cross-Device Sync</span>
+      </div>
     </div>
-    <div class="card" style="width:100%">
-      <div class="auth-card-title" id="auth-subtitle">Sign in to your account</div>
-      <div id="auth-err" class="err-msg"></div>
-      <div id="auth-ok" class="ok-msg"></div>
-      <div class="field-lbl">Email</div>
-      <input id="auth-email" class="field" type="email" placeholder="you@example.com" autocomplete="email"/>
-      <div class="field-lbl">Password</div>
-      <input id="auth-pass" class="field" type="password" placeholder="Password" autocomplete="current-password"/>
-      <button id="auth-btn" class="btn-p" onclick="submitAuth()">Sign In</button>
+
+    <!-- Login card -->
+    <div style="padding:0 20px 28px">
+      <div class="card" style="width:100%">
+        <div class="auth-card-title" id="auth-subtitle">Sign in to your account</div>
+        <div id="auth-err" class="err-msg"></div>
+        <div id="auth-ok" class="ok-msg"></div>
+        <div class="field-lbl">Email</div>
+        <input id="auth-email" class="field" type="email" placeholder="you@example.com" autocomplete="email"/>
+        <div class="field-lbl">Password</div>
+        <input id="auth-pass" class="field" type="password" placeholder="Password" autocomplete="current-password"/>
+        <button id="auth-btn" class="btn-p" onclick="submitAuth()">Sign In</button>
+      </div>
+      <div class="auth-toggle" onclick="toggleAuthMode()">Don't have an account? <span>Sign up</span></div>
+      <div class="skip-link" style="margin-top:12px" onclick="guestMode()">Continue as <span>guest</span> (local only)</div>
     </div>
-    <div class="auth-toggle" onclick="toggleAuthMode()">Don't have an account? <span>Sign up</span></div>
-    <div class="skip-link" style="margin-top:12px" onclick="guestMode()">Continue as <span>guest</span> (local only)</div>
+
+    <!-- Exams We Cover -->
+    <div style="padding:0 20px 8px">
+      <div class="section-lbl">Exams We Cover</div>
+    </div>
+    <div style="padding:0 20px;display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
+
+      <div class="subject-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:24px">🏥</span>
+          <div>
+            <div style="font-size:15px;font-weight:800">NCLEX-RN</div>
+            <div style="font-size:11px;color:var(--text2)">National Council Licensure Examination — Registered Nurse</div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">The NCLEX-RN is the national licensure exam for registered nurses in the United States and Canada. It tests clinical judgment, patient safety, and nursing knowledge across domains including Medical-Surgical, Pharmacology, Mental Health, Maternal Newborn, and Pediatrics. KanPassIt covers all major domains with hundreds of adaptive practice questions aligned to the NCLEX-RN test plan.</p>
+      </div>
+
+      <div class="subject-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:24px">💊</span>
+          <div>
+            <div style="font-size:15px;font-weight:800">NCLEX-PN</div>
+            <div style="font-size:11px;color:var(--text2)">National Council Licensure Examination — Practical Nurse</div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">The NCLEX-PN licenses practical and vocational nurses across the US. The exam covers safe and effective care, health promotion, psychosocial integrity, and physiological integrity. Our adaptive question bank helps LPN and LVN candidates focus on their weakest domains and build clinical reasoning skills before test day.</p>
+      </div>
+
+      <div class="subject-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:24px">🩺</span>
+          <div>
+            <div style="font-size:15px;font-weight:800">CNA Certification</div>
+            <div style="font-size:11px;color:var(--text2)">Certified Nursing Assistant — State Board Exam</div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">CNA certification exams test foundational nursing assistant skills including patient care, communication, infection control, and basic clinical procedures. KanPassIt helps CNA candidates build confidence with scenario-based practice questions that mirror real state board exam formats.</p>
+      </div>
+
+      <div class="subject-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:24px">👔</span>
+          <div>
+            <div style="font-size:15px;font-weight:800">SHRM-CP</div>
+            <div style="font-size:11px;color:var(--text2)">SHRM Certified Professional — HR Certification</div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">The SHRM-CP is a globally recognized HR certification from the Society for Human Resource Management. It validates competency in HR strategy, talent acquisition, employee relations, compensation, and organizational development. Our practice questions are mapped to the SHRM Body of Competency and Knowledge (BoCK), covering both behavioral and technical competencies.</p>
+      </div>
+
+      <div class="subject-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:24px">🏆</span>
+          <div>
+            <div style="font-size:15px;font-weight:800">SHRM-SCP</div>
+            <div style="font-size:11px;color:var(--text2)">SHRM Senior Certified Professional</div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">The SHRM-SCP is designed for senior-level HR professionals responsible for developing and executing HR strategy. It covers leadership, global HR, organizational effectiveness, and workforce planning at an advanced level. Our SHRM-SCP module includes scenario-based situational judgment questions for the exam's strategy-focused format.</p>
+      </div>
+
+      <div class="subject-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:24px">🤖</span>
+          <div>
+            <div style="font-size:15px;font-weight:800">AB-900</div>
+            <div style="font-size:11px;color:var(--text2)">Microsoft 365 Copilot — AI Certification</div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">The AB-900 exam certifies proficiency in Microsoft 365 Copilot, Microsoft's AI-powered productivity suite. It covers AI fundamentals in the workplace, Copilot capabilities across Word, Excel, PowerPoint, Teams, and Outlook, responsible AI use, and organizational adoption strategies.</p>
+      </div>
+
+    </div>
+
+    <!-- How It Works -->
+    <div style="padding:0 20px 8px">
+      <div class="section-lbl">How It Works</div>
+    </div>
+    <div style="padding:0 20px;display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+      <div class="card" style="display:flex;gap:14px;align-items:flex-start;padding:16px">
+        <div class="step-num">1</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px">Choose your exam</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Select from NCLEX-RN, NCLEX-PN, CNA, SHRM-CP, SHRM-SCP, or AB-900. Your progress is tracked separately per exam.</div>
+        </div>
+      </div>
+      <div class="card" style="display:flex;gap:14px;align-items:flex-start;padding:16px">
+        <div class="step-num">2</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px">Take adaptive quizzes</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Answer questions across all exam domains. The engine tracks your performance per domain and surfaces the questions you need most — not the ones you already know.</div>
+        </div>
+      </div>
+      <div class="card" style="display:flex;gap:14px;align-items:flex-start;padding:16px">
+        <div class="step-num">3</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px">Get your AI study plan</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">After each session, AI analyzes your domain scores and generates a personalized study plan targeting your weakest areas — so you spend time where it counts.</div>
+        </div>
+      </div>
+      <div class="card" style="display:flex;gap:14px;align-items:flex-start;padding:16px">
+        <div class="step-num">4</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px">Track your pass likelihood</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Your dashboard shows a real-time Pass Likelihood gauge based on your cumulative performance — so you know exactly when you're ready to book the real exam.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Why Free -->
+    <div style="padding:0 20px 28px">
+      <div class="card">
+        <div style="font-size:14px;font-weight:800;margin-bottom:8px">Why is KanPassIt free?</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">KanPassIt is free because we believe cost shouldn't be a barrier to passing your certification exam. The app is supported by unobtrusive advertising shown within the study experience. There are no paywalls, no question limits, and no premium tiers — every feature is available to every user at no cost.</p>
+      </div>
+    </div>
+
+    <div class="legal-footer"><a href="/privacy.html" target="_blank">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms.html" target="_blank">Terms of Service</a></div>
   </div>
-  <div class="legal-footer"><a href="/privacy.html" target="_blank">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms.html" target="_blank">Terms of Service</a></div>
 </div>
 
 <div class="view" id="v-subjects">
@@ -1940,7 +2069,17 @@ function doReset() {
 // ═══════════════════════════════════════════════════════
 // NAV & VIEW MANAGEMENT
 // ═══════════════════════════════════════════════════════
+function loadAdSense() {
+  if (document.getElementById('adsense-script')) return;
+  var s = document.createElement('script');
+  s.id = 'adsense-script';
+  s.async = true;
+  s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6787955359497496';
+  s.crossOrigin = 'anonymous';
+  document.head.appendChild(s);
+}
 function showView(id) {
+  if (id === 'v-subjects' || id === 'v-app') loadAdSense();
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   const nav = document.getElementById('global-nav');
@@ -2354,8 +2493,39 @@ async function submitUserFeedback() {
 
 </script>
 
-  <!-- SUGGEST CERT MODAL -->
+    <!-- SUGGEST CERT MODAL -->
   <div class="overlay" id="suggest-cert-modal">
     <div class="modal">
       <div class="modal-title">Suggest a Certification</div>
-      <div style="font-size:1
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Missing an exam? Let us know and we'll add it.</div>
+      <div class="field-lbl">Certification Name</div>
+      <input id="suggest-cert-name" class="field" type="text" placeholder="e.g. AWS Cloud Practitioner" autocomplete="off"/>
+      <div class="field-lbl" style="margin-top:4px">Why do you need it? (optional)</div>
+      <textarea id="suggest-cert-reason" class="field" rows="3" placeholder="Tell us a bit about why this exam matters to you…" style="resize:none;min-height:72px"></textarea>
+      <div id="suggest-cert-err" class="err-msg"></div>
+      <div id="suggest-cert-ok" class="ok-msg"></div>
+      <button id="suggest-cert-btn" class="btn-p" onclick="submitCertSuggestion()">Submit Request</button>
+      <button class="modal-cancel" onclick="closeModal('suggest-cert-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- USER FEEDBACK MODAL -->
+  <div class="overlay" id="user-feedback-modal">
+    <div class="modal">
+      <div class="modal-title">Share Feedback</div>
+      <div id="feedback-cat-row" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+        <button class="modal-cat-btn active" data-cat="general" onclick="selectFeedbackCat(this)" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer">General</button>
+        <button class="modal-cat-btn" data-cat="bug" onclick="selectFeedbackCat(this)" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer">Bug</button>
+        <button class="modal-cat-btn" data-cat="question" onclick="selectFeedbackCat(this)" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer">Question Error</button>
+        <button class="modal-cat-btn" data-cat="feature" onclick="selectFeedbackCat(this)" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer">Feature Request</button>
+      </div>
+      <textarea id="user-feedback-text" class="field" rows="4" placeholder="Tell us what's on your mind…" style="resize:none;min-height:90px"></textarea>
+      <div id="user-feedback-err" class="err-msg"></div>
+      <div id="user-feedback-ok" class="ok-msg"></div>
+      <button id="user-feedback-btn" class="btn-p" onclick="submitUserFeedback()">Send Feedback</button>
+      <button class="modal-cancel" onclick="closeModal('user-feedback-modal')">Cancel</button>
+    </div>
+  </div>
+
+</body>
+</html>
