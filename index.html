@@ -2349,4 +2349,18 @@ async function submitUserFeedback() {
     okEl.textContent = '✓ Feedback sent — thank you!';
     document.getElementById('user-feedback-text').value = '';
     document.querySelectorAll('#feedback-cat-row .modal-cat-btn').forEach((b,i) => b.classList.toggle('active', i===0));
-    setTimeout(() =
+    setTimeout(() => closeModal('user-feedback-modal'), 1800);
+  } catch(e) {
+    errEl.textContent = 'Something went wrong. Please try again.';
+    console.error('feedback error:', e);
+  }
+  btn.disabled = false; btn.textContent = 'Send Feedback';
+}
+
+</script>
+
+  <!-- SUGGEST CERT MODAL -->
+  <div class="overlay" id="suggest-cert-modal">
+    <div class="modal">
+      <div class="modal-title">Suggest a Certification</div>
+      <div style="font-size:1
