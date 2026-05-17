@@ -66,7 +66,6 @@
   gtag('js', new Date());
   gtag('config', 'G-4FD4X607Z7');
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6787955359497496" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#0d0d1a;--surface:#16162a;--surface2:#1e1e38;--accent:#0078d4;--accent2:#6264a7;--text:#f0f0f5;--text2:#8888aa;--border:#252540;--pass:#2ecc71;--warn:#f39c12;--fail:#e05c5c;--radius:16px}
@@ -261,6 +260,15 @@ a.la{color:#5aadff;text-decoration:none}
 
 .suggest-cert-link{display:block;text-align:center;font-size:12px;color:#5aadff;text-decoration:none;margin:-4px 0 14px;cursor:pointer;opacity:.85;transition:opacity .15s}
 .suggest-cert-link:hover{opacity:1}
+.lc-h2{font-size:17px;font-weight:800;margin:26px 0 10px;color:var(--text)}
+.lc-p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:10px}
+.lc-ul{font-size:13px;color:var(--text2);line-height:1.7;padding-left:18px;margin-bottom:14px}
+.lc-ul li{margin-bottom:7px}
+.lc-exam-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.lc-exam-title{font-size:14px;font-weight:800;margin-bottom:7px;color:var(--text)}
+.lc-exam-body{font-size:12px;color:var(--text2);line-height:1.65}
+.lc-guide-link{display:block;padding:11px 14px;border-radius:10px;background:rgba(0,120,212,.08);border:1px solid rgba(0,120,212,.2);color:#5aadff;font-size:13px;font-weight:600;text-decoration:none;transition:all .15s;margin-bottom:8px}
+.lc-guide-link:hover{background:rgba(0,120,212,.15)}
 .modal-cat-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .modal-cat-btn{flex:1;padding:8px 6px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;min-width:80px;text-align:center}
 .modal-cat-btn.active{border-color:var(--accent);color:var(--text);background:rgba(0,120,212,.15)}
@@ -328,15 +336,22 @@ CREATE POLICY "Users manage own progress"
 </div>
 
 <div class="view" id="v-auth">
-  <div class="center-wrap">
-    <div class="logo-big">KanPassIt</div>
-    <div class="logo-sub">AI-Powered Exam Prep</div>
-    <p class="landing-tagline">Ace your certification exam with adaptive quizzes and AI-powered study analysis.</p>
-    <div class="feature-pills">
-      <span class="feature-pill">✦ AI Study Analysis</span>
-      <span class="feature-pill">📊 Domain Tracking</span>
-      <span class="feature-pill">🎯 Weak Area Drills</span>
+  <div style="max-width:480px;margin:0 auto;padding:40px 24px 60px">
+
+    <!-- Hero -->
+    <div style="text-align:center;margin-bottom:28px">
+      <div class="logo-big">KanPassIt</div>
+      <div class="logo-sub">Free AI-Powered Certification Exam Prep</div>
+      <p class="landing-tagline">Master your certification with adaptive quizzes, AI-powered weak-area drilling, and real-time domain tracking — completely free.</p>
+      <div class="feature-pills">
+        <span class="feature-pill">✦ AI Study Analysis</span>
+        <span class="feature-pill">📊 Domain Tracking</span>
+        <span class="feature-pill">🎯 Weak Area Drills</span>
+        <span class="feature-pill">🔄 Adaptive Learning</span>
+      </div>
     </div>
+
+    <!-- Login form -->
     <div class="card" style="width:100%">
       <div class="auth-card-title" id="auth-subtitle">Sign in to your account</div>
       <div id="auth-err" class="err-msg"></div>
@@ -349,6 +364,62 @@ CREATE POLICY "Users manage own progress"
     </div>
     <div class="auth-toggle" onclick="toggleAuthMode()">Don't have an account? <span>Sign up</span></div>
     <div class="skip-link" style="margin-top:12px" onclick="guestMode()">Continue as <span>guest</span> (local only)</div>
+
+    <!-- Rich educational content -->
+    <h2 class="lc-h2">Supported Certification Exams</h2>
+    <p class="lc-p">KanPassIt provides free adaptive practice for six major certification exams in nursing and human resources. Our question bank mirrors the real exam format, difficulty, and domain distribution so your study time is as efficient as possible.</p>
+
+    <div class="lc-exam-card">
+      <div class="lc-exam-title">🏥 NCLEX-RN — Registered Nurse Licensure</div>
+      <p class="lc-exam-body">The NCLEX-RN is the licensure exam required to become a registered nurse in the United States and Canada. Administered by the National Council of State Boards of Nursing (NCSBN), the exam uses computerized adaptive testing (CAT) and delivers between 75 and 145 questions based on your performance. The exam covers four major content domains: Safe and Effective Care Environment (43%), Health Promotion and Maintenance (9%), Psychosocial Integrity (9%), and Physiological Integrity (39%). The national first-time pass rate for U.S.-educated candidates is approximately 82%. KanPassIt covers all four domains with hundreds of NCLEX-style questions including select-all-that-apply and prioritization formats.</p>
+    </div>
+
+    <div class="lc-exam-card">
+      <div class="lc-exam-title">💉 NCLEX-PN — Practical Nurse Licensure</div>
+      <p class="lc-exam-body">The NCLEX-PN exam licenses practical and vocational nurses (LPN/LVN) across the U.S. and Canada. The exam ranges from 85 to 205 questions under CAT and covers the practical nurse scope of practice, including coordinating care under RN or physician supervision. Content areas include clinical judgment, safety, pharmacology, and patient-centered care. KanPassIt includes dedicated NCLEX-PN question sets aligned to NCSBN's Next Generation NCLEX (NGN) framework, which emphasizes clinical judgment over rote memorization.</p>
+    </div>
+
+    <div class="lc-exam-card">
+      <div class="lc-exam-title">🩺 CNA — Certified Nursing Assistant</div>
+      <p class="lc-exam-body">The CNA certification exam is required in all U.S. states for nursing assistants working in Medicare- or Medicaid-certified facilities. The written portion tests foundational nursing knowledge including patient rights, infection control, safety, personal care, and basic restorative services. Most state exams include 60–70 questions. KanPassIt helps CNA candidates build confidence in the cognitive knowledge areas tested on the written portion of the exam.</p>
+    </div>
+
+    <div class="lc-exam-card">
+      <div class="lc-exam-title">👔 SHRM-CP — HR Certified Professional</div>
+      <p class="lc-exam-body">The SHRM-CP (Society for Human Resource Management Certified Professional) credential is the standard for early-to-mid career HR professionals. The exam consists of 110 questions (90 scored, 20 field-test) delivered over 3 hours and 40 minutes. Content is split between Behavioral Competencies (40%) — covering Leadership, Communication, and Consultation — and HR Knowledge (60%) — spanning HR Strategy, Talent Acquisition, Employee Engagement, Learning &amp; Development, Total Rewards, and HR Technology. Candidates must earn at least 200 out of 300 scaled score points to pass. KanPassIt covers all eight SHRM BoCK knowledge areas with scenario-based questions modeled on real exam style.</p>
+    </div>
+
+    <div class="lc-exam-card">
+      <div class="lc-exam-title">📋 SHRM-SCP — Senior HR Certified Professional</div>
+      <p class="lc-exam-body">The SHRM-SCP exam targets senior HR practitioners with responsibility for shaping HR strategy at an organizational level. Like the SHRM-CP, it contains 110 questions over 3 hours 40 minutes but emphasizes strategic decision making, workforce planning, and organizational leadership. Questions lean heavily on situational judgment items (SJIs) where candidates choose the most effective course of action among plausible options. KanPassIt's SHRM-SCP question bank includes domain-weighted practice sets to help you close gaps across all tested competency areas.</p>
+    </div>
+
+    <div class="lc-exam-card">
+      <div class="lc-exam-title">🎓 AB-900 — California Substitute Teacher Certification</div>
+      <p class="lc-exam-body">California's AB-900 (Assembly Bill 900) amended the Education Code to create the 30-Day Substitute Teaching Permit, allowing substitute teachers to work in California classrooms without a full teaching credential. The qualifying exam consists of 60 questions covering child development, classroom management, instructional strategies, and subject matter competency. KanPassIt provides targeted AB-900 practice questions aligned to the exam's official content domains, helping candidates achieve the passing standard and qualify for their permit efficiently.</p>
+    </div>
+
+    <h2 class="lc-h2">How KanPassIt Works</h2>
+    <p class="lc-p">KanPassIt uses an adaptive spaced-repetition algorithm that tracks your performance question by question. Questions you answer correctly are shown less frequently, while questions you miss are cycled back more often until you've demonstrated mastery. This approach, backed by decades of cognitive science research, makes your study time significantly more efficient than re-reading notes or doing random practice.</p>
+    <p class="lc-p">After each quiz session, the AI analysis feature reviews your wrong answers and generates a personalized breakdown of your weak domains. It identifies patterns in your mistakes — such as consistently missing pharmacology questions or confusing similar HR policy concepts — and can generate additional targeted practice questions on demand.</p>
+    <p class="lc-p">Your progress is tracked with a Pass Likelihood gauge that estimates your readiness based on your current accuracy rate compared to the established passing standards for each exam. The gauge updates after every session so you always know exactly where you stand.</p>
+
+    <h2 class="lc-h2">Effective Study Strategies</h2>
+    <p class="lc-p">The most effective exam prep combines active recall, distributed practice, and feedback-driven review. Here's how to get the most out of KanPassIt:</p>
+    <ul class="lc-ul">
+      <li><strong>Study daily in short sessions.</strong> 20–30 minutes of focused practice six days a week outperforms a single 3-hour weekend session. Spaced repetition only works when you give your memory time to consolidate between study periods.</li>
+      <li><strong>Review every wrong answer before moving on.</strong> Read the explanation, understand why the correct answer is right, and identify the underlying concept being tested. This transforms wrong answers into learning opportunities.</li>
+      <li><strong>Focus on weak domains first.</strong> Use the Domain Performance chart to identify content areas where your accuracy is lowest, then use the "Focus Weak Areas" drill to target those topics in your next session.</li>
+      <li><strong>Simulate real exam conditions periodically.</strong> Once a week, do a timed session without looking up answers. This builds the stamina and comfort with uncertainty that real exams demand.</li>
+      <li><strong>Use the AI analysis feature after each session.</strong> The AI breakdown surfaces patterns in your mistakes that may not be obvious from looking at individual wrong answers alone.</li>
+    </ul>
+
+    <h2 class="lc-h2">Free Study Guides</h2>
+    <p class="lc-p">Need deeper guidance? Explore our free exam-specific study guides:</p>
+    <a href="/nclex-study-guide.html" class="lc-guide-link">📋 Complete NCLEX-RN &amp; NCLEX-PN Study Guide →</a>
+    <a href="/shrm-study-guide.html" class="lc-guide-link">📋 SHRM-CP &amp; SHRM-SCP Exam Study Guide →</a>
+    <a href="/ab-900-study-guide.html" class="lc-guide-link">📋 AB-900 California Substitute Teaching Exam Guide →</a>
+
   </div>
   <div class="legal-footer"><a href="/privacy.html" target="_blank">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms.html" target="_blank">Terms of Service</a></div>
 </div>
@@ -1948,6 +2019,15 @@ function doReset() {
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // Load AdSense only once content is visible (not on the empty loading screen)
+  if (!window._adsLoaded && (id === 'v-auth' || id === 'v-subjects' || id === 'v-app')) {
+    window._adsLoaded = true;
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6787955359497496';
+    s.crossOrigin = 'anonymous';
+    document.head.appendChild(s);
+  }
   const nav = document.getElementById('global-nav');
   const showNav = (id === 'v-subjects' || id === 'v-app');
   nav.style.display = showNav ? 'flex' : 'none';
@@ -2154,213 +2234,4 @@ function renderAnalyticsDashboard() {
   const html = `
     <div class="analysis-card">
       <div class="analysis-card-title">📊 Overall Progress</div>
-      <div class="analysis-card-body">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px">
-          <div>
-            <div style="font-size:28px;font-weight:800;color:var(--accent)">${totalAnswered}</div>
-            <div style="font-size:11px;color:var(--text2)">Questions Answered</div>
-          </div>
-          <div>
-            <div style="font-size:28px;font-weight:800;color:var(--pass)">${accuracy}%</div>
-            <div style="font-size:11px;color:var(--text2)">Overall Accuracy</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-lbl" style="margin-top:16px">Domain Breakdown</div>
-    ${domainStats.map(d => `
-      <div class="analysis-card">
-        <div class="analysis-card-title">${d.icon} ${d.name}</div>
-        <div class="analysis-card-body">
-          <div style="font-size:13px;margin-bottom:8px">
-            <strong>${d.correct}/${d.answered}</strong> correct of <strong>${d.total}</strong> questions
-          </div>
-          <div class="domain-bar-track">
-            <div class="domain-bar-fill" style="width:${(d.answered/d.total)*100}%;background:var(--accent)"></div>
-          </div>
-          <div style="font-size:11px;color:var(--text2);margin-top:6px">
-            ${d.answered >= d.total ? '✓ Complete' : `${d.total - d.answered} remaining`}
-            · ${d.answered ? d.pct + '% accuracy' : 'Not started'}
-          </div>
-        </div>
-      </div>
-    `).join('')}
-  `;
-
-  const analysisOutput = document.getElementById('ai-analysis-output');
-  if (analysisOutput) {
-    analysisOutput.innerHTML = html;
-  }
-}
-
-init();
-
-// Settings page functions
-async function loadAccountData() {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    document.getElementById('email-display').textContent = user.email || 'Not set';
-    const { data: account } = await supabase.from('user_accounts').select('subscription_tier').eq('user_id', user.id).single();
-    if (account) {
-      const tierDisplay = account.subscription_tier === 'free' ? 'Free' : account.subscription_tier.charAt(0).toUpperCase() + account.subscription_tier.slice(1);
-      document.getElementById('plan-display').textContent = tierDisplay;
-    }
-  } catch (err) {
-    console.error('Error loading account data:', err);
-  }
-}
-
-async function changeEmail() {
-  const newEmail = document.getElementById('new-email-input').value.trim();
-  const errEl = document.getElementById('change-email-err');
-  const okEl = document.getElementById('change-email-ok');
-  errEl.textContent = ''; okEl.textContent = '';
-  if (!newEmail) { errEl.textContent = 'Please enter a new email'; return; }
-  try {
-    const { error } = await supabase.auth.updateUser({ email: newEmail });
-    if (error) throw error;
-    okEl.textContent = 'Verification link sent to ' + newEmail;
-    setTimeout(() => closeModal('change-email-modal'), 2000);
-  } catch (err) { errEl.textContent = err.message; }
-}
-
-async function changePassword() {
-  const newPassword = document.getElementById('new-password-input').value;
-  const confirmPassword = document.getElementById('confirm-password-input').value;
-  const errEl = document.getElementById('change-password-err');
-  const okEl = document.getElementById('change-password-ok');
-  errEl.textContent = ''; okEl.textContent = '';
-  if (newPassword !== confirmPassword) { errEl.textContent = 'Passwords do not match'; return; }
-  if (newPassword.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
-  try {
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) throw error;
-    okEl.textContent = 'Password updated successfully';
-    setTimeout(() => closeModal('change-password-modal'), 2000);
-  } catch (err) { errEl.textContent = err.message; }
-}
-
-async function exportUserData() {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const { data: progress, error } = await supabase.from('user_progress').select('*').eq('user_id', user.id);
-    if (error) throw error;
-    const dataStr = JSON.stringify(progress, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `kanpassit-export-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    toast('Data exported');
-  } catch (err) { toast('Error: ' + err.message); }
-}
-
-async function signOutAllDevices() {
-  try {
-    await supabase.auth.signOut({ scope: 'global' });
-    toast('Signed out everywhere');
-    setTimeout(() => location.reload(), 1000);
-  } catch (err) { toast('Error: ' + err.message); }
-}
-
-async function deleteAccount() {
-  const confirmEmail = document.getElementById('delete-confirm-email').value.trim();
-  const errEl = document.getElementById('delete-account-err');
-  errEl.textContent = '';
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || confirmEmail !== user.email) { errEl.textContent = 'Email does not match'; return; }
-  try {
-    toast('Contact support to delete your account');
-  } catch (err) { errEl.textContent = err.message; }
-}
-
-function showModal(modalId) { document.getElementById(modalId).classList.add('open'); }
-function closeModal(modalId) { document.getElementById(modalId).classList.remove('open'); }
-function showPage(pageId) {
-  if (pageId === 'settings') loadAccountData();
-  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-  document.getElementById('page-' + pageId).classList.add('active');
-  if (pageId !== 'quiz') document.getElementById('global-nav').style.display = 'flex';
-}
-
-// ── Cert Suggestion ──────────────────────────────────────────────────────────
-async function submitCertSuggestion() {
-  const name = document.getElementById('suggest-cert-name').value.trim();
-  const reason = document.getElementById('suggest-cert-reason').value.trim();
-  const errEl = document.getElementById('suggest-cert-err');
-  const okEl = document.getElementById('suggest-cert-ok');
-  const btn = document.getElementById('suggest-cert-btn');
-
-  errEl.textContent = ''; okEl.textContent = '';
-  if (!name) { errEl.textContent = 'Please enter a certification name.'; return; }
-
-  btn.disabled = true; btn.textContent = 'Submitting…';
-  try {
-    const uid = supabase.auth.getSession ? (await supabase.auth.getSession())?.data?.session?.user?.id : null;
-    const { error } = await supabase.from('certification_requests').insert({
-      certification_name: name,
-      reason: reason || null,
-      user_id: uid || null
-    });
-    if (error) throw error;
-    okEl.textContent = '✓ Request submitted — thank you!';
-    document.getElementById('suggest-cert-name').value = '';
-    document.getElementById('suggest-cert-reason').value = '';
-    setTimeout(() => closeModal('suggest-cert-modal'), 1800);
-  } catch(e) {
-    errEl.textContent = 'Something went wrong. Please try again.';
-    console.error('cert suggestion error:', e);
-  }
-  btn.disabled = false; btn.textContent = 'Submit Request';
-}
-
-// ── User Feedback ─────────────────────────────────────────────────────────────
-function selectFeedbackCat(el) {
-  document.querySelectorAll('#feedback-cat-row .modal-cat-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-}
-
-async function submitUserFeedback() {
-  const text = document.getElementById('user-feedback-text').value.trim();
-  const cat = document.querySelector('#feedback-cat-row .modal-cat-btn.active')?.dataset?.cat || 'general';
-  const errEl = document.getElementById('user-feedback-err');
-  const okEl = document.getElementById('user-feedback-ok');
-  const btn = document.getElementById('user-feedback-btn');
-
-  errEl.textContent = ''; okEl.textContent = '';
-  if (!text) { errEl.textContent = 'Please enter your feedback.'; return; }
-
-  btn.disabled = true; btn.textContent = 'Sending…';
-  try {
-    const uid = supabase.auth.getSession ? (await supabase.auth.getSession())?.data?.session?.user?.id : null;
-    const { error } = await supabase.from('user_feedback').insert({
-      feedback_text: text,
-      category: cat,
-      user_id: uid || null
-    });
-    if (error) throw error;
-    okEl.textContent = '✓ Feedback sent — thank you!';
-    document.getElementById('user-feedback-text').value = '';
-    document.querySelectorAll('#feedback-cat-row .modal-cat-btn').forEach((b,i) => b.classList.toggle('active', i===0));
-    setTimeout(() => closeModal('user-feedback-modal'), 1800);
-  } catch(e) {
-    errEl.textContent = 'Something went wrong. Please try again.';
-    console.error('feedback error:', e);
-  }
-  btn.disabled = false; btn.textContent = 'Send Feedback';
-}
-
-</script>
-
-  <!-- SUGGEST CERT MODAL -->
-  <div class="overlay" id="suggest-cert-modal">
-    <div class="modal">
-      <div class="modal-title">Suggest a Certification</div>
-      <div style="font-size:1
+      <div class="analysis-car
