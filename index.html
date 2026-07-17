@@ -809,7 +809,7 @@ const SUBJECTS = {
       {name:'HR Expertise',              icon:'🔧', color:'#f39c12', weight:0.07},
       {name:'Consultation & Business Acumen', icon:'💼', color:'#2ecc71', weight:0.03}
     ],
-    aiContext: 'SHRM Senior Certified Professional (SHRM-SCP) exam. Domains: Acuity (25%), Strategic HR Management (25%), HR Expertise (25%), Consultation & Business Acumen (25%). Senior level certification requiring strategic thinking, business partnering, and advanced HR expertise.'
+    aiContext: 'SHRM Senior Certified Professional (SHRM-SCP) exam. Domains: Acuity (25%), Strategic HR Management (25%), HR Expertise (25%), Consultation & Business Acumen (25%). Senior level certification requiring strategic thinking, business partnering, and advanced HR expertise.' }, 'ghcopilot': { key: 'ghcopilot', name: 'GitHub Copilot', fullName: 'GitHub Copilot Certification (GH-300)', icon: '🐙', color: '#24292f', category: 'Tech', passThreshold: '700/1000 scaled score', examInfo: [['Exam','GH-300'],['Questions','~65'],['Duration','100 minutes'],['Domains','Copilot Features (27.5%) - Responsible AI (17.5%) - Data & Architecture (12.5%) - Prompt Engineering (12.5%) - Developer Productivity (12.5%) - Privacy & Safeguards (17.5%)']], domains: [{name:'Copilot Features',icon:'⚡',color:'#24292f',weight:0.275},{name:'Responsible AI',icon:'🛡️',color:'#e74c3c',weight:0.175},{name:'Privacy & Safeguards',icon:'🔒',color:'#6f42c1',weight:0.175},{name:'Data & Architecture',icon:'🏗️',color:'#0078d4',weight:0.125},{name:'Prompt Engineering',icon:'💬',color:'#2ecc71',weight:0.125},{name:'Developer Productivity',icon:'🚀',color:'#f39c12',weight:0.125}], aiContext: 'GitHub Copilot Certification (GH-300). Domains: Use Copilot Responsibly (15-20%), Use Copilot Features (25-30%), Understand Copilot Data & Architecture (10-15%), Apply Prompt Engineering & Context Crafting (10-15%), Improve Developer Productivity with Copilot (10-15%), Configure Privacy Content Exclusions & Safeguards (10-15%). 100 minutes, passing score 700/1000.'
   }
 };
 
@@ -1382,7 +1382,7 @@ function calcLikelihood(subKey, ans) {
     'ab900': 50,
     'lvn': 125,
     'shrm': 90,
-    'shrm-scp': 90
+    'shrm-scp': 90, 'ghcopilot': 54
   };
   const threshold = thresholds[subKey] || 30;
 
@@ -1413,7 +1413,7 @@ function calcLikelihood(subKey, ans) {
     'ab900': 60,
     'lvn': 150,
     'shrm': 110,
-    'shrm-scp': 110
+    'shrm-scp': 110, 'ghcopilot': 150
   }[subKey] || 100;
 
   // Keep climbing after threshold; don't plateau
