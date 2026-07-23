@@ -783,7 +783,7 @@ function initSupabase(url, key) {
 // ═══════════════════════════════════════════════════════
 // QUESTION LOADER — fetches from Supabase, caches 24h
 // ═══════════════════════════════════════════════════════
-const QB_CACHE_KEY = 'kanpassit_qb_v2';
+const QB_CACHE_KEY = 'kanpassit_qb_v3';
 const QB_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 // Shuffle answer options across all questions to eliminate AI positional bias
@@ -842,11 +842,23 @@ async function loadQuestions() {
   }
 
   try {
-    const { data, error } = await sbClient
-      .from('questions')
-      .select('id, subject_slug, domain, question_text, options, correct_index, correct_indices, question_type, explanation')
-      .eq('active', true)
-      .order('id');
+    let data = [];
+    let error = null;
+    const QB_PAGE_SIZE = 1000;
+    let qbOffset = 0;
+    while (true) {
+      const { data: qbPage, error: qbPageErr } = await sbClient
+        .from('questions')
+        .select('id, subject_slug, domain, question_text, options, correct_index, correct_indices, question_type, explanation')
+        .eq('active', true)
+        .order('id')
+        .range(qbOffset, qbOffset + QB_PAGE_SIZE - 1);
+      if (qbPageErr) { error = qbPageErr; break; }
+      if (!qbPage || !qbPage.length) break;
+      data = data.concat(qbPage);
+      if (qbPage.length < QB_PAGE_SIZE) break;
+      qbOffset += QB_PAGE_SIZE;
+    }
 
     if (error || !data?.length) {
       console.warn('[QB] Supabase fetch failed:', error);
