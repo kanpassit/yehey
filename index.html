@@ -215,6 +215,18 @@ a.la{color:#5aadff;text-decoration:none}
 .modal-cat-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .modal-cat-btn{flex:1;padding:8px 6px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;min-width:80px;text-align:center}
 .modal-cat-btn.active{border-color:var(--accent);color:var(--text);background:rgba(0,120,212,.15)}
+.landing-content{width:100%;text-align:left;margin-top:26px}
+.landing-intro{font-size:13px;color:var(--text2);line-height:1.7}
+.landing-exam-grid{display:flex;flex-direction:column;gap:10px}
+.landing-exam-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.landing-exam-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.landing-exam-icon{font-size:20px;flex-shrink:0}
+.landing-exam-name{font-size:14px;font-weight:800}
+.landing-exam-desc{font-size:12px;color:var(--text2);line-height:1.6;margin:0}
+.landing-how{display:flex;flex-direction:column;gap:12px}
+.landing-how-step{display:flex;align-items:flex-start;gap:10px}
+.landing-how-title{font-size:13px;font-weight:700}
+.landing-how-sub{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -300,6 +312,67 @@ CREATE POLICY "Users manage own progress"
     </div>
     <div class="auth-toggle" onclick="toggleAuthMode()">Don't have an account? <span>Sign up</span></div>
     <div class="skip-link" style="margin-top:12px" onclick="guestMode()">Continue as <span>guest</span> (local only)</div>
+
+    <div class="landing-content">
+      <p class="landing-intro">KanPassIt is a free study platform for professional certification and licensure exams. Practice with quizzes weighted to match each exam's real domain breakdown, get instant feedback and explanations on every question, and use built-in AI analysis to find &mdash; and fix &mdash; your weakest areas before test day.</p>
+
+      <div class="section-lbl" style="margin-top:26px">What You Can Study</div>
+      <div class="landing-exam-grid">
+        <div class="landing-exam-card">
+          <div class="landing-exam-head"><span class="landing-exam-icon">🏢</span><span class="landing-exam-name">AB-900 &mdash; Microsoft 365 Copilot &amp; Agent Administration</span></div>
+          <p class="landing-exam-desc">For IT professionals validating Microsoft 365 Copilot and agent administration skills. Covers data protection &amp; governance, core M365 services, Copilot administration, and agent administration.</p>
+        </div>
+        <div class="landing-exam-card">
+          <div class="landing-exam-head"><span class="landing-exam-icon">👩‍⚕️</span><span class="landing-exam-name">NCLEX-RN &mdash; Registered Nurse</span></div>
+          <p class="landing-exam-desc">Licensure exam for registered nurses. Covers physiological integrity, safe &amp; effective care environment, psychosocial integrity, and health promotion, in the Next Generation NCLEX format.</p>
+        </div>
+        <div class="landing-exam-card">
+          <div class="landing-exam-head"><span class="landing-exam-icon">🩺</span><span class="landing-exam-name">NCLEX-PN &mdash; Licensed Vocational/Practical Nurse</span></div>
+          <p class="landing-exam-desc">Licensure exam for LVNs/LPNs. Covers physiological care, safe care, pharmacology, and psychosocial care.</p>
+        </div>
+        <div class="landing-exam-card">
+          <div class="landing-exam-head"><span class="landing-exam-icon">🏥</span><span class="landing-exam-name">CNA &mdash; Certified Nursing Assistant</span></div>
+          <p class="landing-exam-desc">State nursing assistant competency exam. Covers basic nursing skills, the role of the nurse aide, activities of daily living, and psychosocial care skills.</p>
+        </div>
+        <div class="landing-exam-card">
+          <div class="landing-exam-head"><span class="landing-exam-icon">👥</span><span class="landing-exam-name">SHRM-CP &mdash; HR Certified Professional</span></div>
+          <p class="landing-exam-desc">HR generalist certification from SHRM. Covers employment law &amp; regulations, people &amp; talent management, HR strategy, and HR operations.</p>
+        </div>
+        <div class="landing-exam-card">
+          <div class="landing-exam-head"><span class="landing-exam-icon">👔</span><span class="landing-exam-name">SHRM-SCP &mdash; Senior Certified Professional</span></div>
+          <p class="landing-exam-desc">Senior-level HR certification from SHRM. Covers acuity, strategic HR management, HR expertise, and consultation &amp; business acumen.</p>
+        </div>
+        <div class="landing-exam-card">
+          <div class="landing-exam-head"><span class="landing-exam-icon">🐙</span><span class="landing-exam-name">GitHub Copilot Certification (GH-300)</span></div>
+          <p class="landing-exam-desc">Certification for developers using GitHub Copilot. Covers Copilot features, responsible AI use, data &amp; architecture, prompt engineering, developer productivity, and privacy &amp; safeguards.</p>
+        </div>
+      </div>
+
+      <div class="section-lbl" style="margin-top:26px">How It Works</div>
+      <div class="landing-how">
+        <div class="landing-how-step">
+          <span class="step-num">1</span>
+          <div><div class="landing-how-title">Choose your certification</div><div class="landing-how-sub">Pick from NCLEX, SHRM, AB-900, GitHub Copilot, and more.</div></div>
+        </div>
+        <div class="landing-how-step">
+          <span class="step-num">2</span>
+          <div><div class="landing-how-title">Practice with exam-style questions</div><div class="landing-how-sub">Multiple-choice quizzes weighted to match each exam's actual domain breakdown, with instant feedback and explanations.</div></div>
+        </div>
+        <div class="landing-how-step">
+          <span class="step-num">3</span>
+          <div><div class="landing-how-title">Track your weak areas</div><div class="landing-how-sub">Domain-by-domain performance tracking shows exactly where you need more work.</div></div>
+        </div>
+        <div class="landing-how-step">
+          <span class="step-num">4</span>
+          <div><div class="landing-how-title">Get an AI-powered study plan</div><div class="landing-how-sub">Generate targeted practice questions and a personalized analysis based on your results.</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:22px">
+        <div class="card-title">Why Free?</div>
+        <p class="sec-note" style="margin-bottom:0">KanPassIt is free to use because good exam prep shouldn't be locked behind a paywall. The app is supported by minimal, unobtrusive advertising instead of subscription fees.</p>
+      </div>
+    </div>
   </div>
   <div class="legal-footer"><a href="/privacy.html" target="_blank">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms.html" target="_blank">Terms of Service</a></div>
 </div>
