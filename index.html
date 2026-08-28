@@ -11,7 +11,13 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://kanpassit.com">
 <link rel="canonical" href="https://kanpassit.com">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6787955359497496" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4FD4X607Z7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-4FD4X607Z7');
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#0d0d1a;--surface:#16162a;--surface2:#1e1e38;--accent:#0078d4;--accent2:#6264a7;--text:#f0f0f5;--text2:#8888aa;--border:#252540;--pass:#2ecc71;--warn:#f39c12;--fail:#e05c5c;--radius:16px}
@@ -1920,12 +1926,23 @@ function doReset() {
 // ═══════════════════════════════════════════════════════
 // NAV & VIEW MANAGEMENT
 // ═══════════════════════════════════════════════════════
+let adsenseLoaded = false;
+function loadAdSense() {
+  if (adsenseLoaded) return;
+  adsenseLoaded = true;
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6787955359497496';
+  s.crossOrigin = 'anonymous';
+  document.head.appendChild(s);
+}
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   const nav = document.getElementById('global-nav');
   const showNav = (id === 'v-subjects' || id === 'v-app');
   nav.style.display = showNav ? 'flex' : 'none';
+  if (showNav) loadAdSense();
   if (id === 'v-subjects') {
     // On subjects screen: show only Settings, centered
     document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.style.display = 'none'; });
