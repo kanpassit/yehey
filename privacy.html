@@ -21,9 +21,19 @@ ul li{margin-bottom:6px}
 .contact-box p{margin:0;font-size:14px;color:#8888aa}
 .contact-box a{color:#5aadff}
 hr{border:none;border-top:1px solid #252540;margin:32px 0}
+
+/* Accessibility */
+.a11y-skip{position:fixed;top:8px;left:8px;z-index:1000;background:#fff;color:#0d0d1a;padding:10px 16px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;transform:translateY(-200%)}
+.a11y-skip:focus{transform:none}
+:focus-visible{outline:3px solid #7ec0ff;outline-offset:2px}
+main:focus{outline:none}
+main a,.breadcrumb a{text-decoration:underline;text-underline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
+<a class="a11y-skip" href="#main-content">Skip to main content</a>
+<main id="main-content" tabindex="-1">
 
 <div class="logo">KanPassIt</div>
 <a class="back" href="/">← Back to App</a>
@@ -60,16 +70,16 @@ hr{border:none;border-top:1px solid #252540;margin:32px 0}
   <li><strong>Preference Cookies:</strong> Store your settings and preferences locally (such as your consent choice and study configuration).</li>
   <li><strong>Advertising Cookies:</strong> We use Google AdSense to display advertisements on our free tier. Google and its partners may use cookies to serve ads based on your prior visits to our site and other sites on the internet. Google's use of advertising cookies enables it and its partners to serve ads based on your visit to this site and/or other sites on the internet.</li>
 </ul>
-<p>You may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank">Google Ads Settings</a> or <a href="https://optout.aboutads.info/" target="_blank">optout.aboutads.info</a>. You can also manage cookie preferences through your browser settings.</p>
-<p>For more information about how Google uses data from sites that use its advertising services, see: <a href="https://policies.google.com/technologies/partner-sites" target="_blank">How Google uses information from sites or apps that use our services</a>.</p>
+<p>You may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer">Google Ads Settings<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"> (opens in a new tab)</span></a> or <a href="https://optout.aboutads.info/" target="_blank" rel="noopener noreferrer">optout.aboutads.info<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"> (opens in a new tab)</span></a>. You can also manage cookie preferences through your browser settings.</p>
+<p>For more information about how Google uses data from sites that use its advertising services, see: <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">How Google uses information from sites or apps that use our services<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"> (opens in a new tab)</span></a>.</p>
 
 <h2>4. Third-Party Services</h2>
 <p>We use the following third-party services that may collect data independently:</p>
 <ul>
-  <li><strong>Supabase</strong> — Authentication and database hosting. <a href="https://supabase.com/privacy" target="_blank">Supabase Privacy Policy</a></li>
-  <li><strong>Google AdSense</strong> — Advertising services. <a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a></li>
-  <li><strong>Anthropic Claude API</strong> — AI analysis features (only when you provide your own API key). <a href="https://www.anthropic.com/privacy" target="_blank">Anthropic Privacy Policy</a></li>
-  <li><strong>Vercel</strong> — Website hosting and content delivery. <a href="https://vercel.com/legal/privacy-policy" target="_blank">Vercel Privacy Policy</a></li>
+  <li><strong>Supabase</strong> — Authentication and database hosting. <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase Privacy Policy<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"> (opens in a new tab)</span></a></li>
+  <li><strong>Google AdSense</strong> — Advertising services. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"> (opens in a new tab)</span></a></li>
+  <li><strong>Anthropic Claude API</strong> — AI analysis features (only when you provide your own API key). <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer">Anthropic Privacy Policy<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"> (opens in a new tab)</span></a></li>
+  <li><strong>Vercel</strong> — Website hosting and content delivery. <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">Vercel Privacy Policy<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"> (opens in a new tab)</span></a></li>
 </ul>
 
 <h2>5. Data Sharing</h2>
@@ -116,5 +126,8 @@ hr{border:none;border-top:1px solid #252540;margin:32px 0}
   Website: <a href="https://kanpassit.com">kanpassit.com</a></p>
 </div>
 
+<hr>
+<p><a href="/accessibility.html">Accessibility Statement</a></p>
+</main>
 </body>
 </html>

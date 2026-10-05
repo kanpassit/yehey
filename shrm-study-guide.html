@@ -35,9 +35,19 @@ tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 .breadcrumb a{color:#5aadff;text-decoration:none}
 footer{border-top:1px solid var(--border);padding-top:20px;margin-top:40px;text-align:center;font-size:12px;color:var(--text2)}
 footer a{color:var(--text2);text-decoration:none}
+
+/* Accessibility */
+.a11y-skip{position:fixed;top:8px;left:8px;z-index:1000;background:#fff;color:#0d0d1a;padding:10px 16px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;transform:translateY(-200%)}
+.a11y-skip:focus{transform:none}
+:focus-visible{outline:3px solid #7ec0ff;outline-offset:2px}
+main:focus{outline:none}
+main a,.breadcrumb a{text-decoration:underline;text-underline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
+<a class="a11y-skip" href="#main-content">Skip to main content</a>
+<main id="main-content" tabindex="-1">
 <header>
   <a href="/" class="site-name">KanPassIt</a>
   <div class="breadcrumb"><a href="/">Home</a> › SHRM Study Guide</div>
@@ -145,5 +155,6 @@ footer a{color:var(--text2);text-decoration:none}
   <a href="/">KanPassIt</a> &nbsp;·&nbsp; <a href="/privacy.html">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms.html">Terms of Service</a>
   <p style="margin-top:8px">© 2025 KanPassIt. Free exam prep for NCLEX-RN, NCLEX-PN, CNA, SHRM-CP, SHRM-SCP, and AB-900.</p>
 </footer>
+</main>
 </body>
 </html>

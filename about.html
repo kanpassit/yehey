@@ -22,9 +22,19 @@ ul li{margin-bottom:6px}
 .contact-box p{margin:0;font-size:14px;color:#8888aa}
 .contact-box a{color:#5aadff}
 hr{border:none;border-top:1px solid #252540;margin:32px 0}
+
+/* Accessibility */
+.a11y-skip{position:fixed;top:8px;left:8px;z-index:1000;background:#fff;color:#0d0d1a;padding:10px 16px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;transform:translateY(-200%)}
+.a11y-skip:focus{transform:none}
+:focus-visible{outline:3px solid #7ec0ff;outline-offset:2px}
+main:focus{outline:none}
+main a,.breadcrumb a{text-decoration:underline;text-underline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
+<a class="a11y-skip" href="#main-content">Skip to main content</a>
+<main id="main-content" tabindex="-1">
 
 <div class="logo">KanPassIt</div>
 <a class="back" href="/">← Back to App</a>
@@ -63,5 +73,8 @@ hr{border:none;border-top:1px solid #252540;margin:32px 0}
   Website: <a href="https://kanpassit.com">kanpassit.com</a></p>
 </div>
 
+<hr>
+<p><a href="/accessibility.html">Accessibility Statement</a></p>
+</main>
 </body>
 </html>

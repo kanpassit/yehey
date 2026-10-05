@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accessibility Statement — KanPassIt</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d0d1a;color:#f0f0f5;max-width:680px;margin:0 auto;padding:32px 24px 60px;line-height:1.7}
+a{color:#5aadff;text-decoration:none}a:hover{text-decoration:underline}
+.logo{font-size:22px;font-weight:900;background:linear-gradient(125deg,#0078d4,#6264a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.back{display:inline-block;font-size:13px;color:#8888aa;border:1px solid #252540;border-radius:8px;padding:5px 12px;margin-bottom:28px;cursor:pointer;text-decoration:none}
+.back:hover{border-color:#0078d4;color:#f0f0f5}
+h1{font-size:26px;font-weight:800;margin-bottom:6px}
+.updated{font-size:13px;color:#8888aa;margin-bottom:32px}
+h2{font-size:16px;font-weight:700;margin:28px 0 10px;color:#c0c4f0}
+p{font-size:14px;color:#c0c4f0;margin-bottom:12px}
+ul{font-size:14px;color:#c0c4f0;padding-left:20px;margin-bottom:12px}
+ul li{margin-bottom:6px}
+.contact-box{background:#16162a;border:1px solid #252540;border-radius:12px;padding:18px;margin-top:12px}
+.contact-box p{margin:0;font-size:14px;color:#8888aa}
+.contact-box a{color:#5aadff}
+hr{border:none;border-top:1px solid #252540;margin:32px 0}
+
+/* Accessibility */
+.a11y-skip{position:fixed;top:8px;left:8px;z-index:1000;background:#fff;color:#0d0d1a;padding:10px 16px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;transform:translateY(-200%)}
+.a11y-skip:focus{transform:none}
+:focus-visible{outline:3px solid #7ec0ff;outline-offset:2px}
+main:focus{outline:none}
+main a{text-decoration:underline;text-underline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<a class="a11y-skip" href="#main-content">Skip to main content</a>
+<main id="main-content" tabindex="-1">
+
+<div class="logo">KanPassIt</div>
+<a class="back" href="/">← Back to App</a>
+
+<h1>Accessibility Statement</h1>
+<div class="updated">Last updated: October 5, 2026</div>
+
+<p>KanPassIt is committed to making our exam prep app usable by everyone, including people who use screen readers, keyboards, magnification, or other assistive technology. We aim to meet the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA.</p>
+
+<h2>What we have done</h2>
+<ul>
+  <li>Full keyboard operation of quizzes, menus and dialogs, with visible focus.</li>
+  <li>Screen reader labels, headings, landmarks and announcements for quiz feedback.</li>
+  <li>Text contrast and sizing that meet AA requirements, and support for zooming.</li>
+  <li>Answer states shown with text as well as color.</li>
+  <li>Support for reduced-motion settings.</li>
+</ul>
+
+<h2>Known limitations</h2>
+<ul>
+  <li>Third-party advertising content (Google AdSense) is outside our control and may not be fully accessible.</li>
+  <li>This is an ongoing effort, and some content may not yet meet every guideline.</li>
+</ul>
+
+<h2>Feedback and help</h2>
+<p>If you have trouble using any part of KanPassIt, or need content in another format, please tell us and we will work to fix it promptly.</p>
+<div class="contact-box"><p>Email: <a href="mailto:support@kanpassit.com">support@kanpassit.com</a></p></div>
+
+</main>
+</body>
+</html>
