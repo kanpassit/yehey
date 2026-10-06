@@ -2548,7 +2548,13 @@ async function submitUserFeedback() {
         setTimeout(function(){ var f = focusables(ov)[0]; (f || modal).focus(); }, 30);
       } else if (!open && ov.__open) {
         ov.__open = false;
-        if (opener && document.contains(opener) && opener.focus) opener.focus();
+        // If the opener is gone or hidden (e.g. confirming "Quit" leaves the quiz screen),
+        // focus the heading of the screen we landed on instead of a hidden control.
+        if (opener && document.contains(opener) && opener.offsetParent !== null && opener.focus) opener.focus();
+        else setTimeout(function(){
+          var h = document.querySelector('.view.active h1');
+          if (h) { h.setAttribute('tabindex','-1'); try { h.focus({preventScroll:true}); } catch(e){} }
+        }, 60);
         opener = null;
       }
     }).observe(ov, {attributes:true, attributeFilter:['class']});
