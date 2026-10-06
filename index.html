@@ -2691,7 +2691,14 @@ async function submitUserFeedback() {
     // announce quiz feedback text
     new MutationObserver(function(){
       var fb = document.getElementById('feedback');
-      if (fb && fb.textContent.trim() && fb.__last !== fb.textContent) { fb.__last = fb.textContent; announce(fb.textContent.replace(/\s+/g,' ').trim()); }
+      if (fb && fb.textContent.trim() && fb.__last !== fb.textContent) {
+        fb.__last = fb.textContent;
+        var msg = fb.textContent.replace(/\s+/g,' ').trim();
+        // On a wrong answer, say which option was correct (the visual cue is color/pseudo-text only).
+        var rc = document.querySelector('.option.reveal-correct');
+        if (rc && !/^[✓✔]/.test(msg)) msg += ' Correct answer: ' + rc.textContent.replace(/\s+/g,' ').trim() + '.';
+        announce(msg);
+      }
     }).observe(document.body, {childList:true, subtree:true, characterData:true});
     syncOptions();
   }
