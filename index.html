@@ -2099,7 +2099,7 @@ function showConfirm({ icon, title, body, okLabel, onOk }) {
   document.getElementById('confirm-body').innerHTML    = body;
   document.getElementById('confirm-ok').textContent   = okLabel || 'Confirm';
   _confirmCallback = onOk;
-  document.getElementById('confirm-ok').onclick = () => { closeConfirm(); if (_confirmCallback) _confirmCallback(); };
+  document.getElementById('confirm-ok').onclick = () => { const cb = _confirmCallback; closeConfirm(); if (cb) cb(); };
   document.getElementById('confirm-overlay').classList.add('open');
 }
 function closeConfirm() {
