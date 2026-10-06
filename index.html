@@ -2679,7 +2679,8 @@ async function submitUserFeedback() {
         }
       });
     }).observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:['class']});
-    setTimeout(function(){ firstPass = false; }, 1500);
+    setDocTitle();
+    setTimeout(function(){ firstPass = false; setDocTitle(); }, 1500);
 
     // announce quiz feedback text
     new MutationObserver(function(){
