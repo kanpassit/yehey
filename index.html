@@ -1553,8 +1553,22 @@ function getWeakQs() {
   });
 }
 
+let _qbRetrying = false;
 function startQuiz(mode, domainName) {
   const qs = QB[currentSubject];
+  // The first question load can time out or fail silently (5s cap, no retry), which left
+  // every subject empty and showed only "No questions available". Retry once on demand.
+  if ((!qs || !qs.length) && mode !== 'ai') {
+    if (_qbRetrying) return;
+    _qbRetrying = true;
+    toast('Loading questions…');
+    loadQuestions().then(ok => {
+      _qbRetrying = false;
+      if (ok && QB[currentSubject] && QB[currentSubject].length) { renderDomains(); startQuiz(mode, domainName); }
+      else toast('Couldn\'t load questions. Check your connection and try again.');
+    }).catch(() => { _qbRetrying = false; toast('Couldn\'t load questions. Check your connection and try again.'); });
+    return;
+  }
   let pool = [];
   if (mode === 'all')    pool = shuffle([...qs]);
   if (mode === 'quick')  pool = shuffle([...qs]).slice(0, 10);
@@ -2612,6 +2626,23 @@ async function submitUserFeedback() {
 
     enhanceMisc(document.body);
 
+    var baseTitle = document.title;
+    function setDocTitle(){
+      var v = document.querySelector('.view.active');
+      if (!v || (v.id !== 'v-subjects' && v.id !== 'v-app')) { document.title = baseTitle; return; }
+      var h = v.querySelector('h1'), name = h ? h.textContent.replace(/\s+/g,' ').trim() : '';
+      var parts = [];
+      if (v.id === 'v-app') {
+        var pg = document.querySelector('.page.active'), id = pg ? pg.id.replace('page-','') : '';
+        var nb = id && document.getElementById('nav-' + id);
+        var label = id === 'quiz' ? 'Quiz' : (nb ? (nb.textContent || '').trim() : '');
+        if (label && label !== 'Home') parts.push(label);
+      }
+      if (name) parts.push(name);
+      parts.push('KanPassIt');
+      document.title = parts.join(' | ');
+    }
+
     var firstPass = true;
     new MutationObserver(function(muts){
       muts.forEach(function(m){
@@ -2632,6 +2663,7 @@ async function submitUserFeedback() {
           var t = m.target;
           if (t.classList.contains('option')) syncOptions();
           if (t.classList.contains('modal-cat-btn')) t.setAttribute('aria-pressed', t.classList.contains('active') ? 'true':'false');
+          if ((t.classList.contains('view') || t.classList.contains('page')) && t.classList.contains('active')) setDocTitle();
           if (t.classList.contains('view') && t.classList.contains('active') && !firstPass) {
             var h = t.querySelector('h1'); if (h) { h.setAttribute('tabindex','-1'); try { h.focus({preventScroll:true}); } catch(e){} }
           }
