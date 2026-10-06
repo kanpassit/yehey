@@ -330,9 +330,9 @@ CREATE POLICY "Users manage own progress"
       <div id="auth-err" class="err-msg" role="alert"></div>
       <div id="auth-ok" class="ok-msg" role="status"></div>
       <label class="field-lbl" for="auth-email">Email</label>
-      <input id="auth-email" class="field" type="email" placeholder="you@example.com" autocomplete="email"/>
+      <input id="auth-email" class="field" type="email" placeholder="you@example.com" autocomplete="email" onkeydown="if(event.key==='Enter'){event.preventDefault();submitAuth();}"/>
       <label class="field-lbl" for="auth-pass">Password</label>
-      <input id="auth-pass" class="field" type="password" placeholder="Password" autocomplete="current-password"/>
+      <input id="auth-pass" class="field" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter'){event.preventDefault();submitAuth();}"/>
       <button id="auth-btn" class="btn-p" onclick="submitAuth()">Sign In</button>
     </div>
     <div class="auth-toggle" onclick="toggleAuthMode()">Don't have an account? <span>Sign up</span></div>
