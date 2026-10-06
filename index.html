@@ -809,6 +809,28 @@ const SUBJECTS = {
       {name:'Responsible AI',                    icon:'🛡️', color:'#e74c3c', weight:0.07}
     ],
     aiContext: 'GitHub Copilot Certification (GH-300). Domains: GitHub Copilot Plans & Features (31%), How Copilot Works & Handles Data (15%), Privacy & Context Exclusions (15%), Developer Use Cases for AI (14%), Prompt Crafting & Engineering (9%), Testing with GitHub Copilot (9%), Responsible AI (7%). 100 minutes, passing score 700/1000.'
+  },
+  'sc300': {
+    key: 'sc300',
+    name: 'SC-300',
+    fullName: 'Microsoft Identity and Access Administrator',
+    icon: '🔐',
+    color: '#0078d4',
+    category: 'Tech',
+    passThreshold: '700/1000 scaled score',
+    examInfo: [
+      ['Exam','SC-300'],
+      ['Questions','60'],
+      ['Passing Score','700 / 1000'],
+      ['Domains','Authentication & Access (25–30%) · Identities (20–25%) · Workload Identities (20–25%) · Governance (20–25%)']
+    ],
+    domains: [
+      {name:'Manage User Identities',  icon:'👤', color:'#0078d4', weight:0.225},
+      {name:'Authentication & Access', icon:'🔑', color:'#6264a7', weight:0.275},
+      {name:'Workload Identities',     icon:'🤖', color:'#2ecc71', weight:0.25},
+      {name:'Identity Governance',     icon:'🛡️', color:'#f39c12', weight:0.25}
+    ],
+    aiContext: 'Microsoft Identity and Access Administrator (SC-300). Exam domains: Implement and manage user identities (20-25%), Implement authentication and access management (25-30%), Plan and implement workload identities (20-25%), Plan and automate identity governance (20-25%). Topics include Microsoft Entra ID, Conditional Access, ID Protection, PIM, entitlement management, access reviews, app registrations, Application Proxy, Defender for Cloud Apps, and Global Secure Access. Passing score: 700/1000.'
   }
 };
 
@@ -1393,7 +1415,8 @@ function calcLikelihood(subKey, ans) {
     'lvn': 125,
     'shrm': 90,
     'shrm-scp': 90,
-    'ghcopilot': 54
+    'ghcopilot': 54,
+    'sc300': 50
   };
   const threshold = thresholds[subKey] || 30;
 
@@ -1425,7 +1448,8 @@ function calcLikelihood(subKey, ans) {
     'lvn': 150,
     'shrm': 110,
     'shrm-scp': 110,
-    'ghcopilot': 150
+    'ghcopilot': 150,
+    'sc300': 60
   }[subKey] || 100;
 
   // Keep climbing after threshold; don't plateau
